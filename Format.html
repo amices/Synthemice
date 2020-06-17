@@ -1565,6 +1565,8 @@ Als bias, CI width en Coverage of the 95% CI about the parameter (e.g. beta or 
 <li>What <code>synthpop</code> does when there is missing data, is simply treating it as a separate category. When the variable of the missing data is continuous, it takes a two step approach: first it is modeled whether or not an observation is “predicted” to have a missing value, if the observation is not “predicted” to have a missing value, a value is modeled based on the other predictors.</li>
 </ul></li>
 <li>As information: according to <span class="citation">(Nowok et al., 2016)</span>, the original aim of producing synthetic data has been to provide publicly available datasets that can be used for inference, when the original data cannot be shared. However, inferences based on the synthetic data are said to be only valid if the model used to construct the synthetic data is actually the true data generating mechanism, which is a mechanism hardly ever known. The aim of <code>synthpop</code> lies in providing test data that should resemble the actual data as closely as possible, although it should not be used in any final analyses.</li>
+<li><code>synthpop</code> requires that the method of generating the synthetic data matches that of the observed data. This condition allows to make inferences from synthetic data generated from distributions with parameters fitted to the observed data without sampling the parameters from their posterior distribution, which is referred to as “simple synthesis”.</li>
+<li>Synthesizing seems flawed, because when the sample is not a random sample (which is the case if the missingness is MAR), the synthetic values are based on the incomplete data.</li>
 </ul>
 </div>
 <div id="introduction" class="section level1">
