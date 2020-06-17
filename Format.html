@@ -1503,7 +1503,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">16-06-2020</h4>
+<h4 class="date">17-06-2020</h4>
 
 </div>
 
@@ -1555,18 +1555,39 @@ Als bias, CI width en Coverage of the 95% CI about the parameter (e.g. beta or 
 </ol>
 </div>
 </div>
+<div id="proposal" class="section level1">
+<h1><span class="header-section-number">2</span> Proposal</h1>
+<p>As an initial dataset to work with, the <code>boys</code> dataset from the R package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> is chosen. However, if it appears unfruitful to work with a dataset that includes missing values already, we can use single imputation on the <code>boys</code> data, to be able to work with a complete dataset. The second step is to partition the data into five separate datasets, which is done by means of the function <code>resample_partition()</code> from the R package <code>modelr</code> <span class="citation">(Wickham, 2020)</span>. The next step is to create synthetic data versions of the five subsets by means of the R package <code>synthpop</code> <span class="citation">(Nowok, Raab, &amp; Dibben, 2016)</span>. However, there are several problems thus far concerning this step:</p>
+<ul>
+<li>Why can’t we create synthetic versions of the subset, but can’t we impute the subset? Since both will then be based on the subset only?</li>
+<li>Creating the synthetic data when there are missing values leaves the <code>synthpop</code> package with one option, which is to <em>synthesize</em> the missing values as being a distinct category. Thus, the missingness is being modeled additionally. The other option is to impute the missing values before synthesizing, which we do not want, because this is exactly the reason that we arrived at synthesizing the data. Either way, <code>synthpop</code> treats the the data to be synthesized as known, .
+<ul>
+<li>What <code>synthpop</code> does when there is missing data, is simply treating it as a separate category. When the variable of the missing data is continuous, it takes a two step approach: first it is modeled whether or not an observation is “predicted” to have a missing value, if the observation is not “predicted” to have a missing value, a value is modeled based on the other predictors.</li>
+</ul></li>
+<li>As information: according to <span class="citation">(Nowok et al., 2016)</span>, the original aim of producing synthetic data has been to provide publicly available datasets that can be used for inference, when the original data cannot be shared. However, inferences based on the synthetic data are said to be only valid if the model used to construct the synthetic data is actually the true data generating mechanism, which is a mechanism hardly ever known. The aim of <code>synthpop</code> lies in providing test data that should resemble the actual data as closely as possible, although it should not be used in any final analyses.</li>
+</ul>
+</div>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">3</span> INTRODUCTION</h1>
+<p>Something about federated analyses (why, how), eventually in combination with DataSHIELD (as the proposed method).</p>
+<p>Something about missing data (and multiple imputation).</p>
+<p>Something about synthetic data (why and how).</p>
+<p>Something about pooling results.</p>
+</div>
 <div id="remarks" class="section level1">
-<h1><span class="header-section-number">2</span> REMARKS</h1>
+<h1><span class="header-section-number">4</span> REMARKS</h1>
 <ol style="list-style-type: decimal">
 <li>Randomly subsetting the data leads to “randomly equivalent” datasets. However, when pooling results over multiple nodes, it might be that there are qualitative differences between nodes, which might complicate the imputation process.</li>
 <li>In practice, some variables may be entirely missing, which differs from the current situation in which all datasets consist of the exact same variables.</li>
 <li>Start with a single complete datasets, cut it in five, create a synthetic version of all and run the analyses on this synthetic dataset.</li>
 <li>If I recall it correctly, Stef said that we simply synthesize the individual (partitioned) datasets, and that we could simply Rbind these. However, this would skip the point of basing the imputations on the collection of the 5 datasets together. If this was the case, we could simply use the data as if it is in the nodes, impute the individual sets with reference to the data in the other nodes, and analyse the imputed datasets, and pool the results.</li>
 <li>Synthpop treats missingness as a separate category. For categorical variables, this is fairly straightforward: the category NA is added to the existing categories. In case of continuous data, the first step involves the “prediction” of whether or not a variable is missing, if it is predicted to be missing, the value will be NA, if the observation is not predicted to be missing, a synthetic value will be generated.</li>
+<li>MICE has a pool function to pool the estimates of the multiple analyses that works with a list of datasets. However, the pooled estimates are not equivalent to the estimates after running the <code>lm</code> function on the complete data.</li>
+<li>If you are able to make synthetic data, based on a single dataset (instead of the combination of all 5), then, why are we not able to impute the single datasets directly, without taking the other datasets into account?</li>
 </ol>
 </div>
 <div id="literature-to-read" class="section level1">
-<h1><span class="header-section-number">3</span> Literature to read</h1>
+<h1><span class="header-section-number">5</span> Literature to read</h1>
 <p>Abowd, J. M., &amp; Lane, J. (2004). New approaches to confidentiality protection: Synthetic data, remote access and research data centers. In International workshop on privacy in statistical databases (pp. 282-289). Springer, Berlin, Heidelberg.</p>
 <ul>
 <li>Why and how synthetic data can be used so that no information can be traced back to any individual.</li>
@@ -1576,8 +1597,25 @@ Als bias, CI width en Coverage of the 95% CI about the parameter (e.g. beta or 
 <ul>
 <li>Example of how to generate synthetic values, might give an idea of how this process works.</li>
 </ul>
+<p>Reiter, J. P. (2002). Satisfying disclosure restrictions with synthetic data sets. Journal of Official Statistics, 18(4), 531.</p>
 <p>Reiter, J. P. (2005). Releasing multiply imputed, synthetic public use microdata: An illustration and empirical study. Journal of the Royal Statistical Society: Series A (Statistics in Society), 168(1), 185-205.</p>
 <p><a href="https://synthpop.org.uk/index.html">Synthpop Website.</a></p>
+</div>
+<div id="references" class="section level1">
+<h1><span class="header-section-number">6</span> References</h1>
+
+<p></p>
+<div id="refs">
+<div id="ref-synthpop">
+<p>Nowok, B., Raab, G. M., &amp; Dibben, C. (2016). synthpop: Bespoke creation of synthetic data in R. <em>Journal of Statistical Software</em>, <em>74</em>(11), 1–26. <a href="https://doi.org/10.18637/jss.v074.i11">https://doi.org/10.18637/jss.v074.i11</a></p>
+</div>
+<div id="ref-mice">
+<p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in r. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
+</div>
+<div id="ref-ModelR">
+<p>Wickham, H. (2020). <em>Modelr: Modelling functions that work with the pipe</em>. Retrieved from <a href="https://CRAN.R-project.org/package=modelr">https://CRAN.R-project.org/package=modelr</a></p>
+</div>
+</div>
 </div>
 
 

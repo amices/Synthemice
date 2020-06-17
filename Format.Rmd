@@ -12,6 +12,8 @@ output:
     toc_depth: 2
     toc_float: true
     number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ---
 
 ```{r setup, include=FALSE}
@@ -48,6 +50,23 @@ IF PoC successful --> jeej
 1. Full blown sim with complete(mice(boys, m = 1, seed = 123)) as TRUE/population input
 2. Bias? CI width? Coverage?
 
+# Proposal
+As an initial dataset to work with, the `boys` dataset from the R package `mice` [@mice] is chosen. However, if it appears unfruitful to work with a dataset that includes missing values already, we can use single imputation on the `boys` data, to be able to work with a complete dataset. The second step is to partition the data into five separate datasets, which is done by means of the function `resample_partition()` from the R package `modelr` [@ModelR]. The next step is to create synthetic data versions of the five subsets by means of the R package `synthpop` [@synthpop]. However, there are several problems thus far concerning this step:
+
+* Why can't we create synthetic versions of the subset, but can't we impute the subset? Since both will then be based on the subset only?
+* Creating the synthetic data when there are missing values leaves the `synthpop` package with one option, which is to *synthesize* the missing values as being a distinct category. Thus, the missingness is being modeled additionally. The other option is to impute the missing values before synthesizing, which we do not want, because this is exactly the reason that we arrived at synthesizing the data. Either way, `synthpop` treats the the data to be synthesized as known, .
+  + What `synthpop` does when there is missing data, is simply treating it as a separate category. When the variable of the missing data is continuous, it takes a two step approach: first it is modeled whether or not an observation is "predicted" to have a missing value, if the observation is not "predicted" to have a missing value, a value is modeled based on the other predictors.
+* As information: according to [@synthpop], the original aim of producing synthetic data has been to provide publicly available datasets that can be used for inference, when the original data cannot be shared. However, inferences based on the synthetic data are said to be only valid if the model used to construct the synthetic data is actually the true data generating mechanism, which is a mechanism hardly ever known. The aim of `synthpop` lies in providing test data that should resemble the actual data as closely as possible, although it should not be used in any final analyses. 
+
+# INTRODUCTION
+Something about federated analyses (why, how), eventually in combination with DataSHIELD (as the proposed method).
+
+Something about missing data (and multiple imputation).
+
+Something about synthetic data (why and how).
+
+Something about pooling results.
+
 # REMARKS
 
 1. Randomly subsetting the data leads to "randomly equivalent" datasets. However, when pooling results over multiple nodes, it might be that there are qualitative differences between nodes, which might complicate the imputation process.
@@ -55,6 +74,8 @@ IF PoC successful --> jeej
 3. Start with a single complete datasets, cut it in five, create a synthetic version of all and run the analyses on this synthetic dataset.
 4. If I recall it correctly, Stef said that we simply synthesize the individual (partitioned) datasets, and that we could simply Rbind these. However, this would skip the point of basing the imputations on the collection of the 5 datasets together. If this was the case, we could simply use the data as if it is in the nodes, impute the individual sets with reference to the data in the other nodes, and analyse the imputed datasets, and pool the results.
 5. Synthpop treats missingness as a separate category. For categorical variables, this is fairly straightforward: the category NA is added to the existing categories. In case of continuous data, the first step involves the "prediction" of whether or not a variable is missing, if it is predicted to be missing, the value will be NA, if the observation is not predicted to be missing, a synthetic value will be generated. 
+6. MICE has a pool function to pool the estimates of the multiple analyses that works with a list of datasets. However, the pooled estimates are not equivalent to the estimates after running the `lm` function on the complete data. 
+7. If you are able to make synthetic data, based on a single dataset (instead of the combination of all 5), then, why are we not able to impute the single datasets directly, without taking the other datasets into account?
 
 # Literature to read
 Abowd, J. M., & Lane, J. (2004). New approaches to confidentiality protection: Synthetic data, remote access and research data centers. In International workshop on privacy in statistical databases (pp. 282-289). Springer, Berlin, Heidelberg.
@@ -67,6 +88,17 @@ Patki, N., Wedge, R., & Veeramachaneni, K. (2016, October). The synthetic data v
 
 - Example of how to generate synthetic values, might give an idea of how this process works.
 
+Reiter, J. P. (2002). Satisfying disclosure restrictions with synthetic data sets. Journal of Official Statistics, 18(4), 531.
+
 Reiter, J. P. (2005). Releasing multiply imputed, synthetic public use microdata: An illustration and empirical study. Journal of the Royal Statistical Society: Series A (Statistics in Society), 168(1), 185-205.
 
 [Synthpop Website.](https://synthpop.org.uk/index.html)
+
+# References
+
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\noindent
+
+<div id="refs"></div>
+
