@@ -26,3 +26,22 @@
 # - Als PoC succesvol --> jeej
 #       1. Full blown sim met complete(mice(boys, m = 1, seed = 123)) als TRUE/population input
 #       2. Bias? CI width? Coverage?
+
+## Packages
+require(mice)
+require(tidyverse)
+require(modelr)
+
+## 
+set.seed(123)
+
+## Partition data
+ngroups <- 5                                    # specify number of subsets
+partition <- rep(1/ngroups,ngroups)             # create partitioning object
+names(partition) <- paste0("data", 1:ngroups)   # add names (data1 to data5)
+part <- resample_partition(boys, partition)     # create the partitioned data
+
+#part %>%                                        # use map function to perform lm on all 5 subsets
+#  map(., ~ lm(bmi ~ age + hgt, data = .))       # just to illustrate the use of map for myself
+
+
