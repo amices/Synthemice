@@ -1,0 +1,46 @@
+---
+title: "Federated Imputation"
+author: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+# Synthesizing
+
+To show the concept of synthesizing data, the `boys` dataset from the R-package `mice` [@mice] is singly-imputed, to be able to work with a dataset without missing values. The first approach is to synthesize this dataset as a whole by means of the `syn`-function with default settings from the package `synthpop` [@synthpop], to see whether synthesizing is a suitable approach to generate data that is in accordance with the observed data, and exhibits the same relationships between variables. To see how this process performs when the data is partitioned, the data is first partitioned into five subsets. Then, the subsets are synthesized by means of the `syn` function, and then binded to a single dataset containing the five synthesized subsets. Since the `syn` function contains a random process, this function is rerun over a single partitioned dataset, to see what the effect of only randomly synthesizing the same partitions is. As a third step, the partitioning is also randomized, resulting in the fact that the iterations contain two random processes: (1) the data is partioned randomly for every iteration, and (2) the partitioned data is synthesized with a random component.
+
+That is, the process works as follows: 
+
+@. Impute the `boys` dataset with `m=1`, which results in the completed `boyscomp` data.
+@. Over `i` in `1:nsim(=1000)` iterations, the output following output is collected:
+  + The regression estimates of `nsim` times synthesized complete dataset.
+  + The regression estimates of `nsim` times the synthesized partitioned dataset.
+  + The regression estimates of `nsim` times the synthesized `nsim` times partitioned dataset.
+@. Over `nsim` iterations, the average estimates are calculated ($\bar{Q}$), the bias ($\mu_Q - \bar{Q}$), the confidence intervals averaged over all iterations, and the coverage ($\frac{1}{nsim} \sum_{i = 1}^{nsim} Lower_i < \mu_Q < Upper_i$).
+
+# Results
+
+The previous process results in the following results.
+
+```{r, include = F}
+source("2. Synthesize data.R")
+```
+
+```{r}
+knitr::kable(syn_out)
+```
+
+
+
+

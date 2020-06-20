@@ -20,6 +20,9 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
+
 # SET UP
 
 ## Simple evaluation
