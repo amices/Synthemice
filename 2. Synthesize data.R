@@ -14,8 +14,6 @@ library(broom)                                # broom for tidy results
 
 source("1.a Create data - boys complete.R")   # Obtain the previously synthesized data
 
-set.seed(123)                                 # Set the seed for reproducibility
-
 #########################################################################################
 ## Function for synthesizing the data, that handles partitioned data and the           ##
 ## complete data                                                                       ##
@@ -49,14 +47,17 @@ plan(multisession)  # specify parallel processing
 
 # replicate the function 1000 times on the complete data in parallel
 syns_complete <- future_map_dfr(1:nsim, ~ synthesize(boyscomp),
-                                .id = "sim", .progress = TRUE)
+                                .id = "sim", .progress = TRUE,
+                                .options = future_options(seed = as.integer(123)))
 # replicate the function 1000 times on the same partitioned data
 syns_part <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, parts = part),
-                            .id = "sim", .progress = TRUE)
+                            .id = "sim", .progress = TRUE,
+                            .options = future_options(seed = as.integer(123)))
 # replicate the function 1000 times on a 1000 times partitioned dataset
 
 syns_resample_partition <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, partition = TRUE),
-                                          .id = "sim", .progress= TRUE)
+                                          .id = "sim", .progress= TRUE, 
+                                          .options = future_options(seed = as.integer(123)))
 
 # Specify the model to be run on all synthesized datasets
 syn_model <- function(data) lm(age ~ hgt + tv, data = data)
@@ -88,3 +89,5 @@ syn_out <- results %>%
             "Coverage" = mean(covered)) %>%
   mutate(method = recode(method, `1` = "Complete data", `2` = "Single partition",
                          `3` = "Nsim partitions"))
+
+
