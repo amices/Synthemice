@@ -27,7 +27,7 @@ That is, the process works as follows:
   + The regression estimates of `nsim` times synthesized complete dataset.
   + The regression estimates of `nsim` times the synthesized partitioned dataset.
   + The regression estimates of `nsim` times the synthesized `nsim` times partitioned dataset.
-@. Over `nsim` iterations, the average estimates are calculated ($\bar{Q}$), the bias ($\mu_Q - \bar{Q}$), the confidence intervals averaged over all iterations, and the coverage ($\frac{1}{nsim} \sum_{i = 1}^{nsim} Lower_i < \mu_Q < Upper_i$).
+@. Over `nsim` iterations, the average estimates are calculated ($\bar{Q}$), the bias ($\mu_Q - \bar{Q}$), the confidence intervals averaged over all iterations, and the coverage ($\frac{1}{nsim} \sum_{i = 1}^{nsim} LLCI_i < \mu_Q < ULCI_i$).
 
 # Results
 
@@ -37,10 +37,16 @@ The previous process results in the following results.
 source("2. Synthesize data.R")
 ```
 
-```{r}
-knitr::kable(syn_out)
+```{r, echo = F}
+knitr::kable(syn_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv for three different synthesizing")
 ```
 
+# References
 
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\noindent
+
+<div id="refs"></div>
 
 
