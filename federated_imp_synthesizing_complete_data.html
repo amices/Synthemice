@@ -1290,6 +1290,98 @@ window.buildTabsets = function(tocID) {
 </script>
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
 
 
 <style type="text/css">
@@ -1529,7 +1621,7 @@ div.tocify {
 <h1><span class="header-section-number">2</span> Results</h1>
 <p>The previous process results in the following results.</p>
 <table>
-<caption>Simulation results of the model age ~ hgt + tv for three different synthesizing</caption>
+<caption>Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.</caption>
 <thead>
 <tr class="header">
 <th align="left">method</th>
@@ -1622,6 +1714,51 @@ div.tocify {
 <td align="right">0.140</td>
 <td align="right">0.156</td>
 <td align="right">0.829</td>
+</tr>
+</tbody>
+</table>
+<p>However, the results are not very satisfactory, so I looked further into the possibilities of using the <code>synthpop</code> package. One of the possibilities was to adjust the model, and use passive synthesizing for <code>bmi</code>. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(syn5_out, <span class="dt">digits =</span> <span class="dv">3</span>, <span class="dt">caption =</span> <span class="st">&quot;Simulation results of the model age ~ hgt + tv for three different synthesizing&quot;</span>)</span></code></pre></div>
+<table>
+<caption>Simulation results of the model age ~ hgt + tv for three different synthesizing</caption>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="right">Population value</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-8.429</td>
+<td align="right">-8.484</td>
+<td align="right">-0.055</td>
+<td align="right">-8.813</td>
+<td align="right">-8.155</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">hgt</td>
+<td align="right">0.124</td>
+<td align="right">0.125</td>
+<td align="right">0.001</td>
+<td align="right">0.122</td>
+<td align="right">0.128</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">tv</td>
+<td align="right">0.151</td>
+<td align="right">0.147</td>
+<td align="right">-0.005</td>
+<td align="right">0.129</td>
+<td align="right">0.165</td>
+<td align="right">0.995</td>
 </tr>
 </tbody>
 </table>

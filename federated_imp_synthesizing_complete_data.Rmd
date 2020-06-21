@@ -34,12 +34,26 @@ That is, the process works as follows:
 The previous process results in the following results.
 
 ```{r, include = F}
-source("2. Synthesize data.R")
+source("2.a Synthesize data (m=1).R")
 ```
 
 ```{r, echo = F}
-knitr::kable(syn_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv for three different synthesizing")
+knitr::kable(syn1_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.")
 ```
+
+
+However, the results are not very satisfactory, so I looked further into the possibilities of using the `synthpop` package. One of the possibilities was to adjust the model, and use passive synthesizing for `bmi`. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).
+
+```{r, include = F}
+source("2.b Synthesize data (m=5).R")
+```
+
+
+```{r, echo = F}
+knitr::kable(syn5_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv based on synthesizing the data as a whole, based on 5 synthetic datasets per iteration.")
+```
+
+Which provides much better results. However, I do not know yet how to implement this approach for five partitions in combination with the `synthpop` package.
 
 # References
 

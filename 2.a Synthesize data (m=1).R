@@ -19,7 +19,7 @@ source("1.a Create data - boys complete.R")   # Obtain the previously synthesize
 ## complete data                                                                       ##
 #########################################################################################
 
-synthesize <- function(data, parts = NULL,    # Use a function to synthesize and analyze
+synthesize <- function(data, parts = NULL, method = NULL,    # Use a function to synthesize and analyze
                        partition = FALSE, n.parts = 5) {   # the (synthesized) data.
   
   if (partition) {
@@ -37,7 +37,7 @@ synthesize <- function(data, parts = NULL,    # Use a function to synthesize and
   else {
     # If it concerns the complete data as a whole, simply synthesize the complete data, 
     # and extract this data
-    syn_dat <- syn(data, print.flag = F)$syn
+    syn_dat <- syn(data, print.flag = F, method = method)$syn
   }
   return(syn_dat)
 }
@@ -79,11 +79,12 @@ results <- bind_rows(syns_complete, syns_part, syns_resample_partition, .id = "m
          covered = real > conf.low & real < conf.high)
 
 # Format the results so that we can nicely display them.
-syn_out <- results %>%
+syn1_out <- results %>%
   dplyr::select(term, real, estimate, conf.low, conf.high, covered) %>%
   group_by(method, term) %>%
   summarise("Population value" = unique(real),
             "Qbar" = mean(estimate),
+            "Bias" = mean(estimate) - unique(real),
             "Lower" = mean(conf.low),
             "Upper" = mean(conf.high),
             "Coverage" = mean(covered)) %>%
