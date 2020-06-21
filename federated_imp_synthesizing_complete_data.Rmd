@@ -1,0 +1,66 @@
+---
+title: "Federated Imputation"
+author: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+# Synthesizing
+
+To show the concept of synthesizing data, the `boys` dataset from the R-package `mice` [@mice] is singly-imputed, to be able to work with a dataset without missing values. The first approach is to synthesize this dataset as a whole by means of the `syn`-function with default settings from the package `synthpop` [@synthpop], to see whether synthesizing is a suitable approach to generate data that is in accordance with the observed data, and exhibits the same relationships between variables. To see how this process performs when the data is partitioned, the data is first partitioned into five subsets. Then, the subsets are synthesized by means of the `syn` function, and then binded to a single dataset containing the five synthesized subsets. Since the `syn` function contains a random process, this function is rerun over a single partitioned dataset, to see what the effect of only randomly synthesizing the same partitions is. As a third step, the partitioning is also randomized, resulting in the fact that the iterations contain two random processes: (1) the data is partioned randomly for every iteration, and (2) the partitioned data is synthesized with a random component.
+
+That is, the process works as follows: 
+
+@. Impute the `boys` dataset with `m=1`, which results in the completed `boyscomp` data.
+@. Over `i` in `1:nsim(=1000)` iterations, the output following output is collected:
+  + The regression estimates of `nsim` times synthesized complete dataset.
+  + The regression estimates of `nsim` times the synthesized partitioned dataset.
+  + The regression estimates of `nsim` times the synthesized `nsim` times partitioned dataset.
+@. Over `nsim` iterations, the average estimates are calculated ($\bar{Q}$), the bias ($\mu_Q - \bar{Q}$), the confidence intervals averaged over all iterations, and the coverage ($\frac{1}{nsim} \sum_{i = 1}^{nsim} LLCI_i < \mu_Q < ULCI_i$).
+
+# Results
+
+The previous process results in the following results.
+
+```{r, include = F}
+source("2.a Synthesize data (m=1).R")
+```
+
+```{r, echo = F}
+knitr::kable(syn1_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.")
+```
+
+
+However, the results are not very satisfactory, so I looked further into the possibilities of using the `synthpop` package. One of the possibilities was to adjust the model, and use passive synthesizing for `bmi`. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).
+
+```{r, include = F}
+source("2.b Synthesize data (m=5).R")
+```
+
+
+```{r, echo = F}
+knitr::kable(syn5_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv based on synthesizing the data as a whole, based on 5 synthetic datasets per iteration.")
+```
+
+Which provides much better results. However, I do not know yet how to implement this approach for five partitions in combination with the `synthpop` package.
+
+# References
+
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\noindent
+
+<div id="refs"></div>
+
+
