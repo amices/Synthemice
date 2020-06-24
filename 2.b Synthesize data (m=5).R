@@ -68,7 +68,7 @@ syn5_out <- syns_m5_complete1 %>%
   map(., summary) %>%
   map(., coef) %>%
   map(., function(x) rownames_to_column(as.data.frame(x), var = "Variable")) %>%
-  bind_rows(, .id = "sim") %>%
+  bind_rows(., .id = "sim") %>%
   rename(., "est" = "xpct(Beta)", "se" = "xpct(se.Beta)", "z" = "xpct(z)", "p" = "Pr(>|xpct(z)|)") %>%
   mutate(lower = est - cutoff*se,
          upper = est + cutoff*se) %>%

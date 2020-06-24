@@ -1290,98 +1290,6 @@ window.buildTabsets = function(tocID) {
 </script>
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  background-color: #f8f8f8; }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ef2929; } /* Alert */
-code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #c4a000; } /* Attribute */
-code span.bn { color: #0000cf; } /* BaseN */
-code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4e9a06; } /* Char */
-code span.cn { color: #000000; } /* Constant */
-code span.co { color: #8f5902; font-style: italic; } /* Comment */
-code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
-code span.dt { color: #204a87; } /* DataType */
-code span.dv { color: #0000cf; } /* DecVal */
-code span.er { color: #a40000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #0000cf; } /* Float */
-code span.fu { color: #000000; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
-code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
-code span.ot { color: #8f5902; } /* Other */
-code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
-code span.sc { color: #000000; } /* SpecialChar */
-code span.ss { color: #4e9a06; } /* SpecialString */
-code span.st { color: #4e9a06; } /* String */
-code span.va { color: #000000; } /* Variable */
-code span.vs { color: #4e9a06; } /* VerbatimString */
-code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
-
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
-</script>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 
 
 <style type="text/css">
@@ -1600,910 +1508,127 @@ div.tocify {
 </div>
 
 
-<div id="synthesizing" class="section level1">
-<h1><span class="header-section-number">1</span> Synthesizing</h1>
-<p>To show the concept of synthesizing data, the <code>boys</code> dataset from the R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> is singly-imputed, to be able to work with a dataset without missing values. The first approach is to synthesize this dataset as a whole by means of the <code>syn</code>-function with default settings from the package <code>synthpop</code> <span class="citation">(Nowok, Raab, &amp; Dibben, 2016)</span>, to see whether synthesizing is a suitable approach to generate data that is in accordance with the observed data, and exhibits the same relationships between variables. To see how this process performs when the data is partitioned, the data is first partitioned into five subsets. Then, the subsets are synthesized by means of the <code>syn</code> function, and then binded to a single dataset containing the five synthesized subsets. Since the <code>syn</code> function contains a random process, this function is rerun over a single partitioned dataset, to see what the effect of only randomly synthesizing the same partitions is. As a third step, the partitioning is also randomized, resulting in the fact that the iterations contain two random processes: (1) the data is partioned randomly for every iteration, and (2) the partitioned data is synthesized with a random component.</p>
-<p>That is, the process works as follows:</p>
-<ol class="example" style="list-style-type: decimal">
-<li>Impute the <code>boys</code> dataset with <code>m=1</code>, which results in the completed <code>boyscomp</code> data.</li>
-<li>Over <code>i</code> in <code>1:nsim(=1000)</code> iterations, the output following output is collected:</li>
+<div id="set-up" class="section level1">
+<h1><span class="header-section-number">1</span> SET UP</h1>
+<div id="simple-evaluation" class="section level2">
+<h2><span class="header-section-number">1.1</span> Simple evaluation</h2>
+<ol style="list-style-type: decimal">
+<li>Impute <code>boys</code> data with <code>m=1</code> to obtain <code>boyscompl</code></li>
+<li>For <code>i</code> repetitions, store as a list <code>out</code> the result of</li>
 </ol>
 <ul>
-<li>The regression estimates of <code>nsim</code> times synthesized complete dataset.</li>
-<li>The regression estimates of <code>nsim</code> times the synthesized partitioned dataset.</li>
-<li>The regression estimates of <code>nsim</code> times the synthesized <code>nsim</code> times partitioned dataset.</li>
+<li>partition <code>boyscompl</code> into <code>p=5</code> parts</li>
+<li>synthesize the <code>p</code> parts</li>
+<li>combine the <code>p</code> synthetic parts into <code>boyssynth</code></li>
 </ul>
-<ol start="3" class="example" style="list-style-type: decimal">
-<li>Over <code>nsim</code> iterations, the average estimates are calculated (<span class="math inline">\(\bar{Q}\)</span>), the bias (<span class="math inline">\(\mu_Q - \bar{Q}\)</span>), the confidence intervals averaged over all iterations, and the coverage (<span class="math inline">\(\frac{1}{nsim} \sum_{i = 1}^{nsim} LLCI_i &lt; \mu_Q &lt; ULCI_i\)</span>).</li>
+<ol start="3" style="list-style-type: decimal">
+<li>For the <code>i</code> elements in list <code>out</code>, evaluate</li>
+</ol>
+<ul>
+<li>Qbar (e.g regression estimates of <code>bmi ~ age + wgt</code>)</li>
+<li>CI of Qbar</li>
+<li>coverage of the CI of Qbar</li>
+</ul>
+<div id="if-method-is-valid" class="section level3">
+<h3><span class="header-section-number">1.1.1</span> If method is valid</h3>
+<p>Then Qbar is unbiased and confidence valid (i.e. at least 95% of CI’s cover the population value)</p>
+</div>
+</div>
+<div id="to-do" class="section level2">
+<h2><span class="header-section-number">1.2</span> TO DO</h2>
+<ul>
+<li><input type="checkbox" disabled checked></input>
+Dataset: Boys data in mice</li>
+<li><input type="checkbox" disabled checked></input>
+Partition data in 5 subsets</li>
+<li><input type="checkbox" disabled></input>
+Create synthetic versions of the five subsets</li>
+<li><input type="checkbox" disabled></input>
+Merge 5 synthetic subsets into one central synthetic dataset</li>
+<li><input type="checkbox" disabled></input>
+Impute the central synthetic dataset</li>
+<li><input type="checkbox" disabled></input>
+Deconstruct the m imputed sets into the 5 synthetic sets</li>
+<li><input type="checkbox" disabled></input>
+Match the corresponding synthetic imputation to the observed imputation in all of the (m by 5) synthetic imputed sets</li>
+</ul>
+</div>
+<div id="evaluation-plan---when-are-we-satisfied" class="section level2">
+<h2><span class="header-section-number">1.3</span> Evaluation plan - when are we satisfied?</h2>
+<ul>
+<li><input type="checkbox" disabled></input>
+Has algorithm converged (obv synthetic version –&gt; evt later obv de real data version)</li>
+<li><input type="checkbox" disabled></input>
+Hanne’s suggestion for tracking a model/data parameter based on the real data</li>
+<li><input type="checkbox" disabled></input>
+Als bias, CI width en Coverage of the 95% CI about the parameter (e.g. beta or mean) ok is.</li>
+</ul>
+</div>
+<div id="workflow" class="section level2">
+<h2><span class="header-section-number">1.4</span> Workflow</h2>
+<p>Proof of Concept: Incomplete boys data as starting point and assess:</p>
+<ol style="list-style-type: decimal">
+<li>convergence?</li>
+<li>whether the regression model based on federated imputations differs from the regression model based on the unfederated data.</li>
+<li>1000 sims.</li>
+</ol>
+<p>IF PoC successful –&gt; jeej</p>
+<ol style="list-style-type: decimal">
+<li>Full blown sim with complete(mice(boys, m = 1, seed = 123)) as TRUE/population input</li>
+<li>Bias? CI width? Coverage?</li>
 </ol>
 </div>
-<div id="results" class="section level1">
-<h1><span class="header-section-number">2</span> Results</h1>
-<p>The previous process results in the following results.</p>
-<table>
-<caption>Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.</caption>
-<thead>
-<tr class="header">
-<th align="left">method</th>
-<th align="left">term</th>
-<th align="right">Population value</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Complete data</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.481</td>
-<td align="right">-0.052</td>
-<td align="right">-8.810</td>
-<td align="right">-8.152</td>
-<td align="right">0.986</td>
-</tr>
-<tr class="even">
-<td align="left">Complete data</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.128</td>
-<td align="right">0.956</td>
-</tr>
-<tr class="odd">
-<td align="left">Complete data</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.148</td>
-<td align="right">-0.004</td>
-<td align="right">0.130</td>
-<td align="right">0.166</td>
-<td align="right">0.895</td>
-</tr>
-<tr class="even">
-<td align="left">Single partition</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.472</td>
-<td align="right">-0.043</td>
-<td align="right">-8.619</td>
-<td align="right">-8.325</td>
-<td align="right">0.961</td>
-</tr>
-<tr class="odd">
-<td align="left">Single partition</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.123</td>
-<td align="right">0.126</td>
-<td align="right">0.909</td>
-</tr>
-<tr class="even">
-<td align="left">Single partition</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.148</td>
-<td align="right">-0.004</td>
-<td align="right">0.140</td>
-<td align="right">0.156</td>
-<td align="right">0.816</td>
-</tr>
-<tr class="odd">
-<td align="left">Nsim partitions</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.471</td>
-<td align="right">-0.042</td>
-<td align="right">-8.617</td>
-<td align="right">-8.324</td>
-<td align="right">0.959</td>
-</tr>
-<tr class="even">
-<td align="left">Nsim partitions</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.123</td>
-<td align="right">0.126</td>
-<td align="right">0.912</td>
-</tr>
-<tr class="odd">
-<td align="left">Nsim partitions</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.148</td>
-<td align="right">-0.004</td>
-<td align="right">0.140</td>
-<td align="right">0.156</td>
-<td align="right">0.829</td>
-</tr>
-</tbody>
-</table>
-<p>However, the results are not very satisfactory, so I looked further into the possibilities of using the <code>synthpop</code> package. One of the possibilities was to adjust the model, and use passive synthesizing for <code>bmi</code>. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).</p>
-<table>
-<caption>Simulation results of the model age ~ hgt + tv based on synthesizing the data as a whole, based on 5 synthetic datasets per iteration.</caption>
-<thead>
-<tr class="header">
-<th align="left">Variable</th>
-<th align="right">Population value</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.484</td>
-<td align="right">-0.055</td>
-<td align="right">-8.813</td>
-<td align="right">-8.155</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="even">
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.128</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="odd">
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.147</td>
-<td align="right">-0.005</td>
-<td align="right">0.129</td>
-<td align="right">0.165</td>
-<td align="right">0.995</td>
-</tr>
-</tbody>
-</table>
-<p>Which provides much better results. However, I do not know yet how to implement this approach for five partitions in combination with the <code>synthpop</code> package.</p>
 </div>
-<div id="synthpop-estimates" class="section level1">
-<h1><span class="header-section-number">3</span> Synthpop estimates</h1>
-<p>Synthetic data estimates <span class="math inline">\((\hat{\beta_1}, \hat{\beta_2}, \dots, \hat{\beta_m})\)</span> - if the model for the data is correct, the <span class="math inline">\(m\)</span> estimates from the synthetic data will be centered around the estimate <span class="math inline">\(\hat{\beta}\)</span> that would have been obtained from the observed data. If the method of inference used to fit the model provides consistent estimates of the parameters and the same is true for the analyses of the synthetic data, then the mean of <span class="math inline">\(m\)</span> synthetic estimates, <span class="math inline">\(\bar{\hat{\beta}}=\sum_{i=1}^m\hat{\beta_i}/m\)</span> provides a consistent estimate of <span class="math inline">\(\hat{\beta}\)</span>. Provided that the observed and synthetic data are generated by the common sampling scheme, then <span class="math inline">\(V_{\bar{\hat{\beta}}}=\sum_{i=1}^m V_{\hat{\beta_i}}/m\)</span> will be a consistent estimate of <span class="math inline">\(V_{\hat{\beta}}\)</span>.</p>
-<p>The variance-covariance matrix of <span class="math inline">\(\bar{\hat{\beta}}\)</span>, conditional on <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(V_{\hat{\beta}}\)</span>, becomes <span class="math inline">\(V_{\hat{\beta}}\)</span> which can be estimated from <span class="math inline">\(V_{\bar{\hat{\beta}}}/m\)</span>. Thus the stochastic error in the mean of the synthetic estimates aboutthe values from the observed data can be reduced to a negligible quantity by increasing <span class="math inline">\(m\)</span>. It must be remembered, however that the consistency of <span class="math inline">\(\bar{\hat{\beta}}\)</span> only applies when observed data are a sample from the distribution used for synthesis. In practical applications differences between the analyses on the observed data and those from the mean of the syntheses will be found because the data do not conform to the model used for synthesis. Such differences will not be reduced by increasing <span class="math inline">\(m\)</span>. The synthesiser, with access to the observed data, can estimate <span class="math inline">\(\bar{\hat{\beta}}-\hat{\beta}\)</span> and compare it to its standard error in order to judge the extent that this model mismatch affects the estimates.</p>
+<div id="proposal" class="section level1">
+<h1><span class="header-section-number">2</span> Proposal</h1>
+<p>As an initial dataset to work with, the <code>boys</code> dataset from the R package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> is chosen. However, if it appears unfruitful to work with a dataset that includes missing values already, we can use single imputation on the <code>boys</code> data, to be able to work with a complete dataset. The second step is to partition the data into five separate datasets, which is done by means of the function <code>resample_partition()</code> from the R package <code>modelr</code> <span class="citation">(Wickham, 2020)</span>. The next step is to create synthetic data versions of the five subsets by means of the R package <code>synthpop</code> <span class="citation">(Nowok, Raab, &amp; Dibben, 2016)</span>. However, there are several problems thus far concerning this step:</p>
+<ul>
+<li>Why can’t we create synthetic versions of the subset, but can’t we impute the subset? Since both will then be based on the subset only?</li>
+<li>Creating the synthetic data when there are missing values leaves the <code>synthpop</code> package with one option, which is to <em>synthesize</em> the missing values as being a distinct category. Thus, the missingness is being modeled additionally. The other option is to impute the missing values before synthesizing, which we do not want, because this is exactly the reason that we arrived at synthesizing the data. Either way, <code>synthpop</code> treats the the data to be synthesized as known, .
+<ul>
+<li>What <code>synthpop</code> does when there is missing data, is simply treating it as a separate category. When the variable of the missing data is continuous, it takes a two step approach: first it is modeled whether or not an observation is “predicted” to have a missing value, if the observation is not “predicted” to have a missing value, a value is modeled based on the other predictors.</li>
+</ul></li>
+<li>As information: according to <span class="citation">(Nowok et al., 2016)</span>, the original aim of producing synthetic data has been to provide publicly available datasets that can be used for inference, when the original data cannot be shared. However, inferences based on the synthetic data are said to be only valid if the model used to construct the synthetic data is actually the true data generating mechanism, which is a mechanism hardly ever known. The aim of <code>synthpop</code> lies in providing test data that should resemble the actual data as closely as possible, although it should not be used in any final analyses.</li>
+<li><code>synthpop</code> requires that the method of generating the synthetic data matches that of the observed data. This condition allows to make inferences from synthetic data generated from distributions with parameters fitted to the observed data without sampling the parameters from their posterior distribution, which is referred to as “simple synthesis”.</li>
+<li>Synthesizing seems flawed, because when the sample is not a random sample (which is the case if the missingness is MAR), the synthetic values are based on the incomplete data.</li>
+</ul>
 </div>
-<div id="multivariate-normal-simulated-data" class="section level1">
-<h1><span class="header-section-number">4</span> Multivariate normal simulated data</h1>
-<div id="synthesizing-by-a-linear-regression-model" class="section level2">
-<h2><span class="header-section-number">4.1</span> Synthesizing by a linear regression model</h2>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by a normal linear regression model.</caption>
-<thead>
-<tr class="header">
-<th align="left">Correlation predictors</th>
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">MaxSE</th>
-<th align="right">MinSE</th>
-<th align="right">MeanSE</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.107</td>
-<td align="right">0.054</td>
-<td align="right">0.072</td>
-<td align="right">0.001</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.095</td>
-<td align="right">0.052</td>
-<td align="right">0.071</td>
-<td align="right">0.006</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
-<td align="right">0.098</td>
-<td align="right">0.053</td>
-<td align="right">0.071</td>
-<td align="right">0.000</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.006</td>
-<td align="right">0.117</td>
-<td align="right">0.048</td>
-<td align="right">0.072</td>
-<td align="right">0.006</td>
-<td align="right">-0.136</td>
-<td align="right">0.148</td>
-<td align="right">0.820</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.104</td>
-<td align="right">0.042</td>
-<td align="right">0.071</td>
-<td align="right">0.004</td>
-<td align="right">0.180</td>
-<td align="right">0.460</td>
-<td align="right">0.830</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">0.105</td>
-<td align="right">0.045</td>
-<td align="right">0.072</td>
-<td align="right">-0.008</td>
-<td align="right">0.484</td>
-<td align="right">0.764</td>
-<td align="right">0.814</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.002</td>
-<td align="right">0.107</td>
-<td align="right">0.054</td>
-<td align="right">0.072</td>
-<td align="right">-0.002</td>
-<td align="right">-0.143</td>
-<td align="right">0.139</td>
-<td align="right">0.922</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.094</td>
-<td align="right">0.052</td>
-<td align="right">0.072</td>
-<td align="right">0.004</td>
-<td align="right">0.180</td>
-<td align="right">0.460</td>
-<td align="right">0.922</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.622</td>
-<td align="right">0.103</td>
-<td align="right">0.051</td>
-<td align="right">0.072</td>
-<td align="right">-0.010</td>
-<td align="right">0.482</td>
-<td align="right">0.763</td>
-<td align="right">0.914</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.111</td>
-<td align="right">0.055</td>
-<td align="right">0.072</td>
-<td align="right">0.001</td>
-<td align="right">-0.141</td>
-<td align="right">0.142</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.092</td>
-<td align="right">0.050</td>
-<td align="right">0.072</td>
-<td align="right">0.003</td>
-<td align="right">0.179</td>
-<td align="right">0.460</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">0.097</td>
-<td align="right">0.053</td>
-<td align="right">0.072</td>
-<td align="right">-0.008</td>
-<td align="right">0.484</td>
-<td align="right">0.765</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.127</td>
-<td align="right">0.066</td>
-<td align="right">0.088</td>
-<td align="right">0.001</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">0.122</td>
-<td align="right">0.064</td>
-<td align="right">0.087</td>
-<td align="right">-0.007</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.118</td>
-<td align="right">0.066</td>
-<td align="right">0.087</td>
-<td align="right">0.006</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.010</td>
-<td align="right">0.127</td>
-<td align="right">0.060</td>
-<td align="right">0.088</td>
-<td align="right">0.010</td>
-<td align="right">-0.163</td>
-<td align="right">0.183</td>
-<td align="right">0.826</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">0.131</td>
-<td align="right">0.056</td>
-<td align="right">0.087</td>
-<td align="right">-0.007</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.838</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">0.135</td>
-<td align="right">0.060</td>
-<td align="right">0.087</td>
-<td align="right">-0.004</td>
-<td align="right">0.360</td>
-<td align="right">0.702</td>
-<td align="right">0.838</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.135</td>
-<td align="right">0.065</td>
-<td align="right">0.088</td>
-<td align="right">0.001</td>
-<td align="right">-0.172</td>
-<td align="right">0.174</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.261</td>
-<td align="right">0.121</td>
-<td align="right">0.064</td>
-<td align="right">0.088</td>
-<td align="right">-0.007</td>
-<td align="right">0.088</td>
-<td align="right">0.433</td>
-<td align="right">0.928</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">0.118</td>
-<td align="right">0.063</td>
-<td align="right">0.087</td>
-<td align="right">-0.004</td>
-<td align="right">0.360</td>
-<td align="right">0.702</td>
-<td align="right">0.928</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.003</td>
-<td align="right">0.132</td>
-<td align="right">0.064</td>
-<td align="right">0.088</td>
-<td align="right">0.003</td>
-<td align="right">-0.169</td>
-<td align="right">0.176</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.259</td>
-<td align="right">0.116</td>
-<td align="right">0.063</td>
-<td align="right">0.088</td>
-<td align="right">-0.008</td>
-<td align="right">0.087</td>
-<td align="right">0.431</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.532</td>
-<td align="right">0.119</td>
-<td align="right">0.065</td>
-<td align="right">0.087</td>
-<td align="right">-0.002</td>
-<td align="right">0.361</td>
-<td align="right">0.703</td>
-<td align="right">0.948</td>
-</tr>
-</tbody>
-</table>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">3</span> INTRODUCTION</h1>
+<p>Something about federated analyses (why, how), eventually in combination with DataSHIELD (as the proposed method).</p>
+<p>Something about missing data (and multiple imputation).</p>
+<p>Something about synthetic data (why and how).</p>
+<p>Something about pooling results.</p>
 </div>
-<div id="synthesizing-by-a-classification-and-regression-tree-cart" class="section level2">
-<h2><span class="header-section-number">4.2</span> Synthesizing by a Classification and Regression Tree (CART)</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>knitr<span class="op">::</span><span class="kw">kable</span>(synth_by_cart, <span class="dt">digits =</span> <span class="dv">3</span>, <span class="dt">caption =</span> <span class="st">&quot;Simulation results of multivariate normal data, synthesized by classification and regression trees.&quot;</span>)</span></code></pre></div>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by classification and regression trees.</caption>
-<thead>
-<tr class="header">
-<th align="left">Correlation predictors</th>
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">MaxSE</th>
-<th align="right">MinSE</th>
-<th align="right">MeanSE</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.107</td>
-<td align="right">0.054</td>
-<td align="right">0.072</td>
-<td align="right">0.001</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.095</td>
-<td align="right">0.052</td>
-<td align="right">0.071</td>
-<td align="right">0.006</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
-<td align="right">0.098</td>
-<td align="right">0.053</td>
-<td align="right">0.071</td>
-<td align="right">0.000</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.001</td>
-<td align="right">0.125</td>
-<td align="right">0.047</td>
-<td align="right">0.074</td>
-<td align="right">-0.001</td>
-<td align="right">-0.146</td>
-<td align="right">0.144</td>
-<td align="right">0.840</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.304</td>
-<td align="right">0.121</td>
-<td align="right">0.048</td>
-<td align="right">0.073</td>
-<td align="right">-0.012</td>
-<td align="right">0.160</td>
-<td align="right">0.448</td>
-<td align="right">0.812</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
-<td align="right">0.108</td>
-<td align="right">0.046</td>
-<td align="right">0.074</td>
-<td align="right">-0.028</td>
-<td align="right">0.460</td>
-<td align="right">0.749</td>
-<td align="right">0.808</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.002</td>
-<td align="right">0.113</td>
-<td align="right">0.055</td>
-<td align="right">0.075</td>
-<td align="right">0.002</td>
-<td align="right">-0.144</td>
-<td align="right">0.149</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.295</td>
-<td align="right">0.103</td>
-<td align="right">0.053</td>
-<td align="right">0.074</td>
-<td align="right">-0.021</td>
-<td align="right">0.149</td>
-<td align="right">0.441</td>
-<td align="right">0.906</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
-<td align="right">0.103</td>
-<td align="right">0.054</td>
-<td align="right">0.075</td>
-<td align="right">-0.027</td>
-<td align="right">0.459</td>
-<td align="right">0.752</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.119</td>
-<td align="right">0.058</td>
-<td align="right">0.075</td>
-<td align="right">0.001</td>
-<td align="right">-0.146</td>
-<td align="right">0.148</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.293</td>
-<td align="right">0.107</td>
-<td align="right">0.055</td>
-<td align="right">0.075</td>
-<td align="right">-0.023</td>
-<td align="right">0.147</td>
-<td align="right">0.439</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.603</td>
-<td align="right">0.101</td>
-<td align="right">0.052</td>
-<td align="right">0.075</td>
-<td align="right">-0.030</td>
-<td align="right">0.456</td>
-<td align="right">0.749</td>
-<td align="right">0.920</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.127</td>
-<td align="right">0.066</td>
-<td align="right">0.088</td>
-<td align="right">0.001</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">0.122</td>
-<td align="right">0.064</td>
-<td align="right">0.087</td>
-<td align="right">-0.007</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.118</td>
-<td align="right">0.066</td>
-<td align="right">0.087</td>
-<td align="right">0.006</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.039</td>
-<td align="right">0.135</td>
-<td align="right">0.059</td>
-<td align="right">0.089</td>
-<td align="right">0.039</td>
-<td align="right">-0.134</td>
-<td align="right">0.213</td>
-<td align="right">0.830</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.257</td>
-<td align="right">0.140</td>
-<td align="right">0.057</td>
-<td align="right">0.089</td>
-<td align="right">-0.010</td>
-<td align="right">0.083</td>
-<td align="right">0.431</td>
-<td align="right">0.834</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.516</td>
-<td align="right">0.139</td>
-<td align="right">0.057</td>
-<td align="right">0.087</td>
-<td align="right">-0.019</td>
-<td align="right">0.345</td>
-<td align="right">0.687</td>
-<td align="right">0.806</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.036</td>
-<td align="right">0.131</td>
-<td align="right">0.064</td>
-<td align="right">0.089</td>
-<td align="right">0.036</td>
-<td align="right">-0.137</td>
-<td align="right">0.210</td>
-<td align="right">0.908</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.253</td>
-<td align="right">0.122</td>
-<td align="right">0.060</td>
-<td align="right">0.089</td>
-<td align="right">-0.014</td>
-<td align="right">0.079</td>
-<td align="right">0.427</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.515</td>
-<td align="right">0.125</td>
-<td align="right">0.060</td>
-<td align="right">0.088</td>
-<td align="right">-0.019</td>
-<td align="right">0.343</td>
-<td align="right">0.687</td>
-<td align="right">0.892</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.034</td>
-<td align="right">0.135</td>
-<td align="right">0.065</td>
-<td align="right">0.089</td>
-<td align="right">0.034</td>
-<td align="right">-0.139</td>
-<td align="right">0.208</td>
-<td align="right">0.920</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.255</td>
-<td align="right">0.120</td>
-<td align="right">0.063</td>
-<td align="right">0.089</td>
-<td align="right">-0.012</td>
-<td align="right">0.081</td>
-<td align="right">0.429</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.514</td>
-<td align="right">0.120</td>
-<td align="right">0.063</td>
-<td align="right">0.088</td>
-<td align="right">-0.020</td>
-<td align="right">0.342</td>
-<td align="right">0.686</td>
-<td align="right">0.930</td>
-</tr>
-</tbody>
-</table>
+<div id="remarks" class="section level1">
+<h1><span class="header-section-number">4</span> REMARKS</h1>
+<ol style="list-style-type: decimal">
+<li>Randomly subsetting the data leads to “randomly equivalent” datasets. However, when pooling results over multiple nodes, it might be that there are qualitative differences between nodes, which might complicate the imputation process.</li>
+<li>In practice, some variables may be entirely missing, which differs from the current situation in which all datasets consist of the exact same variables.</li>
+<li>Start with a single complete datasets, cut it in five, create a synthetic version of all and run the analyses on this synthetic dataset.</li>
+<li>If I recall it correctly, Stef said that we simply synthesize the individual (partitioned) datasets, and that we could simply Rbind these. However, this would skip the point of basing the imputations on the collection of the 5 datasets together. If this was the case, we could simply use the data as if it is in the nodes, impute the individual sets with reference to the data in the other nodes, and analyse the imputed datasets, and pool the results.</li>
+<li>Synthpop treats missingness as a separate category. For categorical variables, this is fairly straightforward: the category NA is added to the existing categories. In case of continuous data, the first step involves the “prediction” of whether or not a variable is missing, if it is predicted to be missing, the value will be NA, if the observation is not predicted to be missing, a synthetic value will be generated.</li>
+<li>MICE has a pool function to pool the estimates of the multiple analyses that works with a list of datasets. However, the pooled estimates are not equivalent to the estimates after running the <code>lm</code> function on the complete data.</li>
+<li>If you are able to make synthetic data, based on a single dataset (instead of the combination of all 5), then, why are we not able to impute the single datasets directly, without taking the other datasets into account?</li>
+</ol>
 </div>
+<div id="literature-to-read" class="section level1">
+<h1><span class="header-section-number">5</span> Literature to read</h1>
+<p>Abowd, J. M., &amp; Lane, J. (2004). New approaches to confidentiality protection: Synthetic data, remote access and research data centers. In International workshop on privacy in statistical databases (pp. 282-289). Springer, Berlin, Heidelberg.</p>
+<ul>
+<li>Why and how synthetic data can be used so that no information can be traced back to any individual.</li>
+</ul>
+<p>Nowok, B. synthpop: An R package for generatingsynthetic versions of sensitive microdatafor statistical disclosure control. Retrieved from <a href="https://www.unece.org/fileadmin/DAM/stats/documents/ece/ces/ge.46/20150/Paper_24_bnowok_synthpop.pdf">link</a>.</p>
+<p>Patki, N., Wedge, R., &amp; Veeramachaneni, K. (2016, October). The synthetic data vault. In 2016 IEEE International Conference on Data Science and Advanced Analytics (DSAA) (pp. 399-410). IEEE. Retrieved from <a href="https://www.computer.org/csdl/pds/api/csdl/proceedings/download-article/12OmNwx3Q7S/pdf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJjc2RsX2FwaSIsImF1ZCI6ImNzZGxfYXBpX2Rvd25sb2FkX3Rva2VuIiwic3ViIjoiYW5vbnltb3VzQGNvbXB1dGVyLm9yZyIsImVtYWlsIjoiYW5vbnltb3VzQGNvbXB1dGVyLm9yZyIsImV4cCI6MTU5MjIyMDg2Nn0.JhJGad-Fwo1N1vYkh737g_UwZ_jLNXSn1lcTCyVhaJU">link</a>.</p>
+<ul>
+<li>Example of how to generate synthetic values, might give an idea of how this process works.</li>
+</ul>
+<p>Reiter, J. P. (2002). Satisfying disclosure restrictions with synthetic data sets. Journal of Official Statistics, 18(4), 531.</p>
+<p>Reiter, J. P. (2005). Releasing multiply imputed, synthetic public use microdata: An illustration and empirical study. Journal of the Royal Statistical Society: Series A (Statistics in Society), 168(1), 185-205.</p>
+<p><a href="https://synthpop.org.uk/index.html">Synthpop Website.</a></p>
 </div>
 <div id="references" class="section level1">
-<h1><span class="header-section-number">5</span> References</h1>
+<h1><span class="header-section-number">6</span> References</h1>
 
 <p></p>
 <div id="refs">
@@ -2512,6 +1637,9 @@ div.tocify {
 </div>
 <div id="ref-mice">
 <p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in r. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
+</div>
+<div id="ref-ModelR">
+<p>Wickham, H. (2020). <em>Modelr: Modelling functions that work with the pipe</em>. Retrieved from <a href="https://CRAN.R-project.org/package=modelr">https://CRAN.R-project.org/package=modelr</a></p>
 </div>
 </div>
 </div>
