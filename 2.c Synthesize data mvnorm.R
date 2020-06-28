@@ -2,7 +2,7 @@ library(furrr)
 library(synthpop)
 library(tidyverse)
 
-bootstrap_syn <- function(data, method = NULL, formula, coefs) {
+bootstrap_syn <- function(data, method = NULL, formula, coefs, pop.inf = F) {
   d   <- data                                             # specify the data
   s1  <- syn(d, m = 1, method = method, print.flag = F)   # 1 synthesis
   s5  <- syn(d, m = 5, method = method, print.flag = F)   # 5 syntheses
@@ -14,7 +14,9 @@ bootstrap_syn <- function(data, method = NULL, formula, coefs) {
   r <- list(Real_Sample = lm(f,d), Syn1 = lm.synds(f, s1), Syn5 = lm.synds(f, s5), Syn10 = lm.synds(f, s10))
   
   # Collect the output
-  out <- map(r, function(x) as.data.frame(coef(summary(x)))) %>%
+  out <- map(r, function(x) {if (class(x) == "fit.synds") {x <- summary(x, population.inference = pop.inf)}
+                             else {x <- summary(x)}
+                             return(as.data.frame(coef(x)))}) %>% 
     map(., function(x) {colnames(x) <- c("Est", "SE", "stat", "P"); return(as.data.frame(x))}) %>%
     map(., function(x) rownames_to_column(x, var = "Variable")) %>%
     bind_rows(., .id = "Method") %>%
@@ -52,7 +54,7 @@ rho0[rho0!=1] <- 0
 # and the correlation as specified above, and a sample size of n = 100
 test_rho0 <- normal(.5, ratio_beta = ratio, rho = rho0, n = 100)
 # Test whether the population regression coefficients are in line with the specified r2 (they are)
-sum(test_rho0$coefs^2) + 2*sum(test_rho0$coefs[2]*test_rho0$coefs[3]*.9)
+sum(test_rho0$coefs^2) + 2*sum(test_rho0$coefs[2]*test_rho0$coefs[3]*0)
 
 real_coefs_rho0 <- test_rho0$coefs
 
@@ -156,5 +158,105 @@ synth_by_cart <- bind_rows("Rho = 0" = summary_cart_rho0, "Rho = .5" = summary_c
 
 
 
+#########################################################################################
+## Specify population.inference = TRUE                                                 ##
+#########################################################################################
 
+
+# Generate random normal data, and run the synthesize function on it (bootstrap is a somewhat 
+# inappropriate name, because we sample directly from the population). 
+out_norm_rho0_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho0, n = 100)$dat 
+                                                        bootstrap_syn(data, method = synds_norm, 
+                                                                      formula = DV ~ -1 + IV1 + IV2 + IV3,
+                                                                      pop.inf = T)},
+                                    .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+out_cart_rho0_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho0, n = 100)$dat
+                                                        bootstrap_syn(data, method = synds_cart, 
+                                                                      formula = DV ~ -1 + IV1 + IV2 + IV3,
+                                                                      pop.inf = T)},
+                                    .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+
+# Collect the results
+out_norm_rho0_pop %>%
+  mutate(RealEst = rep(real_coefs_rho0, 2000),
+         Covered = Lower < real_coefs_rho0 & Upper > real_coefs_rho0,
+         Bias = Est - RealEst) %>%
+  ungroup() %>% group_by(Method, Variable) %>%
+  summarise("Population estimate" = unique(RealEst),
+            "Qbar" = mean(Est),
+            "MaxSE" = max(SE),
+            "MinSE" = min(SE),
+            "MeanSE" = mean(SE),
+            "Bias" = mean(Bias),
+            "Lower" = mean(Lower),
+            "Upper" = mean(Upper),
+            "Coverage" = mean(Covered)) %>%
+  arrange(factor(Method, levels = c("Real_Sample", "Syn1", "Syn5", "Syn10"))) -> summary_norm_rho0_pop
+
+out_cart_rho0_pop %>%
+  mutate(RealEst = rep(real_coefs_rho0, 2000),
+         Covered = Lower < real_coefs_rho0 & Upper > real_coefs_rho0,
+         Bias = Est - RealEst) %>%
+  ungroup() %>% group_by(Method, Variable) %>%
+  summarise("Population estimate" = unique(RealEst),
+            "Qbar" = mean(Est),
+            "MaxSE" = max(SE),
+            "MinSE" = min(SE),
+            "MeanSE" = mean(SE),
+            "Bias" = mean(Bias),
+            "Lower" = mean(Lower),
+            "Upper" = mean(Upper),
+            "Coverage" = mean(Covered)) %>%
+  arrange(factor(Method, levels = c("Real_Sample", "Syn1", "Syn5", "Syn10"))) -> summary_cart_rho0_pop
+
+
+
+# Generate random normal data, and run the synthesize function on it (bootstrap is a somewhat 
+# inappropriate name, because we sample directly from the population). 
+out_norm_rho50_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho50, n = 100)$dat 
+                                                         bootstrap_syn(data, method = synds_norm, 
+                                                                       formula = DV ~ -1 + IV1 + IV2 + IV3,
+                                                                       pop.inf = T)},
+                                     .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+out_cart_rho50_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho50, n = 100)$dat
+                                                         bootstrap_syn(data, method = synds_cart,
+                                                                       formula = DV ~ -1 + IV1 + IV2 + IV3,
+                                                                       pop.inf = T)},
+                                     .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+
+# Collect the results
+out_norm_rho50_pop %>%
+  mutate(RealEst = rep(real_coefs_rho0, 2000),
+         Covered = Lower < real_coefs_rho50 & Upper > real_coefs_rho50,
+         Bias = Est - RealEst) %>%
+  ungroup() %>% group_by(Method, Variable) %>%
+  summarise("Population estimate" = unique(RealEst),
+            "Qbar" = mean(Est),
+            "MaxSE" = max(SE),
+            "MinSE" = min(SE),
+            "MeanSE" = mean(SE),
+            "Bias" = mean(Bias),
+            "Lower" = mean(Lower),
+            "Upper" = mean(Upper),
+            "Coverage" = mean(Covered)) %>%
+  arrange(factor(Method, levels = c("Real_Sample", "Syn1", "Syn5", "Syn10"))) -> summary_norm_rho50_pop
+
+out_cart_rho50_pop %>%
+  mutate(RealEst = rep(real_coefs_rho50, 2000),
+         Covered = Lower < real_coefs_rho0 & Upper > real_coefs_rho50,
+         Bias = Est - RealEst) %>%
+  ungroup() %>% group_by(Method, Variable) %>%
+  summarise("Population estimate" = unique(RealEst),
+            "Qbar" = mean(Est),
+            "MaxSE" = max(SE),
+            "MinSE" = min(SE),
+            "MeanSE" = mean(SE),
+            "Bias" = mean(Bias),
+            "Lower" = mean(Lower),
+            "Upper" = mean(Upper),
+            "Coverage" = mean(Covered)) %>%
+  arrange(factor(Method, levels = c("Real_Sample", "Syn1", "Syn5", "Syn10"))) -> summary_cart_rho50_pop
+
+synth_by_lm_pop <- bind_rows("Rho = 0" = summary_norm_rho0_pop, "Rho = .5" = summary_norm_rho50_pop, .id = "Correlation predictors")
+synth_by_cart_pop <- bind_rows("Rho = 0" = summary_cart_rho0_pop, "Rho = .5" = summary_cart_rho50_pop, .id = "Correlation predictors")
 
