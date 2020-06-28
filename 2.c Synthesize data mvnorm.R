@@ -80,10 +80,10 @@ out_norm_rho0 %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -96,10 +96,10 @@ out_cart_rho0 %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -127,10 +127,10 @@ out_norm_rho50 %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -143,10 +143,10 @@ out_cart_rho50 %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -184,10 +184,10 @@ out_norm_rho0_pop %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -200,10 +200,10 @@ out_cart_rho0_pop %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -232,10 +232,10 @@ out_norm_rho50_pop %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%
@@ -248,10 +248,10 @@ out_cart_rho50_pop %>%
   ungroup() %>% group_by(Method, Variable) %>%
   summarise("Population estimate" = unique(RealEst),
             "Qbar" = mean(Est),
-            "MaxSE" = max(SE),
-            "MinSE" = min(SE),
-            "MeanSE" = mean(SE),
             "Bias" = mean(Bias),
+            "MeanSE" = mean(SE),
+            "MinSE" = min(SE),
+            "MaxSE" = max(SE),
             "Lower" = mean(Lower),
             "Upper" = mean(Upper),
             "Coverage" = mean(Covered)) %>%

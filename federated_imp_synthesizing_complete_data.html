@@ -3138,7 +3138,7 @@ div.tocify {
 <div id="variance-estimates" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> Variance estimates</h3>
 <p>The variance of the statistic of interest equals <span class="math inline">\(\bar{v}_M\)</span>, which represents the average variance over the <span class="math inline">\(M\)</span> synthetic datasets, when the goal of the synthesis is to make inferences with regard to the sample at hand, instead of with regard to the population. When the goal of the synthesis is to make population inferences, the variance is adjusted with an additional term, based on the number of synthetic datasets: <span class="math display">\[
-Var(Q) = \bar{v}_M(1 + 1/M),
+Var(Q) = \bar{\mathcal{v}}_M (1 + \frac{1}{M})
 \]</span> where <span class="math inline">\(Q\)</span> is the regression coefficient of the <span class="math inline">\(k^{th}\)</span> variable, <span class="math inline">\(\bar{v}_M\)</span> is the mean of the variables over the <span class="math inline">\(M\)</span> syntheses. If the number of synthesized data points (<span class="math inline">\(J\)</span>) is unequal to the number of observations in the dataset (<span class="math inline">\(N\)</span>), a correction equal to <span class="math inline">\(\frac{J}{N}\)</span> is multiplied with <span class="math inline">\(\bar{v}_M\)</span>.</p>
 </div>
 </div>
