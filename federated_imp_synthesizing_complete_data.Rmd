@@ -16,6 +16,12 @@ bibliography: federated_imp.bib
 csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ---
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
+```
+
 # Synthesizing
 
 To show the concept of synthesizing data, the `boys` dataset from the R-package `mice` [@mice] is singly-imputed, to be able to work with a dataset without missing values. The first approach is to synthesize this dataset as a whole by means of the `syn`-function with default settings from the package `synthpop` [@synthpop], to see whether synthesizing is a suitable approach to generate data that is in accordance with the observed data, and exhibits the same relationships between variables. To see how this process performs when the data is partitioned, the data is first partitioned into five subsets. Then, the subsets are synthesized by means of the `syn` function, and then binded to a single dataset containing the five synthesized subsets. Since the `syn` function contains a random process, this function is rerun over a single partitioned dataset, to see what the effect of only randomly synthesizing the same partitions is. As a third step, the partitioning is also randomized, resulting in the fact that the iterations contain two random processes: (1) the data is partioned randomly for every iteration, and (2) the partitioned data is synthesized with a random component.
@@ -33,23 +39,23 @@ That is, the process works as follows:
 
 The previous process results in the following results.
 
-```{r, include = F}
+```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
 source("2.a Synthesize data (m=1).R")
 ```
 
-```{r, echo = F}
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
 knitr::kable(syn1_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.")
 ```
 
 
 However, the results are not very satisfactory, so I looked further into the possibilities of using the `synthpop` package. One of the possibilities was to adjust the model, and use passive synthesizing for `bmi`. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).
 
-```{r, include = F}
+```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
 source("2.b Synthesize data (m=5).R")
 ```
 
 
-```{r, echo = F}
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
 knitr::kable(syn5_out, digits = 3, caption = "Simulation results of the model age ~ hgt + tv based on synthesizing the data as a whole, based on 5 synthetic datasets per iteration.")
 ```
 
@@ -64,21 +70,50 @@ The variance-covariance matrix of $\bar{\hat{\beta}}$, conditional on $\hat{\bet
 
 # Multivariate normal simulated data
 
-```{r, include = F}
+```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
 source("2.c Synthesize data mvnorm.R")
 ```
 
-## Synthesizing by a linear regression model
+## Inference with sample variance estimates
 
-```{r, echo = F}
+Sample variance estimates are computed as $V_{\bar{\hat{\beta}}} = \frac{1}{m} \sum_{i=1}^m V_{\hat{\beta}_i}$. However, confidence interval coverage is computed with respect to the true population value, instead of the sample estimates.
+
+### Synthesizing by a linear regression model
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
 knitr::kable(synth_by_lm, digits = 3, caption = "Simulation results of multivariate normal data, synthesized by a normal linear regression model.")
 ```
 
-## Synthesizing by a Classification and Regression Tree (CART)
+### Synthesizing by a Classification and Regression Tree (CART)
 
-```{r}
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
 knitr::kable(synth_by_cart, digits = 3, caption = "Simulation results of multivariate normal data, synthesized by classification and regression trees.")
 ```
+
+## Inference with sample variance estimates
+
+Population variance estimates are computed as <!-- TO DO - ADD CORRECT FORMULA $V_{\bar{\hat{\beta}}} = \frac{1}{m} \sum_{i=1}^m V_{\hat{\beta}_i}$ -->. However, confidence interval coverage is computed with respect to the true population value, instead of the sample estimates.
+
+### Synthesizing by a linear regression model
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+knitr::kable(synth_by_lm_pop, digits = 3, caption = "Simulation results of multivariate normal data, synthesized by a normal linear regression model.")
+```
+
+### Synthesizing by a Classification and Regression Tree (CART)
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+knitr::kable(synth_by_cart_pop, digits = 3, caption = "Simulation results of multivariate normal data, synthesized by classification and regression trees.")
+```
+
+
+### Variance estimates
+
+The variance of the statistic of interest equals $\bar{v}_M$, which represents the average variance over the $M$ synthetic datasets, when the goal of the synthesis is to make inferences with regard to the sample at hand, instead of with regard to the population. When the goal of the synthesis is to make population inferences, the variance is adjusted with an additional term, based on the number of synthetic datasets: 
+$$
+Var(Q) = \bar{\mathcal{v}}_M (1 + \frac{1}{M})
+$$
+where $Q$ is the regression coefficient of the $k^{th}$ variable, $\bar{v}_M$ is the mean of the variables over the $M$ syntheses. If the number of synthesized data points ($J$) is unequal to the number of observations in the dataset ($N$), a correction equal to $\frac{J}{N}$ is multiplied with $\bar{v}_M$. 
 
 
 # References
