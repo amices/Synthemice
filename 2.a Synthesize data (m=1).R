@@ -13,40 +13,13 @@ library(furrr)                                # furrr for parallel mapping
 library(broom)                                # broom for tidy results
 
 source("1.a Create data - boys complete.R")   # Obtain the previously synthesized data
-
-#########################################################################################
-## Function for synthesizing the data, that handles partitioned data and the           ##
-## complete data                                                                       ##
-#########################################################################################
-
-synthesize <- function(data, parts = NULL, method = NULL,    # Use a function to synthesize and analyze
-                       partition = FALSE, n.parts = 5) {   # the (synthesized) data.
-  
-  if (partition) {
-    # If the data must be partitioned every iterations, the function creates the partitions
-    partitions <- rep(1/n.parts, n.parts)
-    names(partitions) <- paste0("d", 1:n.parts)
-    parts <- resample_partition(data, partitions)
-  }
-  
-  if (!is.null(parts)) {
-    # If there are partitions included, synthesize synthesize the data of all partitions,
-    # and rowbind the synthesized partitions
-    syn_dat <- map_dfr(parts, ~ syn(.[[1]],print.flag = F)$syn) 
-  }                                           
-  else {
-    # If it concerns the complete data as a whole, simply synthesize the complete data, 
-    # and extract this data
-    syn_dat <- syn(data, print.flag = F, method = method)$syn
-  }
-  return(syn_dat)
-}
+source("1.c Functions.R")
 
 nsim <- 1000        # number of iterations
 plan(multisession)  # specify parallel processing
 
 # replicate the function 1000 times on the complete data in parallel
-syns_complete <- future_map_dfr(1:nsim, ~ synthesize(boyscomp),
+syns_complete <- future_map_dfr(1:nsim, function(x) synthesize(boyscomp),
                                 .id = "sim", .progress = TRUE,
                                 .options = future_options(seed = as.integer(123)))
 # replicate the function 1000 times on the same partitioned data
@@ -55,7 +28,7 @@ syns_part <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, parts = part),
                             .options = future_options(seed = as.integer(123)))
 # replicate the function 1000 times on a 1000 times partitioned dataset
 
-syns_resample_partition <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, partition = TRUE),
+syns_resample_partition <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, partition = TRUE,n.parts=5),
                                           .id = "sim", .progress= TRUE, 
                                           .options = future_options(seed = as.integer(123)))
 

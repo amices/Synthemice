@@ -113,7 +113,7 @@ The variance of the statistic of interest equals $\bar{v}_M$, which represents t
 $$
 Var(Q) = \bar{\mathcal{v}}_M (1 + \frac{1}{M})
 $$
-where $Q$ is the regression coefficient of the $k^{th}$ variable, $\bar{v}_M$ is the mean of the variables over the $M$ syntheses. If the number of synthesized data points ($J$) is unequal to the number of observations in the dataset ($N$), a correction equal to $\frac{J}{N}$ is multiplied with $\bar{v}_M$. 
+where $Q$ is the statistic of interest and $\bar{v}_M$ is the mean of the statistic over the $M$ syntheses. If the number of synthesized data points ($J$) is unequal to the number of observations in the dataset ($N$), a correction equal to $\frac{J}{N}$ is multiplied with $\bar{v}_M$. 
 
 
 # References

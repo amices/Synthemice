@@ -1519,215 +1519,31 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">01-07-2020</h4>
+<h4 class="date">02-07-2020</h4>
 
 </div>
 
 
-<div id="synthesizing" class="section level1">
-<h1><span class="header-section-number">1</span> Synthesizing</h1>
-<p>To show the concept of synthesizing data, the <code>boys</code> dataset from the R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> is singly-imputed, to be able to work with a dataset without missing values. The first approach is to synthesize this dataset as a whole by means of the <code>syn</code>-function with default settings from the package <code>synthpop</code> <span class="citation">(Nowok, Raab, &amp; Dibben, 2016)</span>, to see whether synthesizing is a suitable approach to generate data that is in accordance with the observed data, and exhibits the same relationships between variables. To see how this process performs when the data is partitioned, the data is first partitioned into five subsets. Then, the subsets are synthesized by means of the <code>syn</code> function, and then binded to a single dataset containing the five synthesized subsets. Since the <code>syn</code> function contains a random process, this function is rerun over a single partitioned dataset, to see what the effect of only randomly synthesizing the same partitions is. As a third step, the partitioning is also randomized, resulting in the fact that the iterations contain two random processes: (1) the data is partioned randomly for every iteration, and (2) the partitioned data is synthesized with a random component.</p>
-<p>That is, the process works as follows:</p>
-<ol class="example" style="list-style-type: decimal">
-<li>Impute the <code>boys</code> dataset with <code>m=1</code>, which results in the completed <code>boyscomp</code> data.</li>
-<li>Over <code>i</code> in <code>1:nsim(=1000)</code> iterations, the output following output is collected:</li>
-</ol>
-<ul>
-<li>The regression estimates of <code>nsim</code> times synthesized complete dataset.</li>
-<li>The regression estimates of <code>nsim</code> times the synthesized partitioned dataset.</li>
-<li>The regression estimates of <code>nsim</code> times the synthesized <code>nsim</code> times partitioned dataset.</li>
-</ul>
-<ol start="3" class="example" style="list-style-type: decimal">
-<li>Over <code>nsim</code> iterations, the average estimates are calculated (<span class="math inline">\(\bar{Q}\)</span>), the bias (<span class="math inline">\(\mu_Q - \bar{Q}\)</span>), the confidence intervals averaged over all iterations, and the coverage (<span class="math inline">\(\frac{1}{nsim} \sum_{i = 1}^{nsim} LLCI_i &lt; \mu_Q &lt; ULCI_i\)</span>).</li>
-</ol>
-</div>
-<div id="results" class="section level1">
-<h1><span class="header-section-number">2</span> Results</h1>
-<p>The previous process results in the following results.</p>
-<table>
-<caption>Simulation results of the model age ~ hgt + tv for three different synthesizing approaches (complete data, same subset 1000 times, 1000 different subsets, all with the number of synthetic datasets equal to 1.</caption>
-<thead>
-<tr class="header">
-<th align="left">method</th>
-<th align="left">term</th>
-<th align="right">Population value</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Complete data</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.481</td>
-<td align="right">-0.052</td>
-<td align="right">-8.810</td>
-<td align="right">-8.152</td>
-<td align="right">0.986</td>
-</tr>
-<tr class="even">
-<td align="left">Complete data</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.128</td>
-<td align="right">0.956</td>
-</tr>
-<tr class="odd">
-<td align="left">Complete data</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.148</td>
-<td align="right">-0.004</td>
-<td align="right">0.130</td>
-<td align="right">0.166</td>
-<td align="right">0.895</td>
-</tr>
-<tr class="even">
-<td align="left">Single partition</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.504</td>
-<td align="right">-0.074</td>
-<td align="right">-8.849</td>
-<td align="right">-8.158</td>
-<td align="right">0.968</td>
-</tr>
-<tr class="odd">
-<td align="left">Single partition</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.129</td>
-<td align="right">0.910</td>
-</tr>
-<tr class="even">
-<td align="left">Single partition</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.143</td>
-<td align="right">-0.008</td>
-<td align="right">0.124</td>
-<td align="right">0.163</td>
-<td align="right">0.838</td>
-</tr>
-<tr class="odd">
-<td align="left">Nsim partitions</td>
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.488</td>
-<td align="right">-0.059</td>
-<td align="right">-8.830</td>
-<td align="right">-8.146</td>
-<td align="right">0.960</td>
-</tr>
-<tr class="even">
-<td align="left">Nsim partitions</td>
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.129</td>
-<td align="right">0.897</td>
-</tr>
-<tr class="odd">
-<td align="left">Nsim partitions</td>
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.144</td>
-<td align="right">-0.007</td>
-<td align="right">0.125</td>
-<td align="right">0.163</td>
-<td align="right">0.832</td>
-</tr>
-</tbody>
-</table>
-<p>However, the results are not very satisfactory, so I looked further into the possibilities of using the <code>synthpop</code> package. One of the possibilities was to adjust the model, and use passive synthesizing for <code>bmi</code>. Additionally, instead of one synthetic dataset, I made 5, so that the results are averaged over five synthetic datasets, instead of only one. This leads to much better results, as is shown below (only for the case in which the complete dataset is synthetized).</p>
-<table>
-<caption>Simulation results of the model age ~ hgt + tv based on synthesizing the data as a whole, based on 5 synthetic datasets per iteration.</caption>
-<thead>
-<tr class="header">
-<th align="left">Variable</th>
-<th align="right">Population value</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">-8.429</td>
-<td align="right">-8.484</td>
-<td align="right">-0.055</td>
-<td align="right">-8.813</td>
-<td align="right">-8.155</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="even">
-<td align="left">hgt</td>
-<td align="right">0.124</td>
-<td align="right">0.125</td>
-<td align="right">0.001</td>
-<td align="right">0.122</td>
-<td align="right">0.128</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="odd">
-<td align="left">tv</td>
-<td align="right">0.151</td>
-<td align="right">0.147</td>
-<td align="right">-0.005</td>
-<td align="right">0.129</td>
-<td align="right">0.165</td>
-<td align="right">0.995</td>
-</tr>
-</tbody>
-</table>
-<p>Which provides much better results. However, I do not know yet how to implement this approach for five partitions in combination with the <code>synthpop</code> package.</p>
-</div>
-<div id="synthpop-estimates" class="section level1">
-<h1><span class="header-section-number">3</span> Synthpop estimates</h1>
-<p>Synthetic data estimates <span class="math inline">\((\hat{\beta_1}, \hat{\beta_2}, \dots, \hat{\beta_m})\)</span> - if the model for the data is correct, the <span class="math inline">\(m\)</span> estimates from the synthetic data will be centered around the estimate <span class="math inline">\(\hat{\beta}\)</span> that would have been obtained from the observed data. If the method of inference used to fit the model provides consistent estimates of the parameters and the same is true for the analyses of the synthetic data, then the mean of <span class="math inline">\(m\)</span> synthetic estimates, <span class="math inline">\(\bar{\hat{\beta}}=\sum_{i=1}^m\hat{\beta_i}/m\)</span> provides a consistent estimate of <span class="math inline">\(\hat{\beta}\)</span>. Provided that the observed and synthetic data are generated by the common sampling scheme, then <span class="math inline">\(V_{\bar{\hat{\beta}}}=\sum_{i=1}^m V_{\hat{\beta_i}}/m\)</span> will be a consistent estimate of <span class="math inline">\(V_{\hat{\beta}}\)</span>.</p>
-<p>The variance-covariance matrix of <span class="math inline">\(\bar{\hat{\beta}}\)</span>, conditional on <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(V_{\hat{\beta}}\)</span>, becomes <span class="math inline">\(V_{\hat{\beta}}\)</span> which can be estimated from <span class="math inline">\(V_{\bar{\hat{\beta}}}/m\)</span>. Thus the stochastic error in the mean of the synthetic estimates aboutthe values from the observed data can be reduced to a negligible quantity by increasing <span class="math inline">\(m\)</span>. It must be remembered, however that the consistency of <span class="math inline">\(\bar{\hat{\beta}}\)</span> only applies when observed data are a sample from the distribution used for synthesis. In practical applications differences between the analyses on the observed data and those from the mean of the syntheses will be found because the data do not conform to the model used for synthesis. Such differences will not be reduced by increasing <span class="math inline">\(m\)</span>. The synthesiser, with access to the observed data, can estimate <span class="math inline">\(\bar{\hat{\beta}}-\hat{\beta}\)</span> and compare it to its standard error in order to judge the extent that this model mismatch affects the estimates.</p>
-</div>
-<div id="multivariate-normal-simulated-data" class="section level1">
-<h1><span class="header-section-number">4</span> Multivariate normal simulated data</h1>
-<div id="inference-with-sample-variance-estimates" class="section level2">
-<h2><span class="header-section-number">4.1</span> Inference with sample variance estimates</h2>
-<p>Sample variance estimates are computed as <span class="math inline">\(V_{\bar{\hat{\beta}}} = \frac{1}{m} \sum_{i=1}^m V_{\hat{\beta}_i}\)</span>. However, confidence interval coverage is computed with respect to the true population value, instead of the sample estimates.</p>
-<div id="synthesizing-by-a-linear-regression-model" class="section level3">
-<h3><span class="header-section-number">4.1.1</span> Synthesizing by a linear regression model</h3>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by a normal linear regression model.</caption>
+<div id="previous-results" class="section level1">
+<h1><span class="header-section-number">1</span> Previous results</h1>
+<p>Without partitioning the data, we already saw that synthesizing does not distort the relationships of the variables in the data at hand. That is, synthesizing a dataset results in <span class="math inline">\(M\)</span> synthetic datasets with, on average, the same properties as the original dataset. The results can be seen in the following table. This table contains the simulation results of synthesizing multivariate normally distributed data, where the correlation between predictors equals <span class="math inline">\(\rho = 0\)</span>, the proportion explained variance equals <span class="math inline">\(R^2 = .50\)</span> and the sample size equals <span class="math inline">\(n = 100\)</span>. Note that synthesizing is done by means of the default settings (by means of CART), and the variance of the estimates is calculated as <span class="math display">\[Var(\beta) = \bar{v}_{M}(1 + \frac{1}{M}),\]</span> where <span class="math inline">\(\bar{v}_M\)</span> is the average variance of the regression coefficient over the <span class="math inline">\(M\)</span> synthetic datasets.</p>
+<table style="width:100%;">
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.</caption>
 <colgroup>
-<col width="19%"></col>
-<col width="10%"></col>
+<col width="12%"></col>
+<col width="9%"></col>
+<col width="21%"></col>
+<col width="6%"></col>
 <col width="7%"></col>
-<col width="16%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
 <col width="7%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="9%"></col>
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Correlation predictors</th>
 <th align="left">Method</th>
 <th align="left">Variable</th>
 <th align="right">Population estimate</th>
@@ -1743,1490 +1559,580 @@ div.tocify {
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Rho = 0</td>
 <td align="left">Real_Sample</td>
 <td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.072</td>
-<td align="right">0.054</td>
-<td align="right">0.107</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.006</td>
-<td align="right">0.071</td>
-<td align="right">0.052</td>
-<td align="right">0.095</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
 <td align="right">0.000</td>
-<td align="right">0.071</td>
+<td align="right">0.000</td>
+<td align="right">0.072</td>
 <td align="right">0.053</td>
-<td align="right">0.098</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.006</td>
-<td align="right">0.006</td>
-<td align="right">0.072</td>
-<td align="right">0.048</td>
-<td align="right">0.117</td>
-<td align="right">-0.136</td>
-<td align="right">0.148</td>
-<td align="right">0.820</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.004</td>
-<td align="right">0.071</td>
-<td align="right">0.042</td>
-<td align="right">0.104</td>
-<td align="right">0.180</td>
-<td align="right">0.460</td>
-<td align="right">0.830</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">-0.008</td>
-<td align="right">0.072</td>
-<td align="right">0.045</td>
-<td align="right">0.105</td>
-<td align="right">0.484</td>
-<td align="right">0.764</td>
-<td align="right">0.814</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.002</td>
-<td align="right">-0.002</td>
-<td align="right">0.072</td>
-<td align="right">0.054</td>
 <td align="right">0.107</td>
-<td align="right">-0.143</td>
-<td align="right">0.139</td>
-<td align="right">0.922</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.004</td>
-<td align="right">0.072</td>
-<td align="right">0.052</td>
-<td align="right">0.094</td>
-<td align="right">0.180</td>
-<td align="right">0.460</td>
-<td align="right">0.922</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.622</td>
-<td align="right">-0.010</td>
-<td align="right">0.072</td>
-<td align="right">0.051</td>
-<td align="right">0.103</td>
-<td align="right">0.482</td>
-<td align="right">0.763</td>
-<td align="right">0.914</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.072</td>
-<td align="right">0.055</td>
-<td align="right">0.111</td>
 <td align="right">-0.141</td>
-<td align="right">0.142</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.003</td>
-<td align="right">0.072</td>
-<td align="right">0.050</td>
-<td align="right">0.092</td>
-<td align="right">0.179</td>
-<td align="right">0.460</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">-0.008</td>
-<td align="right">0.072</td>
-<td align="right">0.053</td>
-<td align="right">0.097</td>
-<td align="right">0.484</td>
-<td align="right">0.765</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.088</td>
-<td align="right">0.066</td>
-<td align="right">0.127</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.087</td>
-<td align="right">0.064</td>
-<td align="right">0.122</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.006</td>
-<td align="right">0.087</td>
-<td align="right">0.066</td>
-<td align="right">0.118</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.010</td>
-<td align="right">0.010</td>
-<td align="right">0.088</td>
-<td align="right">0.060</td>
-<td align="right">0.127</td>
-<td align="right">-0.163</td>
-<td align="right">0.183</td>
-<td align="right">0.826</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.087</td>
-<td align="right">0.056</td>
-<td align="right">0.131</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.838</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">-0.004</td>
-<td align="right">0.087</td>
-<td align="right">0.060</td>
-<td align="right">0.135</td>
-<td align="right">0.360</td>
-<td align="right">0.702</td>
-<td align="right">0.838</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.088</td>
-<td align="right">0.065</td>
-<td align="right">0.135</td>
-<td align="right">-0.172</td>
-<td align="right">0.174</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.261</td>
-<td align="right">-0.007</td>
-<td align="right">0.088</td>
-<td align="right">0.064</td>
-<td align="right">0.121</td>
-<td align="right">0.088</td>
-<td align="right">0.433</td>
-<td align="right">0.928</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">-0.004</td>
-<td align="right">0.087</td>
-<td align="right">0.063</td>
-<td align="right">0.118</td>
-<td align="right">0.360</td>
-<td align="right">0.702</td>
-<td align="right">0.928</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.003</td>
-<td align="right">0.003</td>
-<td align="right">0.088</td>
-<td align="right">0.064</td>
-<td align="right">0.132</td>
-<td align="right">-0.169</td>
-<td align="right">0.176</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.259</td>
-<td align="right">-0.008</td>
-<td align="right">0.088</td>
-<td align="right">0.063</td>
-<td align="right">0.116</td>
-<td align="right">0.087</td>
-<td align="right">0.431</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.532</td>
-<td align="right">-0.002</td>
-<td align="right">0.087</td>
-<td align="right">0.065</td>
-<td align="right">0.119</td>
-<td align="right">0.361</td>
-<td align="right">0.703</td>
-<td align="right">0.948</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="synthesizing-by-a-classification-and-regression-tree-cart" class="section level3">
-<h3><span class="header-section-number">4.1.2</span> Synthesizing by a Classification and Regression Tree (CART)</h3>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by classification and regression trees.</caption>
-<colgroup>
-<col width="19%"></col>
-<col width="10%"></col>
-<col width="7%"></col>
-<col width="16%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="7%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Correlation predictors</th>
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">MeanSE</th>
-<th align="right">MinSE</th>
-<th align="right">MaxSE</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.072</td>
-<td align="right">0.054</td>
-<td align="right">0.107</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.006</td>
-<td align="right">0.071</td>
-<td align="right">0.052</td>
-<td align="right">0.095</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
-<td align="right">0.000</td>
-<td align="right">0.071</td>
-<td align="right">0.053</td>
-<td align="right">0.098</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.001</td>
-<td align="right">-0.001</td>
-<td align="right">0.074</td>
-<td align="right">0.047</td>
-<td align="right">0.125</td>
-<td align="right">-0.146</td>
-<td align="right">0.144</td>
-<td align="right">0.840</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.304</td>
-<td align="right">-0.012</td>
-<td align="right">0.073</td>
-<td align="right">0.048</td>
-<td align="right">0.121</td>
-<td align="right">0.160</td>
-<td align="right">0.448</td>
-<td align="right">0.812</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
-<td align="right">-0.028</td>
-<td align="right">0.074</td>
-<td align="right">0.046</td>
-<td align="right">0.108</td>
-<td align="right">0.460</td>
-<td align="right">0.749</td>
-<td align="right">0.808</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-<td align="right">0.075</td>
-<td align="right">0.055</td>
-<td align="right">0.113</td>
-<td align="right">-0.144</td>
-<td align="right">0.149</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.295</td>
-<td align="right">-0.021</td>
-<td align="right">0.074</td>
-<td align="right">0.053</td>
-<td align="right">0.103</td>
-<td align="right">0.149</td>
-<td align="right">0.441</td>
-<td align="right">0.906</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
-<td align="right">-0.027</td>
-<td align="right">0.075</td>
-<td align="right">0.054</td>
-<td align="right">0.103</td>
-<td align="right">0.459</td>
-<td align="right">0.752</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.075</td>
-<td align="right">0.058</td>
-<td align="right">0.119</td>
-<td align="right">-0.146</td>
-<td align="right">0.148</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.293</td>
-<td align="right">-0.023</td>
-<td align="right">0.075</td>
-<td align="right">0.055</td>
-<td align="right">0.107</td>
-<td align="right">0.147</td>
-<td align="right">0.439</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.603</td>
-<td align="right">-0.030</td>
-<td align="right">0.075</td>
-<td align="right">0.052</td>
-<td align="right">0.101</td>
-<td align="right">0.456</td>
-<td align="right">0.749</td>
-<td align="right">0.920</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.088</td>
-<td align="right">0.066</td>
-<td align="right">0.127</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.087</td>
-<td align="right">0.064</td>
-<td align="right">0.122</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.006</td>
-<td align="right">0.087</td>
-<td align="right">0.066</td>
-<td align="right">0.118</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.039</td>
-<td align="right">0.039</td>
-<td align="right">0.089</td>
-<td align="right">0.059</td>
-<td align="right">0.135</td>
-<td align="right">-0.134</td>
-<td align="right">0.213</td>
-<td align="right">0.830</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.257</td>
-<td align="right">-0.010</td>
-<td align="right">0.089</td>
-<td align="right">0.057</td>
 <td align="right">0.140</td>
-<td align="right">0.083</td>
-<td align="right">0.431</td>
-<td align="right">0.834</td>
+<td align="right">0.952</td>
 </tr>
 <tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.516</td>
-<td align="right">-0.019</td>
-<td align="right">0.087</td>
-<td align="right">0.057</td>
-<td align="right">0.139</td>
-<td align="right">0.345</td>
-<td align="right">0.687</td>
-<td align="right">0.806</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.319</td>
+<td align="right">0.003</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.096</td>
+<td align="right">0.179</td>
+<td align="right">0.459</td>
+<td align="right">0.947</td>
 </tr>
 <tr class="odd">
-<td align="left">Rho = .5</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.633</td>
+<td align="right">0.000</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.098</td>
+<td align="right">0.493</td>
+<td align="right">0.773</td>
+<td align="right">0.954</td>
+</tr>
+<tr class="even">
 <td align="left">Syn5</td>
 <td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">0.036</td>
-<td align="right">0.036</td>
-<td align="right">0.089</td>
-<td align="right">0.064</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.082</td>
+<td align="right">0.058</td>
+<td align="right">0.124</td>
+<td align="right">-0.159</td>
+<td align="right">0.162</td>
+<td align="right">0.959</td>
+</tr>
+<tr class="odd">
+<td align="left">Syn5</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.291</td>
+<td align="right">-0.025</td>
+<td align="right">0.082</td>
+<td align="right">0.058</td>
+<td align="right">0.114</td>
 <td align="right">0.131</td>
-<td align="right">-0.137</td>
-<td align="right">0.210</td>
-<td align="right">0.908</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.253</td>
-<td align="right">-0.014</td>
-<td align="right">0.089</td>
-<td align="right">0.060</td>
-<td align="right">0.122</td>
-<td align="right">0.079</td>
-<td align="right">0.427</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.515</td>
-<td align="right">-0.019</td>
-<td align="right">0.088</td>
-<td align="right">0.060</td>
-<td align="right">0.125</td>
-<td align="right">0.343</td>
-<td align="right">0.687</td>
-<td align="right">0.892</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.034</td>
-<td align="right">0.034</td>
-<td align="right">0.089</td>
-<td align="right">0.065</td>
-<td align="right">0.135</td>
-<td align="right">-0.139</td>
-<td align="right">0.208</td>
-<td align="right">0.920</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.255</td>
-<td align="right">-0.012</td>
-<td align="right">0.089</td>
-<td align="right">0.063</td>
-<td align="right">0.120</td>
-<td align="right">0.081</td>
-<td align="right">0.429</td>
+<td align="right">0.451</td>
 <td align="right">0.932</td>
 </tr>
 <tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.514</td>
-<td align="right">-0.020</td>
-<td align="right">0.088</td>
-<td align="right">0.063</td>
-<td align="right">0.120</td>
-<td align="right">0.342</td>
-<td align="right">0.686</td>
-<td align="right">0.930</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="inference-with-sample-variance-estimates-1" class="section level2">
-<h2><span class="header-section-number">4.2</span> Inference with sample variance estimates</h2>
-<p>Population variance estimates are computed as <!-- TO DO - ADD CORRECT FORMULA $V_{\bar{\hat{\beta}}} = \frac{1}{m} \sum_{i=1}^m V_{\hat{\beta}_i}$ -->. However, confidence interval coverage is computed with respect to the true population value, instead of the sample estimates.</p>
-<div id="synthesizing-by-a-linear-regression-model-1" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> Synthesizing by a linear regression model</h3>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by a normal linear regression model.</caption>
-<colgroup>
-<col width="19%"></col>
-<col width="10%"></col>
-<col width="7%"></col>
-<col width="16%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="7%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Correlation predictors</th>
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">MeanSE</th>
-<th align="right">MinSE</th>
-<th align="right">MaxSE</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.072</td>
-<td align="right">0.054</td>
-<td align="right">0.107</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.006</td>
-<td align="right">0.071</td>
-<td align="right">0.052</td>
-<td align="right">0.095</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
-<td align="right">0.000</td>
-<td align="right">0.071</td>
-<td align="right">0.053</td>
-<td align="right">0.098</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.006</td>
-<td align="right">0.006</td>
-<td align="right">0.102</td>
-<td align="right">0.068</td>
-<td align="right">0.166</td>
-<td align="right">-0.195</td>
-<td align="right">0.206</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.004</td>
-<td align="right">0.101</td>
-<td align="right">0.059</td>
-<td align="right">0.146</td>
-<td align="right">0.122</td>
-<td align="right">0.518</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">-0.008</td>
-<td align="right">0.101</td>
-<td align="right">0.064</td>
-<td align="right">0.148</td>
-<td align="right">0.426</td>
-<td align="right">0.822</td>
-<td align="right">0.938</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.002</td>
-<td align="right">-0.002</td>
-<td align="right">0.079</td>
-<td align="right">0.059</td>
-<td align="right">0.117</td>
-<td align="right">-0.157</td>
-<td align="right">0.152</td>
-<td align="right">0.944</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.004</td>
-<td align="right">0.078</td>
-<td align="right">0.057</td>
-<td align="right">0.103</td>
-<td align="right">0.166</td>
-<td align="right">0.473</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
 <td align="left">Syn5</td>
 <td align="left">IV3</td>
 <td align="right">0.632</td>
-<td align="right">0.622</td>
-<td align="right">-0.010</td>
-<td align="right">0.079</td>
-<td align="right">0.056</td>
-<td align="right">0.113</td>
-<td align="right">0.469</td>
-<td align="right">0.776</td>
-<td align="right">0.934</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.076</td>
-<td align="right">0.058</td>
-<td align="right">0.117</td>
-<td align="right">-0.148</td>
-<td align="right">0.149</td>
-<td align="right">0.952</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.320</td>
-<td align="right">0.003</td>
-<td align="right">0.075</td>
-<td align="right">0.053</td>
-<td align="right">0.097</td>
-<td align="right">0.173</td>
-<td align="right">0.467</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.624</td>
-<td align="right">-0.008</td>
-<td align="right">0.075</td>
-<td align="right">0.055</td>
-<td align="right">0.101</td>
-<td align="right">0.477</td>
-<td align="right">0.772</td>
-<td align="right">0.944</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.088</td>
-<td align="right">0.066</td>
-<td align="right">0.127</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.087</td>
-<td align="right">0.064</td>
-<td align="right">0.122</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.006</td>
-<td align="right">0.087</td>
-<td align="right">0.066</td>
-<td align="right">0.118</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.010</td>
-<td align="right">0.010</td>
-<td align="right">0.125</td>
-<td align="right">0.084</td>
-<td align="right">0.180</td>
-<td align="right">-0.234</td>
-<td align="right">0.254</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.124</td>
-<td align="right">0.080</td>
-<td align="right">0.185</td>
-<td align="right">0.018</td>
-<td align="right">0.503</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">-0.004</td>
-<td align="right">0.123</td>
-<td align="right">0.085</td>
-<td align="right">0.190</td>
-<td align="right">0.290</td>
-<td align="right">0.772</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.097</td>
-<td align="right">0.071</td>
-<td align="right">0.148</td>
-<td align="right">-0.188</td>
-<td align="right">0.191</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.261</td>
-<td align="right">-0.007</td>
-<td align="right">0.096</td>
-<td align="right">0.070</td>
-<td align="right">0.133</td>
-<td align="right">0.072</td>
-<td align="right">0.449</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.531</td>
-<td align="right">-0.004</td>
-<td align="right">0.096</td>
-<td align="right">0.069</td>
-<td align="right">0.129</td>
-<td align="right">0.344</td>
-<td align="right">0.718</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.003</td>
-<td align="right">0.003</td>
-<td align="right">0.092</td>
-<td align="right">0.067</td>
-<td align="right">0.139</td>
-<td align="right">-0.178</td>
-<td align="right">0.184</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.259</td>
-<td align="right">-0.008</td>
-<td align="right">0.092</td>
-<td align="right">0.066</td>
-<td align="right">0.121</td>
-<td align="right">0.079</td>
-<td align="right">0.439</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.532</td>
-<td align="right">-0.002</td>
-<td align="right">0.091</td>
-<td align="right">0.068</td>
-<td align="right">0.125</td>
-<td align="right">0.353</td>
-<td align="right">0.711</td>
-<td align="right">0.954</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="synthesizing-by-a-classification-and-regression-tree-cart-1" class="section level3">
-<h3><span class="header-section-number">4.2.2</span> Synthesizing by a Classification and Regression Tree (CART)</h3>
-<table>
-<caption>Simulation results of multivariate normal data, synthesized by classification and regression trees.</caption>
-<colgroup>
-<col width="19%"></col>
-<col width="10%"></col>
-<col width="7%"></col>
-<col width="16%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="7%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Correlation predictors</th>
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">MeanSE</th>
-<th align="right">MinSE</th>
-<th align="right">MaxSE</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.072</td>
-<td align="right">0.054</td>
-<td align="right">0.107</td>
-<td align="right">-0.140</td>
-<td align="right">0.141</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.323</td>
-<td align="right">0.006</td>
-<td align="right">0.071</td>
-<td align="right">0.052</td>
-<td align="right">0.095</td>
-<td align="right">0.183</td>
-<td align="right">0.462</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.633</td>
-<td align="right">0.000</td>
-<td align="right">0.071</td>
-<td align="right">0.053</td>
-<td align="right">0.098</td>
-<td align="right">0.492</td>
-<td align="right">0.773</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">-0.001</td>
-<td align="right">-0.001</td>
-<td align="right">0.105</td>
-<td align="right">0.067</td>
-<td align="right">0.176</td>
-<td align="right">-0.206</td>
-<td align="right">0.204</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.304</td>
-<td align="right">-0.012</td>
-<td align="right">0.104</td>
-<td align="right">0.067</td>
-<td align="right">0.172</td>
-<td align="right">0.100</td>
-<td align="right">0.507</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
-<td align="right">-0.028</td>
-<td align="right">0.104</td>
-<td align="right">0.065</td>
-<td align="right">0.153</td>
-<td align="right">0.400</td>
-<td align="right">0.809</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-<td align="right">0.082</td>
-<td align="right">0.060</td>
-<td align="right">0.124</td>
-<td align="right">-0.158</td>
-<td align="right">0.163</td>
-<td align="right">0.952</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.295</td>
-<td align="right">-0.021</td>
-<td align="right">0.082</td>
-<td align="right">0.058</td>
-<td align="right">0.113</td>
-<td align="right">0.135</td>
-<td align="right">0.455</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.605</td>
+<td align="right">0.606</td>
 <td align="right">-0.027</td>
 <td align="right">0.082</td>
 <td align="right">0.059</td>
-<td align="right">0.112</td>
+<td align="right">0.115</td>
 <td align="right">0.445</td>
 <td align="right">0.766</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.079</td>
-<td align="right">0.061</td>
-<td align="right">0.125</td>
-<td align="right">-0.153</td>
-<td align="right">0.155</td>
-<td align="right">0.938</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.293</td>
-<td align="right">-0.023</td>
-<td align="right">0.078</td>
-<td align="right">0.058</td>
-<td align="right">0.113</td>
-<td align="right">0.140</td>
-<td align="right">0.447</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = 0</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.603</td>
-<td align="right">-0.030</td>
-<td align="right">0.079</td>
-<td align="right">0.055</td>
-<td align="right">0.106</td>
-<td align="right">0.449</td>
-<td align="right">0.757</td>
-<td align="right">0.930</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.088</td>
-<td align="right">0.066</td>
-<td align="right">0.127</td>
-<td align="right">-0.171</td>
-<td align="right">0.173</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.260</td>
-<td align="right">-0.007</td>
-<td align="right">0.087</td>
-<td align="right">0.064</td>
-<td align="right">0.122</td>
-<td align="right">0.089</td>
-<td align="right">0.432</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.540</td>
-<td align="right">0.006</td>
-<td align="right">0.087</td>
-<td align="right">0.066</td>
-<td align="right">0.118</td>
-<td align="right">0.370</td>
-<td align="right">0.711</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.039</td>
-<td align="right">0.039</td>
-<td align="right">0.125</td>
-<td align="right">0.083</td>
-<td align="right">0.192</td>
-<td align="right">-0.206</td>
-<td align="right">0.285</td>
-<td align="right">0.946</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.257</td>
-<td align="right">-0.010</td>
-<td align="right">0.126</td>
-<td align="right">0.080</td>
-<td align="right">0.198</td>
-<td align="right">0.011</td>
-<td align="right">0.503</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn1</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.516</td>
-<td align="right">-0.019</td>
-<td align="right">0.124</td>
-<td align="right">0.081</td>
-<td align="right">0.196</td>
-<td align="right">0.274</td>
-<td align="right">0.758</td>
-<td align="right">0.954</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.036</td>
-<td align="right">0.036</td>
-<td align="right">0.097</td>
-<td align="right">0.070</td>
-<td align="right">0.144</td>
-<td align="right">-0.154</td>
-<td align="right">0.226</td>
-<td align="right">0.936</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.253</td>
-<td align="right">-0.014</td>
-<td align="right">0.097</td>
-<td align="right">0.066</td>
-<td align="right">0.134</td>
-<td align="right">0.062</td>
-<td align="right">0.443</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn5</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.515</td>
-<td align="right">-0.019</td>
-<td align="right">0.096</td>
-<td align="right">0.065</td>
-<td align="right">0.137</td>
-<td align="right">0.327</td>
-<td align="right">0.703</td>
-<td align="right">0.924</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.034</td>
-<td align="right">0.034</td>
-<td align="right">0.093</td>
-<td align="right">0.068</td>
-<td align="right">0.142</td>
-<td align="right">-0.148</td>
-<td align="right">0.217</td>
-<td align="right">0.934</td>
-</tr>
-<tr class="odd">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV2</td>
-<td align="right">0.267</td>
-<td align="right">0.255</td>
-<td align="right">-0.012</td>
-<td align="right">0.093</td>
-<td align="right">0.066</td>
-<td align="right">0.126</td>
-<td align="right">0.073</td>
-<td align="right">0.438</td>
-<td align="right">0.942</td>
-</tr>
-<tr class="even">
-<td align="left">Rho = .5</td>
-<td align="left">Syn10</td>
-<td align="left">IV3</td>
-<td align="right">0.535</td>
-<td align="right">0.514</td>
-<td align="right">-0.020</td>
-<td align="right">0.092</td>
-<td align="right">0.066</td>
-<td align="right">0.126</td>
-<td align="right">0.334</td>
-<td align="right">0.694</td>
-<td align="right">0.940</td>
+<td align="right">0.943</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="variance-estimates" class="section level3">
-<h3><span class="header-section-number">4.2.3</span> Variance estimates</h3>
-<p>The variance of the statistic of interest equals <span class="math inline">\(\bar{v}_M\)</span>, which represents the average variance over the <span class="math inline">\(M\)</span> synthetic datasets, when the goal of the synthesis is to make inferences with regard to the sample at hand, instead of with regard to the population. When the goal of the synthesis is to make population inferences, the variance is adjusted with an additional term, based on the number of synthetic datasets: <span class="math display">\[
-Var(Q) = \bar{\mathcal{v}}_M (1 + \frac{1}{M})
-\]</span> where <span class="math inline">\(Q\)</span> is the statistic of interest and <span class="math inline">\(\bar{v}_M\)</span> is the mean of the statistic over the <span class="math inline">\(M\)</span> syntheses. If the number of synthesized data points (<span class="math inline">\(J\)</span>) is unequal to the number of observations in the dataset (<span class="math inline">\(N\)</span>), a correction equal to <span class="math inline">\(\frac{J}{N}\)</span> is multiplied with <span class="math inline">\(\bar{v}_M\)</span>.</p>
-</div>
-</div>
-</div>
-<div id="references" class="section level1">
-<h1><span class="header-section-number">5</span> References</h1>
-
-<p></p>
-<div id="refs">
-<div id="ref-synthpop">
-<p>Nowok, B., Raab, G. M., &amp; Dibben, C. (2016). synthpop: Bespoke creation of synthetic data in R. <em>Journal of Statistical Software</em>, <em>74</em>(11), 1–26. <a href="https://doi.org/10.18637/jss.v074.i11">https://doi.org/10.18637/jss.v074.i11</a></p>
-</div>
-<div id="ref-mice">
-<p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in r. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
-</div>
-</div>
+<div id="results-with-partitioned-data" class="section level1">
+<h1><span class="header-section-number">2</span> Results with partitioned data</h1>
+<p>When we first partition the sampled data from the multivariate normal distribution, the results change to some extent, which can be seen in the following table.</p>
+<table style="width:100%;">
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows with partitioned data.</caption>
+<colgroup>
+<col width="11%"></col>
+<col width="11%"></col>
+<col width="8%"></col>
+<col width="18%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Sample size</th>
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.072</td>
+<td align="right">0.053</td>
+<td align="right">0.107</td>
+<td align="right">-0.141</td>
+<td align="right">0.140</td>
+<td align="right">0.952</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.319</td>
+<td align="right">0.003</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.096</td>
+<td align="right">0.179</td>
+<td align="right">0.459</td>
+<td align="right">0.947</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.633</td>
+<td align="right">0.000</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.098</td>
+<td align="right">0.493</td>
+<td align="right">0.773</td>
+<td align="right">0.954</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">-0.003</td>
+<td align="right">-0.003</td>
+<td align="right">0.094</td>
+<td align="right">0.064</td>
+<td align="right">0.135</td>
+<td align="right">-0.188</td>
+<td align="right">0.181</td>
+<td align="right">0.957</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.215</td>
+<td align="right">-0.101</td>
+<td align="right">0.094</td>
+<td align="right">0.069</td>
+<td align="right">0.135</td>
+<td align="right">0.030</td>
+<td align="right">0.400</td>
+<td align="right">0.823</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.471</td>
+<td align="right">-0.161</td>
+<td align="right">0.094</td>
+<td align="right">0.069</td>
+<td align="right">0.131</td>
+<td align="right">0.287</td>
+<td align="right">0.656</td>
+<td align="right">0.613</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">-0.043</td>
+<td align="right">0.044</td>
+<td align="right">0.959</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.316</td>
+<td align="right">0.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">0.272</td>
+<td align="right">0.360</td>
+<td align="right">0.952</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
+<td align="right">0.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">0.588</td>
+<td align="right">0.676</td>
+<td align="right">0.947</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">0.025</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">-0.048</td>
+<td align="right">0.050</td>
+<td align="right">0.954</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.300</td>
+<td align="right">-0.016</td>
+<td align="right">0.025</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">0.251</td>
+<td align="right">0.349</td>
+<td align="right">0.893</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.618</td>
+<td align="right">-0.015</td>
+<td align="right">0.025</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">0.569</td>
+<td align="right">0.667</td>
+<td align="right">0.909</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">-0.014</td>
+<td align="right">0.014</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.317</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.303</td>
+<td align="right">0.331</td>
+<td align="right">0.948</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.619</td>
+<td align="right">0.646</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.015</td>
+<td align="right">0.015</td>
+<td align="right">0.917</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.314</td>
+<td align="right">-0.002</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.299</td>
+<td align="right">0.330</td>
+<td align="right">0.940</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.630</td>
+<td align="right">-0.002</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.615</td>
+<td align="right">0.645</td>
+<td align="right">0.932</td>
+</tr>
+</tbody>
+</table>
+<p>When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.</p>
+<table>
+<caption>Results of a linear regression model where weight is regressed on height and age, with the data partitioned into 5 subsets and m = 5 synthetic versions of each subset.</caption>
+<colgroup>
+<col width="14%"></col>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="16%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Sample size</th>
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Single partition</td>
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.203</td>
+<td align="right">-9.203</td>
+<td align="right">0.000</td>
+<td align="right">2.042</td>
+<td align="right">2.042</td>
+<td align="right">2.042</td>
+<td align="right">-13.204</td>
+<td align="right">-5.201</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">Single partition</td>
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.345</td>
+<td align="right">2.345</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.188</td>
+<td align="right">0.188</td>
+<td align="right">1.976</td>
+<td align="right">2.714</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Single partition</td>
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.190</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.028</td>
+<td align="right">0.028</td>
+<td align="right">0.135</td>
+<td align="right">0.244</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">Single partition</td>
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.203</td>
+<td align="right">-10.184</td>
+<td align="right">-0.981</td>
+<td align="right">2.191</td>
+<td align="right">2.050</td>
+<td align="right">2.422</td>
+<td align="right">-14.479</td>
+<td align="right">-5.889</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Single partition</td>
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.345</td>
+<td align="right">2.239</td>
+<td align="right">-0.106</td>
+<td align="right">0.202</td>
+<td align="right">0.189</td>
+<td align="right">0.224</td>
+<td align="right">1.844</td>
+<td align="right">2.634</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">Single partition</td>
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.204</td>
+<td align="right">0.015</td>
+<td align="right">0.030</td>
+<td align="right">0.028</td>
+<td align="right">0.033</td>
+<td align="right">0.146</td>
+<td align="right">0.263</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Nsim partitions</td>
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.203</td>
+<td align="right">-9.203</td>
+<td align="right">0.000</td>
+<td align="right">2.042</td>
+<td align="right">2.042</td>
+<td align="right">2.042</td>
+<td align="right">-13.204</td>
+<td align="right">-5.201</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">Nsim partitions</td>
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.345</td>
+<td align="right">2.345</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.188</td>
+<td align="right">0.188</td>
+<td align="right">1.976</td>
+<td align="right">2.714</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Nsim partitions</td>
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.190</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.028</td>
+<td align="right">0.028</td>
+<td align="right">0.135</td>
+<td align="right">0.244</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">Nsim partitions</td>
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.203</td>
+<td align="right">-9.626</td>
+<td align="right">-0.423</td>
+<td align="right">2.221</td>
+<td align="right">2.068</td>
+<td align="right">2.387</td>
+<td align="right">-13.979</td>
+<td align="right">-5.273</td>
+<td align="right">0.998</td>
+</tr>
+<tr class="odd">
+<td align="left">Nsim partitions</td>
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.345</td>
+<td align="right">2.294</td>
+<td align="right">-0.051</td>
+<td align="right">0.205</td>
+<td align="right">0.187</td>
+<td align="right">0.223</td>
+<td align="right">1.893</td>
+<td align="right">2.694</td>
+<td align="right">0.992</td>
+</tr>
+<tr class="even">
+<td align="left">Nsim partitions</td>
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.196</td>
+<td align="right">0.007</td>
+<td align="right">0.030</td>
+<td align="right">0.028</td>
+<td align="right">0.033</td>
+<td align="right">0.137</td>
+<td align="right">0.256</td>
+<td align="right">0.993</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
