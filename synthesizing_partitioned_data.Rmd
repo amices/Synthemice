@@ -1,0 +1,61 @@
+---
+title: "Federated Imputation"
+author: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
+```
+
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.d Synthesize partitioned data.R")
+```
+
+# Previous results
+
+Without partitioning the data, we already saw that synthesizing does not distort the relationships of the variables in the data at hand. That is, synthesizing a dataset results in $M$ synthetic datasets with, on average, the same properties as the original dataset. The results can be seen in the following table. This table contains the simulation results of synthesizing multivariate normally distributed data, where the correlation between predictors equals $\rho = 0$, the proportion explained variance equals $R^2 = .50$ and the sample size equals $n = 100$. Note that synthesizing is done by means of the default settings (by means of CART), and the variance of the estimates is calculated as 
+$$Var(\beta) = \bar{v}_{M}(1 + \frac{1}{M}),$$
+where $\bar{v}_M$ is the average variance of the regression coefficient over the $M$ synthetic datasets.
+
+```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+knitr::kable(summary_out_norm, digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.")
+```
+
+# Results with partitioned data
+
+When we first partition the sampled data from the multivariate normal distribution, the results change to some extent, which can be seen in the following table.
+
+
+```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+bind_rows("n = 100" = summary_out_norm_part_n100, 
+          "n = 1000" = summary_out_norm_part_n1000, 
+          "n = 10000" = summary_out_norm_part_n10000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows with partitioned data.")
+```
+
+
+When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
+
+```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+bind_rows("Single partition" = summary_out_same_part, "Nsim partitions" = summary_out_nsim_parts, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where weight is regressed on height and age, with the data partitioned into 5 subsets and m = 5 synthetic versions of each subset.")
+```
+
+
+
+
