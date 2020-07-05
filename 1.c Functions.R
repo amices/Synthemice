@@ -75,12 +75,14 @@ normal <- function(r2, ratio_beta, rho, n = 10000) {
   return(list(dat = data.frame(DV = y, X), coefs = b*ratio_beta))
 }
 
-syn_part_data <- function(partitioned_data, M, formula) {
+syn_part_data <- function(partitioned_data, M, formula, 
+                          method = NULL, pop.inf = T) {
   
   d <- partitioned_data
   f <- formula
   
-  out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F))
+  out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F,
+                                method = method))
   
   new_syns <- as.list(1:M)
   
@@ -93,11 +95,11 @@ syn_part_data <- function(partitioned_data, M, formula) {
   
   data <- map_dfr(d, function(x) as.data.frame(x))
   
-  # Fit the lm models on all four datasets (the real data and the synthetic data)
+  # Fit the lm models on all datasets
   r <- list(Real_Sample = lm(f,data), Syn = lm.synds(f, syn))
   
   # Collect the output
-  out <- map(r, function(x) {if (class(x) == "fit.synds") {x <- summary(x, population.inference = T)}
+  out <- map(r, function(x) {if (class(x) == "fit.synds") {x <- summary(x, population.inference = pop.inf)}
     else {x <- summary(x)}
     return(as.data.frame(coef(x)))}) %>% 
     map(., function(x) {colnames(x) <- c("Est", "SE", "stat", "P"); return(as.data.frame(x))}) %>%
@@ -110,6 +112,49 @@ syn_part_data <- function(partitioned_data, M, formula) {
            Upper = Est + qnorm(.975)*SE)
   # Return the output
   return(as.data.frame(out))
+}
+
+syn_part_data_new_var <- function(partitioned_data, M, formula, pop.inf = T) {
+  
+  d <- partitioned_data
+  f <- formula
+  
+  out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F))
+  
+  all_syns <- as.list(1:M)
+  
+  for (m in 1:M) {
+    all_syns[[m]] <- map(1:length(out), function(x) out[[x]]$syn[[m]])
+  }
+  
+  results <- all_syns %>% unlist(recursive = F) %>% 
+    map_dfr(., .id = "syn", function(x) {
+      lm(f, x) %>% broom::tidy() %>%
+      mutate(variance = std.error^2) %>%
+      dplyr::select(term = term, est = estimate, variance = variance)})
+  
+  real_results <- map_dfr(d, function(x) as.data.frame(x)) %>%
+                  lm(f, .) %>% broom::tidy(conf.int=T) %>%
+                  dplyr::select(term = term, Qbar = estimate, SE = std.error,
+                                Lower = conf.low, Upper = conf.high)
+  
+  results %>%
+    group_by(term) %>%
+    summarise(Qbar = mean(est),
+              bm = sum((est - Qbar)^2 / (n()-1)),
+              vbar = mean(variance),
+              Ts = (bm * (1 + 1 / (n())) -vbar),
+              Tstar_s = max(0,Ts) + ifelse(Ts < 0, 1, 0)*vbar,
+              SE = sqrt(Tstar_s),
+              rm = (1 + 1/n())*bm/vbar,
+              df = (n() - 1)*(1 - 1/rm)^2,
+              Lower = Qbar - qt(.975, df)*sqrt(Tstar_s),
+              Upper = Qbar + qt(.975, df)*sqrt(Tstar_s)) %>% ungroup() -> summary_results
+    #dplyr::select(term, Qbar, SE, Lower, Upper) -> summary_results
+  
+  output <- bind_rows(Real = real_results, Synthetic = summary_results, .id = "Method")
+  
+  return(output)
 }
 
 print_results <- function(output, coefs) {
@@ -126,6 +171,7 @@ print_results <- function(output, coefs) {
               "MaxSE" = max(SE),
               "Lower" = mean(Lower),
               "Upper" = mean(Upper),
+              "CIW" = mean(Upper) - mean(Lower),
               "Coverage" = mean(Covered)) %>%
     arrange(factor(Method, levels = c("Real_Sample", "Syn1", "Syn5", "Syn10")))
 }

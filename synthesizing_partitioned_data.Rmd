@@ -20,11 +20,13 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
+library(tidyverse)
 ```
 
 ```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
 source("2.d Synthesize partitioned data.R")
 ```
+
 
 # Previous results
 
@@ -33,29 +35,46 @@ $$Var(\beta) = \bar{v}_{M}(1 + \frac{1}{M}),$$
 where $\bar{v}_M$ is the average variance of the regression coefficient over the $M$ synthetic datasets.
 
 ```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
-knitr::kable(summary_out_norm, digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.")
+knitr::kable(summary_out_cart, digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.")
 ```
 
 # Results with partitioned data
 
-When we first partition the sampled data from the multivariate normal distribution, the results change to some extent, which can be seen in the following table.
+## CART Synthesizing method
+
+CART Method: First variable is sampled from the observed data, the second variable is predicted from the first variable by means of a regression tree, the third variable is predicted from the first two variables, and so on. 
+
+When we first partition the sampled data from the multivariate normal distribution, the results change to quite some extent, which can be seen in the following table. The coverage seems to be very low, and far below the nominal level of $95\%$. 
 
 
 ```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
-bind_rows("n = 100" = summary_out_norm_part_n100, 
-          "n = 1000" = summary_out_norm_part_n1000, 
-          "n = 10000" = summary_out_norm_part_n10000, .id = "Sample size") %>%
-  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows with partitioned data.")
+bind_rows("n = 100" = summary_out_cart_part_n100, 
+          "n = 1000" = summary_out_cart_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
 ```
 
 
-When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
+## Norm Synethesizing method
 
-```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+Norm Method: The first variable is sampled from a univariate normal distribution, the second variable is drawn from a normal distribution with mean $\mu = \beta_1 * X_1$ and variance $\sigma^2 = \sigma^2_e$, the third variable is drawn based on the first two variables, and so on. This performs much better than the previous method, but this introduces bias, which is accompanied by a somewhat too low coverage.
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+bind_rows("n = 100" = summary_out_norm_part_n100,
+          "n = 1000" = summary_out_norm_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of method 'norm' with M = 10 in the last three rows with partitioned data.")
+  
+
+```
+
+
+<!--When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
+
+```{r, echo = F, cache=thomcache, cache.lazy=thomlazy, eval = F}
 bind_rows("Single partition" = summary_out_same_part, "Nsim partitions" = summary_out_nsim_parts, .id = "Sample size") %>%
   knitr::kable(., digits = 3, caption = "Results of a linear regression model where weight is regressed on height and age, with the data partitioned into 5 subsets and m = 5 synthetic versions of each subset.")
 ```
 
+-->
 
 
 
