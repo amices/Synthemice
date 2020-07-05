@@ -1519,7 +1519,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">02-07-2020</h4>
+<h4 class="date">05-07-2020</h4>
 
 </div>
 
@@ -1530,17 +1530,18 @@ div.tocify {
 <table style="width:100%;">
 <caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.</caption>
 <colgroup>
-<col width="12%"></col>
-<col width="9%"></col>
-<col width="21%"></col>
-<col width="6%"></col>
-<col width="7%"></col>
-<col width="7%"></col>
+<col width="11%"></col>
+<col width="8%"></col>
+<col width="19%"></col>
+<col width="5%"></col>
 <col width="6%"></col>
 <col width="6%"></col>
-<col width="7%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
 <col width="6%"></col>
-<col width="9%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -1554,6 +1555,7 @@ div.tocify {
 <th align="right">MaxSE</th>
 <th align="right">Lower</th>
 <th align="right">Upper</th>
+<th align="right">CIW</th>
 <th align="right">Coverage</th>
 </tr>
 </thead>
@@ -1569,6 +1571,7 @@ div.tocify {
 <td align="right">0.107</td>
 <td align="right">-0.141</td>
 <td align="right">0.140</td>
+<td align="right">0.281</td>
 <td align="right">0.952</td>
 </tr>
 <tr class="even">
@@ -1582,6 +1585,7 @@ div.tocify {
 <td align="right">0.096</td>
 <td align="right">0.179</td>
 <td align="right">0.459</td>
+<td align="right">0.280</td>
 <td align="right">0.947</td>
 </tr>
 <tr class="odd">
@@ -1595,60 +1599,67 @@ div.tocify {
 <td align="right">0.098</td>
 <td align="right">0.493</td>
 <td align="right">0.773</td>
+<td align="right">0.280</td>
 <td align="right">0.954</td>
 </tr>
 <tr class="even">
-<td align="left">Syn5</td>
+<td align="left">Syn10</td>
 <td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-<td align="right">0.082</td>
-<td align="right">0.058</td>
-<td align="right">0.124</td>
-<td align="right">-0.159</td>
-<td align="right">0.162</td>
-<td align="right">0.959</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.079</td>
+<td align="right">0.057</td>
+<td align="right">0.125</td>
+<td align="right">-0.154</td>
+<td align="right">0.154</td>
+<td align="right">0.308</td>
+<td align="right">0.951</td>
 </tr>
 <tr class="odd">
-<td align="left">Syn5</td>
+<td align="left">Syn10</td>
 <td align="left">IV2</td>
 <td align="right">0.316</td>
-<td align="right">0.291</td>
-<td align="right">-0.025</td>
-<td align="right">0.082</td>
+<td align="right">0.290</td>
+<td align="right">-0.026</td>
+<td align="right">0.079</td>
 <td align="right">0.058</td>
-<td align="right">0.114</td>
-<td align="right">0.131</td>
-<td align="right">0.451</td>
-<td align="right">0.932</td>
+<td align="right">0.113</td>
+<td align="right">0.136</td>
+<td align="right">0.444</td>
+<td align="right">0.308</td>
+<td align="right">0.925</td>
 </tr>
 <tr class="even">
-<td align="left">Syn5</td>
+<td align="left">Syn10</td>
 <td align="left">IV3</td>
 <td align="right">0.632</td>
-<td align="right">0.606</td>
-<td align="right">-0.027</td>
-<td align="right">0.082</td>
-<td align="right">0.059</td>
-<td align="right">0.115</td>
-<td align="right">0.445</td>
-<td align="right">0.766</td>
-<td align="right">0.943</td>
+<td align="right">0.604</td>
+<td align="right">-0.028</td>
+<td align="right">0.079</td>
+<td align="right">0.055</td>
+<td align="right">0.106</td>
+<td align="right">0.450</td>
+<td align="right">0.758</td>
+<td align="right">0.308</td>
+<td align="right">0.938</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="results-with-partitioned-data" class="section level1">
 <h1><span class="header-section-number">2</span> Results with partitioned data</h1>
-<p>When we first partition the sampled data from the multivariate normal distribution, the results change to some extent, which can be seen in the following table.</p>
+<div id="cart-synthesizing-method" class="section level2">
+<h2><span class="header-section-number">2.1</span> CART Synthesizing method</h2>
+<p>CART Method: First variable is sampled from the observed data, the second variable is predicted from the first variable by means of a regression tree, the third variable is predicted from the first two variables, and so on.</p>
+<p>When we first partition the sampled data from the multivariate normal distribution, the results change to quite some extent, which can be seen in the following table. The coverage seems to be very low, and far below the nominal level of <span class="math inline">\(95\%\)</span>.</p>
 <table style="width:100%;">
-<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows with partitioned data.</caption>
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.</caption>
 <colgroup>
-<col width="11%"></col>
-<col width="11%"></col>
-<col width="8%"></col>
-<col width="18%"></col>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="7%"></col>
+<col width="17%"></col>
 <col width="6%"></col>
 <col width="6%"></col>
 <col width="6%"></col>
@@ -1656,7 +1667,8 @@ div.tocify {
 <col width="5%"></col>
 <col width="6%"></col>
 <col width="5%"></col>
-<col width="8%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -1671,6 +1683,7 @@ div.tocify {
 <th align="right">MaxSE</th>
 <th align="right">Lower</th>
 <th align="right">Upper</th>
+<th align="right">CIW</th>
 <th align="right">Coverage</th>
 </tr>
 </thead>
@@ -1687,6 +1700,7 @@ div.tocify {
 <td align="right">0.107</td>
 <td align="right">-0.141</td>
 <td align="right">0.140</td>
+<td align="right">0.281</td>
 <td align="right">0.952</td>
 </tr>
 <tr class="even">
@@ -1701,6 +1715,7 @@ div.tocify {
 <td align="right">0.096</td>
 <td align="right">0.179</td>
 <td align="right">0.459</td>
+<td align="right">0.280</td>
 <td align="right">0.947</td>
 </tr>
 <tr class="odd">
@@ -1715,6 +1730,7 @@ div.tocify {
 <td align="right">0.098</td>
 <td align="right">0.493</td>
 <td align="right">0.773</td>
+<td align="right">0.280</td>
 <td align="right">0.954</td>
 </tr>
 <tr class="even">
@@ -1724,40 +1740,43 @@ div.tocify {
 <td align="right">0.000</td>
 <td align="right">-0.003</td>
 <td align="right">-0.003</td>
-<td align="right">0.094</td>
-<td align="right">0.064</td>
-<td align="right">0.135</td>
-<td align="right">-0.188</td>
-<td align="right">0.181</td>
-<td align="right">0.957</td>
+<td align="right">0.090</td>
+<td align="right">0.066</td>
+<td align="right">0.139</td>
+<td align="right">-0.180</td>
+<td align="right">0.174</td>
+<td align="right">0.354</td>
+<td align="right">0.972</td>
 </tr>
 <tr class="odd">
 <td align="left">n = 100</td>
 <td align="left">Syn</td>
 <td align="left">IV2</td>
 <td align="right">0.316</td>
-<td align="right">0.215</td>
-<td align="right">-0.101</td>
-<td align="right">0.094</td>
-<td align="right">0.069</td>
-<td align="right">0.135</td>
-<td align="right">0.030</td>
-<td align="right">0.400</td>
-<td align="right">0.823</td>
+<td align="right">0.214</td>
+<td align="right">-0.102</td>
+<td align="right">0.090</td>
+<td align="right">0.066</td>
+<td align="right">0.120</td>
+<td align="right">0.037</td>
+<td align="right">0.391</td>
+<td align="right">0.354</td>
+<td align="right">0.812</td>
 </tr>
 <tr class="even">
 <td align="left">n = 100</td>
 <td align="left">Syn</td>
 <td align="left">IV3</td>
 <td align="right">0.632</td>
-<td align="right">0.471</td>
-<td align="right">-0.161</td>
-<td align="right">0.094</td>
-<td align="right">0.069</td>
-<td align="right">0.131</td>
-<td align="right">0.287</td>
-<td align="right">0.656</td>
-<td align="right">0.613</td>
+<td align="right">0.472</td>
+<td align="right">-0.160</td>
+<td align="right">0.090</td>
+<td align="right">0.067</td>
+<td align="right">0.121</td>
+<td align="right">0.296</td>
+<td align="right">0.649</td>
+<td align="right">0.353</td>
+<td align="right">0.585</td>
 </tr>
 <tr class="odd">
 <td align="left">n = 1000</td>
@@ -1771,6 +1790,7 @@ div.tocify {
 <td align="right">0.025</td>
 <td align="right">-0.043</td>
 <td align="right">0.044</td>
+<td align="right">0.088</td>
 <td align="right">0.959</td>
 </tr>
 <tr class="even">
@@ -1785,6 +1805,7 @@ div.tocify {
 <td align="right">0.025</td>
 <td align="right">0.272</td>
 <td align="right">0.360</td>
+<td align="right">0.088</td>
 <td align="right">0.952</td>
 </tr>
 <tr class="odd">
@@ -1799,6 +1820,7 @@ div.tocify {
 <td align="right">0.025</td>
 <td align="right">0.588</td>
 <td align="right">0.676</td>
+<td align="right">0.088</td>
 <td align="right">0.947</td>
 </tr>
 <tr class="even">
@@ -1806,14 +1828,15 @@ div.tocify {
 <td align="left">Syn</td>
 <td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">0.025</td>
-<td align="right">0.022</td>
-<td align="right">0.028</td>
-<td align="right">-0.048</td>
-<td align="right">0.050</td>
-<td align="right">0.954</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.024</td>
+<td align="right">0.021</td>
+<td align="right">0.026</td>
+<td align="right">-0.045</td>
+<td align="right">0.049</td>
+<td align="right">0.094</td>
+<td align="right">0.951</td>
 </tr>
 <tr class="odd">
 <td align="left">n = 1000</td>
@@ -1822,12 +1845,13 @@ div.tocify {
 <td align="right">0.316</td>
 <td align="right">0.300</td>
 <td align="right">-0.016</td>
-<td align="right">0.025</td>
+<td align="right">0.024</td>
 <td align="right">0.022</td>
-<td align="right">0.028</td>
-<td align="right">0.251</td>
-<td align="right">0.349</td>
-<td align="right">0.893</td>
+<td align="right">0.027</td>
+<td align="right">0.253</td>
+<td align="right">0.347</td>
+<td align="right">0.094</td>
+<td align="right">0.891</td>
 </tr>
 <tr class="even">
 <td align="left">n = 1000</td>
@@ -1835,114 +1859,35 @@ div.tocify {
 <td align="left">IV3</td>
 <td align="right">0.632</td>
 <td align="right">0.618</td>
-<td align="right">-0.015</td>
-<td align="right">0.025</td>
-<td align="right">0.022</td>
-<td align="right">0.028</td>
-<td align="right">0.569</td>
-<td align="right">0.667</td>
-<td align="right">0.909</td>
-</tr>
-<tr class="odd">
-<td align="left">n = 10000</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
 <td align="right">-0.014</td>
-<td align="right">0.014</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">n = 10000</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.317</td>
-<td align="right">0.000</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
-<td align="right">0.303</td>
-<td align="right">0.331</td>
-<td align="right">0.948</td>
-</tr>
-<tr class="odd">
-<td align="left">n = 10000</td>
-<td align="left">Real_Sample</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.632</td>
-<td align="right">0.000</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
-<td align="right">0.007</td>
-<td align="right">0.619</td>
-<td align="right">0.646</td>
-<td align="right">0.950</td>
-</tr>
-<tr class="even">
-<td align="left">n = 10000</td>
-<td align="left">Syn</td>
-<td align="left">IV1</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.008</td>
-<td align="right">0.007</td>
-<td align="right">0.008</td>
-<td align="right">-0.015</td>
-<td align="right">0.015</td>
-<td align="right">0.917</td>
-</tr>
-<tr class="odd">
-<td align="left">n = 10000</td>
-<td align="left">Syn</td>
-<td align="left">IV2</td>
-<td align="right">0.316</td>
-<td align="right">0.314</td>
-<td align="right">-0.002</td>
-<td align="right">0.008</td>
-<td align="right">0.007</td>
-<td align="right">0.008</td>
-<td align="right">0.299</td>
-<td align="right">0.330</td>
-<td align="right">0.940</td>
-</tr>
-<tr class="even">
-<td align="left">n = 10000</td>
-<td align="left">Syn</td>
-<td align="left">IV3</td>
-<td align="right">0.632</td>
-<td align="right">0.630</td>
-<td align="right">-0.002</td>
-<td align="right">0.008</td>
-<td align="right">0.007</td>
-<td align="right">0.008</td>
-<td align="right">0.615</td>
-<td align="right">0.645</td>
-<td align="right">0.932</td>
+<td align="right">0.024</td>
+<td align="right">0.021</td>
+<td align="right">0.027</td>
+<td align="right">0.571</td>
+<td align="right">0.665</td>
+<td align="right">0.094</td>
+<td align="right">0.904</td>
 </tr>
 </tbody>
 </table>
-<p>When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.</p>
-<table>
-<caption>Results of a linear regression model where weight is regressed on height and age, with the data partitioned into 5 subsets and m = 5 synthetic versions of each subset.</caption>
+</div>
+<div id="norm-synethesizing-method" class="section level2">
+<h2><span class="header-section-number">2.2</span> Norm Synethesizing method</h2>
+<p>Norm Method: The first variable is sampled from a univariate normal distribution, the second variable is drawn from a normal distribution with mean <span class="math inline">\(\mu = \beta_1 * X_1\)</span> and variance <span class="math inline">\(\sigma^2 = \sigma^2_e\)</span>, the third variable is drawn based on the first two variables, and so on. This performs much better than the previous method, but this introduces bias, which is accompanied by a somewhat too low coverage.</p>
+<table style="width:100%;">
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of method ‘norm’ with M = 10 in the last three rows with partitioned data.</caption>
 <colgroup>
-<col width="14%"></col>
 <col width="10%"></col>
 <col width="10%"></col>
-<col width="16%"></col>
+<col width="7%"></col>
+<col width="17%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
 <col width="6%"></col>
 <col width="5%"></col>
 <col width="5%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
 <col width="6%"></col>
+<col width="5%"></col>
 <col width="5%"></col>
 <col width="7%"></col>
 </colgroup>
@@ -1959,180 +1904,199 @@ div.tocify {
 <th align="right">MaxSE</th>
 <th align="right">Lower</th>
 <th align="right">Upper</th>
+<th align="right">CIW</th>
 <th align="right">Coverage</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Real_Sample</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.203</td>
-<td align="right">-9.203</td>
+<td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">2.042</td>
-<td align="right">2.042</td>
-<td align="right">2.042</td>
-<td align="right">-13.204</td>
-<td align="right">-5.201</td>
-<td align="right">1.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.072</td>
+<td align="right">0.053</td>
+<td align="right">0.107</td>
+<td align="right">-0.141</td>
+<td align="right">0.140</td>
+<td align="right">0.281</td>
+<td align="right">0.952</td>
 </tr>
 <tr class="even">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Real_Sample</td>
-<td align="left">age</td>
-<td align="right">2.345</td>
-<td align="right">2.345</td>
-<td align="right">0.000</td>
-<td align="right">0.188</td>
-<td align="right">0.188</td>
-<td align="right">0.188</td>
-<td align="right">1.976</td>
-<td align="right">2.714</td>
-<td align="right">1.000</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.319</td>
+<td align="right">0.003</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.096</td>
+<td align="right">0.179</td>
+<td align="right">0.459</td>
+<td align="right">0.280</td>
+<td align="right">0.947</td>
 </tr>
 <tr class="odd">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Real_Sample</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.190</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.633</td>
 <td align="right">0.000</td>
-<td align="right">0.028</td>
-<td align="right">0.028</td>
-<td align="right">0.028</td>
-<td align="right">0.135</td>
-<td align="right">0.244</td>
-<td align="right">1.000</td>
+<td align="right">0.071</td>
+<td align="right">0.052</td>
+<td align="right">0.098</td>
+<td align="right">0.493</td>
+<td align="right">0.773</td>
+<td align="right">0.280</td>
+<td align="right">0.954</td>
 </tr>
 <tr class="even">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Syn</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.203</td>
-<td align="right">-10.184</td>
-<td align="right">-0.981</td>
-<td align="right">2.191</td>
-<td align="right">2.050</td>
-<td align="right">2.422</td>
-<td align="right">-14.479</td>
-<td align="right">-5.889</td>
-<td align="right">1.000</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">-0.001</td>
+<td align="right">-0.001</td>
+<td align="right">0.076</td>
+<td align="right">0.055</td>
+<td align="right">0.118</td>
+<td align="right">-0.150</td>
+<td align="right">0.149</td>
+<td align="right">0.299</td>
+<td align="right">0.953</td>
 </tr>
 <tr class="odd">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Syn</td>
-<td align="left">age</td>
-<td align="right">2.345</td>
-<td align="right">2.239</td>
-<td align="right">-0.106</td>
-<td align="right">0.202</td>
-<td align="right">0.189</td>
-<td align="right">0.224</td>
-<td align="right">1.844</td>
-<td align="right">2.634</td>
-<td align="right">1.000</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.301</td>
+<td align="right">-0.015</td>
+<td align="right">0.075</td>
+<td align="right">0.054</td>
+<td align="right">0.103</td>
+<td align="right">0.155</td>
+<td align="right">0.447</td>
+<td align="right">0.292</td>
+<td align="right">0.949</td>
 </tr>
 <tr class="even">
-<td align="left">Single partition</td>
+<td align="left">n = 100</td>
 <td align="left">Syn</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.204</td>
-<td align="right">0.015</td>
-<td align="right">0.030</td>
-<td align="right">0.028</td>
-<td align="right">0.033</td>
-<td align="right">0.146</td>
-<td align="right">0.263</td>
-<td align="right">1.000</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.581</td>
+<td align="right">-0.052</td>
+<td align="right">0.074</td>
+<td align="right">0.055</td>
+<td align="right">0.103</td>
+<td align="right">0.435</td>
+<td align="right">0.727</td>
+<td align="right">0.292</td>
+<td align="right">0.898</td>
 </tr>
 <tr class="odd">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Real_Sample</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.203</td>
-<td align="right">-9.203</td>
+<td align="left">IV1</td>
 <td align="right">0.000</td>
-<td align="right">2.042</td>
-<td align="right">2.042</td>
-<td align="right">2.042</td>
-<td align="right">-13.204</td>
-<td align="right">-5.201</td>
-<td align="right">1.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">-0.043</td>
+<td align="right">0.044</td>
+<td align="right">0.088</td>
+<td align="right">0.959</td>
 </tr>
 <tr class="even">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Real_Sample</td>
-<td align="left">age</td>
-<td align="right">2.345</td>
-<td align="right">2.345</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.316</td>
 <td align="right">0.000</td>
-<td align="right">0.188</td>
-<td align="right">0.188</td>
-<td align="right">0.188</td>
-<td align="right">1.976</td>
-<td align="right">2.714</td>
-<td align="right">1.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">0.272</td>
+<td align="right">0.360</td>
+<td align="right">0.088</td>
+<td align="right">0.952</td>
 </tr>
 <tr class="odd">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Real_Sample</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.190</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
 <td align="right">0.000</td>
-<td align="right">0.028</td>
-<td align="right">0.028</td>
-<td align="right">0.028</td>
-<td align="right">0.135</td>
-<td align="right">0.244</td>
-<td align="right">1.000</td>
+<td align="right">0.022</td>
+<td align="right">0.020</td>
+<td align="right">0.025</td>
+<td align="right">0.588</td>
+<td align="right">0.676</td>
+<td align="right">0.088</td>
+<td align="right">0.947</td>
 </tr>
 <tr class="even">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Syn</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.203</td>
-<td align="right">-9.626</td>
-<td align="right">-0.423</td>
-<td align="right">2.221</td>
-<td align="right">2.068</td>
-<td align="right">2.387</td>
-<td align="right">-13.979</td>
-<td align="right">-5.273</td>
-<td align="right">0.998</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">0.024</td>
+<td align="right">0.021</td>
+<td align="right">0.026</td>
+<td align="right">-0.046</td>
+<td align="right">0.047</td>
+<td align="right">0.092</td>
+<td align="right">0.957</td>
 </tr>
 <tr class="odd">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Syn</td>
-<td align="left">age</td>
-<td align="right">2.345</td>
-<td align="right">2.294</td>
-<td align="right">-0.051</td>
-<td align="right">0.205</td>
-<td align="right">0.187</td>
-<td align="right">0.223</td>
-<td align="right">1.893</td>
-<td align="right">2.694</td>
-<td align="right">0.992</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.315</td>
+<td align="right">-0.002</td>
+<td align="right">0.023</td>
+<td align="right">0.021</td>
+<td align="right">0.026</td>
+<td align="right">0.269</td>
+<td align="right">0.360</td>
+<td align="right">0.092</td>
+<td align="right">0.946</td>
 </tr>
 <tr class="even">
-<td align="left">Nsim partitions</td>
+<td align="left">n = 1000</td>
 <td align="left">Syn</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.196</td>
-<td align="right">0.007</td>
-<td align="right">0.030</td>
-<td align="right">0.028</td>
-<td align="right">0.033</td>
-<td align="right">0.137</td>
-<td align="right">0.256</td>
-<td align="right">0.993</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.627</td>
+<td align="right">-0.005</td>
+<td align="right">0.023</td>
+<td align="right">0.021</td>
+<td align="right">0.027</td>
+<td align="right">0.581</td>
+<td align="right">0.673</td>
+<td align="right">0.092</td>
+<td align="right">0.935</td>
 </tr>
 </tbody>
 </table>
+<!--When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
+
+
+
+-->
+</div>
 </div>
 
 
