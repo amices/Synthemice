@@ -38,7 +38,7 @@ where $\bar{v}_M$ is the average variance of the regression coefficient over the
 knitr::kable(summary_out_cart, digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.")
 ```
 
-# Results with partitioned data
+# Results with partitioned data and uncorrelated predictors
 
 ## CART Synthesizing method
 
@@ -49,7 +49,8 @@ When we first partition the sampled data from the multivariate normal distributi
 
 ```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
 bind_rows("n = 100" = summary_out_cart_part_n100, 
-          "n = 1000" = summary_out_cart_part_n1000, .id = "Sample size") %>%
+          "n = 1000" = summary_out_cart_part_n1000,
+          "n = 10000" = summary_out_cart_part_n10000, .id = "Sample size") %>%
   knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
 ```
 
@@ -60,21 +61,51 @@ Norm Method: The first variable is sampled from a univariate normal distribution
 
 ```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
 bind_rows("n = 100" = summary_out_norm_part_n100,
-          "n = 1000" = summary_out_norm_part_n1000, .id = "Sample size") %>%
+          "n = 1000" = summary_out_norm_part_n1000, 
+          "n = 10000" = summary_out_norm_part_n10000, .id = "Sample size") %>%
   knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of method 'norm' with M = 10 in the last three rows with partitioned data.")
   
 
 ```
 
 
-<!--When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
+# Results with partitioned data and correlated predictors
 
-```{r, echo = F, cache=thomcache, cache.lazy=thomlazy, eval = F}
-bind_rows("Single partition" = summary_out_same_part, "Nsim partitions" = summary_out_nsim_parts, .id = "Sample size") %>%
-  knitr::kable(., digits = 3, caption = "Results of a linear regression model where weight is regressed on height and age, with the data partitioned into 5 subsets and m = 5 synthetic versions of each subset.")
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.e Synthesize partitioned data with correlations.R")
 ```
 
--->
+When there are no correlations between the predictors, there is less information in the data with regard to every predictor, so it might be more difficult to correctly estimate all relationships in the data appropriately. Therefore, we introduce some moderate correlations between the predictors, so that, hopefully, the patterns in the data can be used to synthesize the data. The following correlation matrix is used to model the relationships between the data.
 
+$$
+\rho =
+\begin{bmatrix}
+1 & 0.15 & 0.25\\
+0.15 & 1 & 0.35\\
+0.25 & 0.35 & 1
+\end{bmatrix}
+$$
+
+## CART Synthesizing method
+
+When we use the CART synthesizing method, in combination with the data with correlated predictors coming from a multivariate normal distribution, we obtain the following results.
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+bind_rows("n = 100" = cor_summary_out_cart_part_n100, 
+          "n = 1000" = cor_summary_out_cart_part_n1000,
+          "n = 10000" = cor_summary_out_cart_part_n10000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
+
+## Norm Synthesizing method
+
+When we use the norm synthesizing method, in combination with the data with correlated predictors coming from a multivariate normal distribution, we obtain the following results.
+
+```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+bind_rows("n = 100" = cor_summary_out_norm_part_n100, 
+          "n = 1000" = cor_summary_out_norm_part_n1000,
+          "n = 10000" = cor_summary_out_norm_part_n10000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
 
 
