@@ -1519,7 +1519,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">05-07-2020</h4>
+<h4 class="date">07-07-2020</h4>
 
 </div>
 
@@ -1647,8 +1647,8 @@ div.tocify {
 </tbody>
 </table>
 </div>
-<div id="results-with-partitioned-data" class="section level1">
-<h1><span class="header-section-number">2</span> Results with partitioned data</h1>
+<div id="results-with-partitioned-data-and-uncorrelated-predictors" class="section level1">
+<h1><span class="header-section-number">2</span> Results with partitioned data and uncorrelated predictors</h1>
 <div id="cart-synthesizing-method" class="section level2">
 <h2><span class="header-section-number">2.1</span> CART Synthesizing method</h2>
 <p>CART Method: First variable is sampled from the observed data, the second variable is predicted from the first variable by means of a regression tree, the third variable is predicted from the first two variables, and so on.</p>
@@ -1867,6 +1867,96 @@ div.tocify {
 <td align="right">0.665</td>
 <td align="right">0.094</td>
 <td align="right">0.904</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">-0.014</td>
+<td align="right">0.014</td>
+<td align="right">0.028</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.317</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.303</td>
+<td align="right">0.331</td>
+<td align="right">0.028</td>
+<td align="right">0.948</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.619</td>
+<td align="right">0.646</td>
+<td align="right">0.028</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.015</td>
+<td align="right">0.014</td>
+<td align="right">0.029</td>
+<td align="right">0.939</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.314</td>
+<td align="right">-0.002</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.300</td>
+<td align="right">0.329</td>
+<td align="right">0.029</td>
+<td align="right">0.922</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.630</td>
+<td align="right">-0.002</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.616</td>
+<td align="right">0.645</td>
+<td align="right">0.029</td>
+<td align="right">0.940</td>
 </tr>
 </tbody>
 </table>
@@ -2089,13 +2179,732 @@ div.tocify {
 <td align="right">0.092</td>
 <td align="right">0.935</td>
 </tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">-0.014</td>
+<td align="right">0.014</td>
+<td align="right">0.028</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.317</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.303</td>
+<td align="right">0.331</td>
+<td align="right">0.028</td>
+<td align="right">0.948</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.619</td>
+<td align="right">0.646</td>
+<td align="right">0.028</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.014</td>
+<td align="right">0.015</td>
+<td align="right">0.029</td>
+<td align="right">0.957</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.316</td>
+<td align="right">0.317</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.302</td>
+<td align="right">0.331</td>
+<td align="right">0.029</td>
+<td align="right">0.942</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.632</td>
+<td align="right">0.632</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.618</td>
+<td align="right">0.647</td>
+<td align="right">0.029</td>
+<td align="right">0.948</td>
+</tr>
 </tbody>
 </table>
-<!--When we do the same with the imputed boys dataset, where the number of imputations equals one, we obtain the following results.
-
-
-
--->
+</div>
+</div>
+<div id="results-with-partitioned-data-and-correlated-predictors" class="section level1">
+<h1><span class="header-section-number">3</span> Results with partitioned data and correlated predictors</h1>
+<p>When there are no correlations between the predictors, there is less information in the data with regard to every predictor, so it might be more difficult to correctly estimate all relationships in the data appropriately. Therefore, we introduce some moderate correlations between the predictors, so that, hopefully, the patterns in the data can be used to synthesize the data. The following correlation matrix is used to model the relationships between the data.</p>
+<p><span class="math display">\[
+\rho =
+\begin{bmatrix}
+1 &amp; 0.15 &amp; 0.25\\
+0.15 &amp; 1 &amp; 0.35\\
+0.25 &amp; 0.35 &amp; 1
+\end{bmatrix}
+\]</span></p>
+<div id="cart-synthesizing-method-1" class="section level2">
+<h2><span class="header-section-number">3.1</span> CART Synthesizing method</h2>
+<p>When we use the CART synthesizing method, in combination with the data with correlated predictors coming from a multivariate normal distribution, we obtain the following results.</p>
+<table style="width:100%;">
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.</caption>
+<colgroup>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="7%"></col>
+<col width="17%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Sample size</th>
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.074</td>
+<td align="right">0.056</td>
+<td align="right">0.104</td>
+<td align="right">-0.143</td>
+<td align="right">0.147</td>
+<td align="right">0.290</td>
+<td align="right">0.945</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.278</td>
+<td align="right">-0.002</td>
+<td align="right">0.077</td>
+<td align="right">0.055</td>
+<td align="right">0.107</td>
+<td align="right">0.128</td>
+<td align="right">0.428</td>
+<td align="right">0.300</td>
+<td align="right">0.952</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.558</td>
+<td align="right">-0.001</td>
+<td align="right">0.078</td>
+<td align="right">0.058</td>
+<td align="right">0.110</td>
+<td align="right">0.404</td>
+<td align="right">0.712</td>
+<td align="right">0.308</td>
+<td align="right">0.947</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.083</td>
+<td align="right">0.083</td>
+<td align="right">0.088</td>
+<td align="right">0.062</td>
+<td align="right">0.129</td>
+<td align="right">-0.090</td>
+<td align="right">0.256</td>
+<td align="right">0.346</td>
+<td align="right">0.884</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.270</td>
+<td align="right">-0.009</td>
+<td align="right">0.091</td>
+<td align="right">0.064</td>
+<td align="right">0.130</td>
+<td align="right">0.093</td>
+<td align="right">0.448</td>
+<td align="right">0.355</td>
+<td align="right">0.970</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.415</td>
+<td align="right">-0.144</td>
+<td align="right">0.091</td>
+<td align="right">0.069</td>
+<td align="right">0.132</td>
+<td align="right">0.236</td>
+<td align="right">0.594</td>
+<td align="right">0.358</td>
+<td align="right">0.674</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.023</td>
+<td align="right">0.021</td>
+<td align="right">0.026</td>
+<td align="right">-0.045</td>
+<td align="right">0.045</td>
+<td align="right">0.091</td>
+<td align="right">0.955</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.279</td>
+<td align="right">0.000</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.027</td>
+<td align="right">0.232</td>
+<td align="right">0.326</td>
+<td align="right">0.094</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.560</td>
+<td align="right">0.001</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.027</td>
+<td align="right">0.512</td>
+<td align="right">0.608</td>
+<td align="right">0.096</td>
+<td align="right">0.945</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.009</td>
+<td align="right">0.009</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">-0.039</td>
+<td align="right">0.057</td>
+<td align="right">0.096</td>
+<td align="right">0.933</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.281</td>
+<td align="right">0.001</td>
+<td align="right">0.025</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">0.231</td>
+<td align="right">0.330</td>
+<td align="right">0.099</td>
+<td align="right">0.947</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.552</td>
+<td align="right">-0.007</td>
+<td align="right">0.026</td>
+<td align="right">0.023</td>
+<td align="right">0.029</td>
+<td align="right">0.501</td>
+<td align="right">0.602</td>
+<td align="right">0.101</td>
+<td align="right">0.927</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.014</td>
+<td align="right">0.015</td>
+<td align="right">0.029</td>
+<td align="right">0.944</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.279</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.264</td>
+<td align="right">0.294</td>
+<td align="right">0.030</td>
+<td align="right">0.955</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.559</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.544</td>
+<td align="right">0.574</td>
+<td align="right">0.030</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.013</td>
+<td align="right">0.017</td>
+<td align="right">0.030</td>
+<td align="right">0.952</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.280</td>
+<td align="right">0.001</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.265</td>
+<td align="right">0.296</td>
+<td align="right">0.031</td>
+<td align="right">0.941</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.558</td>
+<td align="right">-0.001</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.542</td>
+<td align="right">0.574</td>
+<td align="right">0.032</td>
+<td align="right">0.944</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="norm-synthesizing-method" class="section level2">
+<h2><span class="header-section-number">3.2</span> Norm Synthesizing method</h2>
+<p>When we use the norm synthesizing method, in combination with the data with correlated predictors coming from a multivariate normal distribution, we obtain the following results.</p>
+<table style="width:100%;">
+<caption>Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.</caption>
+<colgroup>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="7%"></col>
+<col width="17%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Sample size</th>
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.074</td>
+<td align="right">0.056</td>
+<td align="right">0.104</td>
+<td align="right">-0.143</td>
+<td align="right">0.147</td>
+<td align="right">0.290</td>
+<td align="right">0.945</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.278</td>
+<td align="right">-0.002</td>
+<td align="right">0.077</td>
+<td align="right">0.055</td>
+<td align="right">0.107</td>
+<td align="right">0.128</td>
+<td align="right">0.428</td>
+<td align="right">0.300</td>
+<td align="right">0.952</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.558</td>
+<td align="right">-0.001</td>
+<td align="right">0.078</td>
+<td align="right">0.058</td>
+<td align="right">0.110</td>
+<td align="right">0.404</td>
+<td align="right">0.712</td>
+<td align="right">0.308</td>
+<td align="right">0.947</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.010</td>
+<td align="right">0.010</td>
+<td align="right">0.078</td>
+<td align="right">0.058</td>
+<td align="right">0.114</td>
+<td align="right">-0.143</td>
+<td align="right">0.164</td>
+<td align="right">0.307</td>
+<td align="right">0.955</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.270</td>
+<td align="right">-0.010</td>
+<td align="right">0.079</td>
+<td align="right">0.058</td>
+<td align="right">0.118</td>
+<td align="right">0.114</td>
+<td align="right">0.425</td>
+<td align="right">0.311</td>
+<td align="right">0.956</td>
+</tr>
+<tr class="even">
+<td align="left">n = 100</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.508</td>
+<td align="right">-0.051</td>
+<td align="right">0.081</td>
+<td align="right">0.058</td>
+<td align="right">0.117</td>
+<td align="right">0.350</td>
+<td align="right">0.666</td>
+<td align="right">0.316</td>
+<td align="right">0.907</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.023</td>
+<td align="right">0.021</td>
+<td align="right">0.026</td>
+<td align="right">-0.045</td>
+<td align="right">0.045</td>
+<td align="right">0.091</td>
+<td align="right">0.955</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.279</td>
+<td align="right">0.000</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.027</td>
+<td align="right">0.232</td>
+<td align="right">0.326</td>
+<td align="right">0.094</td>
+<td align="right">0.950</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.560</td>
+<td align="right">0.001</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.027</td>
+<td align="right">0.512</td>
+<td align="right">0.608</td>
+<td align="right">0.096</td>
+<td align="right">0.945</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">0.024</td>
+<td align="right">0.022</td>
+<td align="right">0.028</td>
+<td align="right">-0.047</td>
+<td align="right">0.049</td>
+<td align="right">0.095</td>
+<td align="right">0.957</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.278</td>
+<td align="right">-0.001</td>
+<td align="right">0.025</td>
+<td align="right">0.022</td>
+<td align="right">0.029</td>
+<td align="right">0.229</td>
+<td align="right">0.327</td>
+<td align="right">0.098</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="even">
+<td align="left">n = 1000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.555</td>
+<td align="right">-0.004</td>
+<td align="right">0.026</td>
+<td align="right">0.023</td>
+<td align="right">0.028</td>
+<td align="right">0.505</td>
+<td align="right">0.605</td>
+<td align="right">0.101</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.014</td>
+<td align="right">0.015</td>
+<td align="right">0.029</td>
+<td align="right">0.944</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.279</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.264</td>
+<td align="right">0.294</td>
+<td align="right">0.030</td>
+<td align="right">0.955</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Real_Sample</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.559</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.544</td>
+<td align="right">0.574</td>
+<td align="right">0.030</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV1</td>
+<td align="right">0.000</td>
+<td align="right">0.001</td>
+<td align="right">0.001</td>
+<td align="right">0.008</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">-0.015</td>
+<td align="right">0.016</td>
+<td align="right">0.030</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="odd">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV2</td>
+<td align="right">0.280</td>
+<td align="right">0.279</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.264</td>
+<td align="right">0.295</td>
+<td align="right">0.031</td>
+<td align="right">0.958</td>
+</tr>
+<tr class="even">
+<td align="left">n = 10000</td>
+<td align="left">Syn</td>
+<td align="left">IV3</td>
+<td align="right">0.559</td>
+<td align="right">0.559</td>
+<td align="right">0.000</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.008</td>
+<td align="right">0.543</td>
+<td align="right">0.575</td>
+<td align="right">0.032</td>
+<td align="right">0.952</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
