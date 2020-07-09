@@ -108,4 +108,95 @@ bind_rows("n = 100" = cor_summary_out_norm_part_n100,
   knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
 ```
 
+# Ten subsets instead of five
+
+## Uncorrelated predictors
+
+### CART Synthesization
+
+Below, the results are presented when the data is partitioned into 10 subsets, instead of five, corresponding to ten different nodes that are synthesized separately, and then combined into a single dataset that is analysed by means of the standard estimators as presented by @raab_practical_2016. This yields regression coefficients that are equal to
+$$
+\beta_{M,k} = \sum^M_{m=1} \beta_{m,k} / M,
+$$
+with a variance of 
+$$
+V = \bar{v}_M(1+\frac{1}{M}),
+$$
+where $\bar{v}_M$ equals $\sum^M_{m=1}\frac{v_m}{M}$.
+
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.f Synthesize 10 subsets with and without correlations.R")
+```
+
+
+```{r, echo = F}
+bind_rows("n = 100" = p10_summary_out_cart_part_n100, 
+          "n = 1000" = p10_summary_out_cart_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
+
+### Norm synthesization
+
+```{r, echo = F}
+bind_rows("n = 100" = p10_summary_out_norm_part_n100, 
+          "n = 1000" = p10_summary_out_norm_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
+
+## Correlated predictors
+
+### CART synthesization
+
+```{r, echo = F}
+bind_rows("n = 100" = cor_p10_summary_out_cart_part_n100, 
+          "n = 1000" = cor_p10_summary_out_cart_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
+
+### Norm synthesization
+
+```{r, echo = F}
+bind_rows("n = 100" = cor_p10_summary_out_norm_part_n100, 
+          "n = 1000" = cor_p10_summary_out_norm_part_n1000, .id = "Sample size") %>%
+  knitr::kable(., digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data by means of CART with M = 10 in the last three rows with partitioned data.")
+```
+
+# Workflow from now on
+
+Necessity to further investigate structure of the data by means of, say, eigenvalues (correlations seem to be okay with large samples, according to results presented)?
+
+## Proposal
+
+### Complete data workflow
+
+@. Verder werken met de completed boys data (ondanks de hoge correlatie sowieso realistischer dan gesimuleerde multivariate normal data). Eventueel zou ik ook nog een andere dataset kunnen zoeken die wellicht meer lijkt op een "standaard" social sciences dataset.
+  + Indien we met de boys data werken, kunnen we eventueel ook nog een subset nemen (om te kijken hoe het gaat met "echte" data als we de sample size verkleinen), en we zouden kunnen bootstrappen om een grotere sample te creëren dan de huidige 748 observaties (wellicht met Stef overleggen wat een redelijk aantal observaties en nodes zijn over verschillende ziekenhuizen).
+@. For i in 1:nsim (en eventueel voor verschillende sample sizes):
+    + Boys dataset (of dus eventueel andere) bootstrappen, zodat we een "superpopulatie" krijgen. 
+    + Partition bootstrap sample, zodat we weer nodes krijgen.
+    + Synthesize nodes independently from each other.
+    + Rbind synthetic versions.
+    + Analyse de complete (n = 748) synthetic dataset en de gebootstrapte dataset. 
+@. Dan: gemiddelde over de bootstraps is de "populatiewaarde".
+@. Check Qbar, bias, CI width en CI coverage van synthetische data.
+
+### Missing data workflow
+
+@. Werken met boys data met missings.
+@. Maak superpopulatie obs van bootstrappen (binnen de for-loop)
+@. For i in 1:nsim (eventueel voor verschillende sample sizes):
+    + Bootstrap boys data (hebben we bootstrap sample)
+    + Partitioneer bootstrap sample in 5 delen
+    + Synthesize each node independently from the others.
+    + Merge the nodes
+    + Impute the synthetic dataset as a whole
+    + Subset the synthetic data so that they correspond to the observed (partitioned) data
+    + Match the corresponding synthetic imputation to the observed imputation for all of the synthetic imputed sets.
+@. Gemiddelde over de bootstraps is de populatiewaarde.
+@. Check Qbar, bias, CI width en CI coverage van synthetische data.
+
+### IK MOET LEZEN
+@. Drechsler over synthetic data
+@. Over CART (Elements of Statistical Learning?)
+
 

@@ -60,40 +60,75 @@ normal_syn <- function(data, method = NULL, formula, pop.inf = F) {
   return(as.data.frame(out))
 }
 
-# Generate multicariate normal data
+#########################################################################################
+## Function for generating multivariate normal data with a prespecified correlation    ##
+## between the predictors, and a prespecified relative contribution of each IV, as     ##
+## well as a prespecified R squared and sample size.                                   ##
+#########################################################################################
+
 normal <- function(r2, ratio_beta, rho, n = 10000) {
+  # First, draw the covariates from a multivariate normal distribution with means of 0, so
+  # that if the variances equal one, and the covariances equal zero, one has a multivariate
+  # standard normal distribution. However, of course it is possible to introduce 
+  # correlations between the predictors.
   X <- MASS::mvrnorm(n = n, mu = rep(0, length(ratio_beta)), Sigma = rho)
+  # Set the variable names (X1, ..., XK results in problems in synthpop)
   colnames(X) <- paste0("IV", 1:length(ratio_beta))
+  # Empty matrix for the regression coefficients.
   coefs <- matrix(NA, nrow = length(ratio_beta), ncol = length(ratio_beta))
   for (i in 1:length(ratio_beta)) {
     for (j in 1:length(ratio_beta)) {
+      # Set the relative contribution of each pair of regression coefficients to the 
+      # population R2 level (relative contribution equals the product of the ratios).
+      # Note that only the lower triangle is specified (including the diagonal elements).
       coefs[i,j] <- ifelse(i > j, ratio_beta[i] * ratio_beta[j], 0)
     }
   }
+  # b here equals the regression coefficient of the variable which "ratio" would be 
+  # as being equal to 1. If the ratio equals two, the regression coefficient should be
+  # equal to two times b. 
   b <- sqrt((r2 / (sum(ratio_beta^2) + 2 * sum(coefs * rho))))
+  # Specify the outcome variable of interest.
   y <- X %*% (b*ratio_beta) + rnorm(n, 0, sqrt(1 - r2))
+  # Return the complete data, and the population regression coefficients.
   return(list(dat = data.frame(DV = y, X), coefs = b*ratio_beta))
 }
+
+
+#########################################################################################
+## Function for synthesizing partitioned data, with M synthetic versions of J          ##
+## partitions, with a user-defined method of synthesization and user-defined method    ##
+## of inference (sample based or population based)                                     ##
+#########################################################################################
 
 syn_part_data <- function(partitioned_data, M, formula, 
                           method = NULL, pop.inf = T) {
   
-  d <- partitioned_data
-  f <- formula
+  d <- partitioned_data # short code for the partitioned data
+  f <- formula          # short code for the formula
   
+  # Synthesize every partition of the data M times with method = method
   out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F,
                                 method = method))
-  
+  # Set an empty list for every synthetic dataset
   new_syns <- as.list(1:M)
   
+  # For every all partitions, extract the first, second, ..., m synthetic versions,
+  # and rbind the first synthetic version of all datasets, the second, and so on, so that
+  # one obtains M synthetic complete datasets
   for (m in 1:M) {
     new_syns[[m]] <- map_dfr(1:length(out), function(x) out[[x]]$syn[[m]])
   }
-  
+  # Extract one class == synds object, so that the lm function in the synthpop package
+  # remains usable (the analyses do not rely on anything else than the synthetic data,
+  # except for the number of synthetic datasets (which remains preserved)). However,
+  # it might be better to write a custom function in the future, this is a quick and 
+  # dirty fix
   syn <- out[[1]]
-  syn$syn <- new_syns
+  # Add all synthesized versions to the syn-list of a single "syn" output object
+  syn$syn <- new_syns 
   
-  data <- map_dfr(d, function(x) as.data.frame(x))
+  data <- map_dfr(d, function(x) as.data.frame(x)) # extract the actually observed data
   
   # Fit the lm models on all datasets
   r <- list(Real_Sample = lm(f,data), Syn = lm.synds(f, syn))
@@ -114,48 +149,9 @@ syn_part_data <- function(partitioned_data, M, formula,
   return(as.data.frame(out))
 }
 
-syn_part_data_new_var <- function(partitioned_data, M, formula, pop.inf = T) {
-  
-  d <- partitioned_data
-  f <- formula
-  
-  out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F))
-  
-  all_syns <- as.list(1:M)
-  
-  for (m in 1:M) {
-    all_syns[[m]] <- map(1:length(out), function(x) out[[x]]$syn[[m]])
-  }
-  
-  results <- all_syns %>% unlist(recursive = F) %>% 
-    map_dfr(., .id = "syn", function(x) {
-      lm(f, x) %>% broom::tidy() %>%
-      mutate(variance = std.error^2) %>%
-      dplyr::select(term = term, est = estimate, variance = variance)})
-  
-  real_results <- map_dfr(d, function(x) as.data.frame(x)) %>%
-                  lm(f, .) %>% broom::tidy(conf.int=T) %>%
-                  dplyr::select(term = term, Qbar = estimate, SE = std.error,
-                                Lower = conf.low, Upper = conf.high)
-  
-  results %>%
-    group_by(term) %>%
-    summarise(Qbar = mean(est),
-              bm = sum((est - Qbar)^2 / (n()-1)),
-              vbar = mean(variance),
-              Ts = (bm * (1 + 1 / (n())) -vbar),
-              Tstar_s = max(0,Ts) + ifelse(Ts < 0, 1, 0)*vbar,
-              SE = sqrt(Tstar_s),
-              rm = (1 + 1/n())*bm/vbar,
-              df = (n() - 1)*(1 - 1/rm)^2,
-              Lower = Qbar - qt(.975, df)*sqrt(Tstar_s),
-              Upper = Qbar + qt(.975, df)*sqrt(Tstar_s)) %>% ungroup() -> summary_results
-    #dplyr::select(term, Qbar, SE, Lower, Upper) -> summary_results
-  
-  output <- bind_rows(Real = real_results, Synthetic = summary_results, .id = "Method")
-  
-  return(output)
-}
+#########################################################################################
+## Simple extracting of the output of the syn_part_data                                ##
+#########################################################################################
 
 print_results <- function(output, coefs) {
   output %>%
