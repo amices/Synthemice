@@ -1519,7 +1519,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">08-07-2020</h4>
+<h4 class="date">09-07-2020</h4>
 
 </div>
 
@@ -3806,6 +3806,8 @@ V = \bar{v}_M(1+\frac{1}{M}),
 <p>Necessity to further investigate structure of the data by means of, say, eigenvalues (correlations seem to be okay with large samples, according to results presented)?</p>
 <div id="proposal" class="section level2">
 <h2><span class="header-section-number">5.1</span> Proposal</h2>
+<div id="complete-data-workflow" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Complete data workflow</h3>
 <ol class="example" style="list-style-type: decimal">
 <li>Verder werken met de completed boys data (ondanks de hoge correlatie sowieso realistischer dan gesimuleerde multivariate normal data). Eventueel zou ik ook nog een andere dataset kunnen zoeken die wellicht meer lijkt op een “standaard” social sciences dataset.</li>
 </ol>
@@ -3813,17 +3815,47 @@ V = \bar{v}_M(1+\frac{1}{M}),
 <li>Indien we met de boys data werken, kunnen we eventueel ook nog een subset nemen (om te kijken hoe het gaat met “echte” data als we de sample size verkleinen), en we zouden kunnen bootstrappen om een grotere sample te creëren dan de huidige 748 observaties (wellicht met Stef overleggen wat een redelijk aantal observaties en nodes zijn over verschillende ziekenhuizen).</li>
 </ul>
 <ol start="2" class="example" style="list-style-type: decimal">
-<li>Boys dataset bootstrappen, zodat we een “superpopulatie” krijgen. En dan zowel gebootstrapte echte data vergelijken met synthetische versie van elke boodstrap sample. In dat geval dat geval is het gemiddelde over de bootstrap samples de populatie waarde.</li>
-</ol>
+<li>For i in 1:nsim (en eventueel voor verschillende sample sizes):
 <ul>
-<li></li>
-</ul>
-<ol style="list-style-type: decimal">
-<li>Second point.</li>
+<li>Boys dataset (of dus eventueel andere) bootstrappen, zodat we een “superpopulatie” krijgen.</li>
+<li>Partition bootstrap sample, zodat we weer nodes krijgen.</li>
+<li>Synthesize nodes independently from each other.</li>
+<li>Rbind synthetic versions.</li>
+<li>Analyse de complete (n = 748) synthetic dataset en de gebootstrapte dataset.</li>
+</ul></li>
+<li>Dan: gemiddelde over de bootstraps is de “populatiewaarde”.</li>
+<li>Check Qbar, bias, CI width en CI coverage van synthetische data.</li>
+</ol>
+</div>
+<div id="missing-data-workflow" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Missing data workflow</h3>
+<ol start="5" class="example" style="list-style-type: decimal">
+<li>Werken met boys data met missings.</li>
+<li>Maak superpopulatie obs van bootstrappen (binnen de for-loop)</li>
+<li>For i in 1:nsim (eventueel voor verschillende sample sizes):
+<ul>
+<li>Bootstrap boys data (hebben we bootstrap sample)</li>
+<li>Partitioneer bootstrap sample in 5 delen</li>
+<li>Synthesize each node independently from the others.</li>
+<li>Merge the nodes</li>
+<li>Impute the synthetic dataset as a whole</li>
+<li>Subset the synthetic data so that they correspond to the observed (partitioned) data</li>
+<li>Match the corresponding synthetic imputation to the observed imputation for all of the synthetic imputed sets.</li>
+</ul></li>
+<li>Gemiddelde over de bootstraps is de populatiewaarde.</li>
+<li>Check Qbar, bias, CI width en CI coverage van synthetische data.</li>
+</ol>
+</div>
+<div id="ik-moet-lezen" class="section level3">
+<h3><span class="header-section-number">5.1.3</span> IK MOET LEZEN</h3>
+<ol start="10" class="example" style="list-style-type: decimal">
+<li>Drechsler over synthetic data</li>
+<li>Over CART (Elements of Statistical Learning?)</li>
 </ol>
 <div id="refs" class="references">
 <div id="ref-raab_practical_2016">
 <p>Raab, G. M., Nowok, B., &amp; Dibben, C. (2016). Practical Data Synthesis for Large Samples. <em>Journal of Privacy and Confidentiality</em>, <em>7</em>(3), 67–97. <a href="https://doi.org/10.29012/jpc.v7i3.407">https://doi.org/10.29012/jpc.v7i3.407</a></p>
+</div>
 </div>
 </div>
 </div>
