@@ -180,7 +180,27 @@ Necessity to further investigate structure of the data by means of, say, eigenva
 @. Dan: gemiddelde over de bootstraps is de "populatiewaarde".
 @. Check Qbar, bias, CI width en CI coverage van synthetische data.
 
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.g Synthesize bootstrapped boys data.R")
+```
+
+```{r, echo = F}
+knitr::kable(summary_cart_10, digits = 3)
+
+knitr::kable(summary_vs_10, digits = 3)
+
+knitr::kable(summary_cart_20, digits = 3)
+
+knitr::kable(summary_vs_20, digits = 3)
+
+```
+
+
 ### Missing data workflow
+
+#### IDEA
+
+* Since synthpop messes up 
 
 @. Werken met boys data met missings.
 @. Maak superpopulatie obs van bootstrappen (binnen de for-loop)

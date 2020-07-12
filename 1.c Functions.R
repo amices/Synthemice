@@ -101,7 +101,7 @@ normal <- function(r2, ratio_beta, rho, n = 10000) {
 ## of inference (sample based or population based)                                     ##
 #########################################################################################
 
-syn_part_data <- function(partitioned_data, M, formula, 
+syn_part_data <- function(partitioned_data, M, formula, visit,
                           method = NULL, pop.inf = T) {
   
   d <- partitioned_data # short code for the partitioned data
@@ -109,7 +109,7 @@ syn_part_data <- function(partitioned_data, M, formula,
   
   # Synthesize every partition of the data M times with method = method
   out <- map(d, function(x) syn(as.data.frame(x), m = M, print.flag = F,
-                                method = method))
+                                method = method, visit.sequence = visit))
   # Set an empty list for every synthetic dataset
   new_syns <- as.list(1:M)
   

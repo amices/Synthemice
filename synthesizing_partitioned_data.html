@@ -1519,7 +1519,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">09-07-2020</h4>
+<h4 class="date">11-07-2020</h4>
 
 </div>
 
@@ -3826,9 +3826,486 @@ V = \bar{v}_M(1+\frac{1}{M}),
 <li>Dan: gemiddelde over de bootstraps is de “populatiewaarde”.</li>
 <li>Check Qbar, bias, CI width en CI coverage van synthetische data.</li>
 </ol>
+<table>
+<colgroup>
+<col width="11%"></col>
+<col width="11%"></col>
+<col width="18%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.180</td>
+<td align="right">-9.180</td>
+<td align="right">0.000</td>
+<td align="right">2.040</td>
+<td align="right">1.680</td>
+<td align="right">2.361</td>
+<td align="right">-13.178</td>
+<td align="right">-5.182</td>
+<td align="right">7.996</td>
+<td align="right">0.919</td>
+</tr>
+<tr class="even">
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.347</td>
+<td align="right">2.347</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.152</td>
+<td align="right">0.222</td>
+<td align="right">1.978</td>
+<td align="right">2.716</td>
+<td align="right">0.738</td>
+<td align="right">0.910</td>
+</tr>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.189</td>
+<td align="right">0.189</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.023</td>
+<td align="right">0.033</td>
+<td align="right">0.135</td>
+<td align="right">0.244</td>
+<td align="right">0.110</td>
+<td align="right">0.910</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.180</td>
+<td align="right">-9.426</td>
+<td align="right">-0.246</td>
+<td align="right">2.125</td>
+<td align="right">1.768</td>
+<td align="right">2.502</td>
+<td align="right">-13.590</td>
+<td align="right">-5.262</td>
+<td align="right">8.328</td>
+<td align="right">0.918</td>
+</tr>
+<tr class="odd">
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.347</td>
+<td align="right">2.313</td>
+<td align="right">-0.034</td>
+<td align="right">0.196</td>
+<td align="right">0.160</td>
+<td align="right">0.229</td>
+<td align="right">1.929</td>
+<td align="right">2.696</td>
+<td align="right">0.767</td>
+<td align="right">0.907</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.189</td>
+<td align="right">0.194</td>
+<td align="right">0.004</td>
+<td align="right">0.029</td>
+<td align="right">0.024</td>
+<td align="right">0.034</td>
+<td align="right">0.137</td>
+<td align="right">0.250</td>
+<td align="right">0.114</td>
+<td align="right">0.903</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col width="11%"></col>
+<col width="11%"></col>
+<col width="18%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.214</td>
+<td align="right">-9.214</td>
+<td align="right">0.000</td>
+<td align="right">2.037</td>
+<td align="right">1.721</td>
+<td align="right">2.390</td>
+<td align="right">-13.207</td>
+<td align="right">-5.221</td>
+<td align="right">7.986</td>
+<td align="right">0.943</td>
+</tr>
+<tr class="even">
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.343</td>
+<td align="right">2.343</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.159</td>
+<td align="right">0.221</td>
+<td align="right">1.975</td>
+<td align="right">2.712</td>
+<td align="right">0.737</td>
+<td align="right">0.932</td>
+</tr>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.190</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.024</td>
+<td align="right">0.033</td>
+<td align="right">0.135</td>
+<td align="right">0.245</td>
+<td align="right">0.109</td>
+<td align="right">0.930</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.214</td>
+<td align="right">-10.265</td>
+<td align="right">-1.051</td>
+<td align="right">2.057</td>
+<td align="right">1.711</td>
+<td align="right">2.394</td>
+<td align="right">-14.296</td>
+<td align="right">-6.234</td>
+<td align="right">8.062</td>
+<td align="right">0.913</td>
+</tr>
+<tr class="odd">
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.343</td>
+<td align="right">2.241</td>
+<td align="right">-0.102</td>
+<td align="right">0.189</td>
+<td align="right">0.158</td>
+<td align="right">0.222</td>
+<td align="right">1.871</td>
+<td align="right">2.611</td>
+<td align="right">0.741</td>
+<td align="right">0.883</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.205</td>
+<td align="right">0.015</td>
+<td align="right">0.028</td>
+<td align="right">0.023</td>
+<td align="right">0.033</td>
+<td align="right">0.150</td>
+<td align="right">0.260</td>
+<td align="right">0.110</td>
+<td align="right">0.890</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col width="11%"></col>
+<col width="11%"></col>
+<col width="18%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.180</td>
+<td align="right">-9.180</td>
+<td align="right">0.000</td>
+<td align="right">2.040</td>
+<td align="right">1.680</td>
+<td align="right">2.361</td>
+<td align="right">-13.178</td>
+<td align="right">-5.182</td>
+<td align="right">7.996</td>
+<td align="right">0.919</td>
+</tr>
+<tr class="even">
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.347</td>
+<td align="right">2.347</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.152</td>
+<td align="right">0.222</td>
+<td align="right">1.978</td>
+<td align="right">2.716</td>
+<td align="right">0.738</td>
+<td align="right">0.910</td>
+</tr>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.189</td>
+<td align="right">0.189</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.023</td>
+<td align="right">0.033</td>
+<td align="right">0.135</td>
+<td align="right">0.244</td>
+<td align="right">0.110</td>
+<td align="right">0.910</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.180</td>
+<td align="right">-9.431</td>
+<td align="right">-0.251</td>
+<td align="right">2.074</td>
+<td align="right">1.752</td>
+<td align="right">2.400</td>
+<td align="right">-13.497</td>
+<td align="right">-5.366</td>
+<td align="right">8.131</td>
+<td align="right">0.914</td>
+</tr>
+<tr class="odd">
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.347</td>
+<td align="right">2.312</td>
+<td align="right">-0.034</td>
+<td align="right">0.191</td>
+<td align="right">0.158</td>
+<td align="right">0.226</td>
+<td align="right">1.938</td>
+<td align="right">2.687</td>
+<td align="right">0.749</td>
+<td align="right">0.892</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.189</td>
+<td align="right">0.194</td>
+<td align="right">0.004</td>
+<td align="right">0.028</td>
+<td align="right">0.024</td>
+<td align="right">0.033</td>
+<td align="right">0.138</td>
+<td align="right">0.249</td>
+<td align="right">0.111</td>
+<td align="right">0.895</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col width="11%"></col>
+<col width="11%"></col>
+<col width="18%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="7%"></col>
+<col width="6%"></col>
+<col width="5%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Variable</th>
+<th align="right">Population estimate</th>
+<th align="right">Qbar</th>
+<th align="right">Bias</th>
+<th align="right">MeanSE</th>
+<th align="right">MinSE</th>
+<th align="right">MaxSE</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+<th align="right">CIW</th>
+<th align="right">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.214</td>
+<td align="right">-9.214</td>
+<td align="right">0.000</td>
+<td align="right">2.037</td>
+<td align="right">1.721</td>
+<td align="right">2.390</td>
+<td align="right">-13.207</td>
+<td align="right">-5.221</td>
+<td align="right">7.986</td>
+<td align="right">0.943</td>
+</tr>
+<tr class="even">
+<td align="left">Real_Sample</td>
+<td align="left">age</td>
+<td align="right">2.343</td>
+<td align="right">2.343</td>
+<td align="right">0.000</td>
+<td align="right">0.188</td>
+<td align="right">0.159</td>
+<td align="right">0.221</td>
+<td align="right">1.975</td>
+<td align="right">2.712</td>
+<td align="right">0.737</td>
+<td align="right">0.932</td>
+</tr>
+<tr class="odd">
+<td align="left">Real_Sample</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.190</td>
+<td align="right">0.000</td>
+<td align="right">0.028</td>
+<td align="right">0.024</td>
+<td align="right">0.033</td>
+<td align="right">0.135</td>
+<td align="right">0.245</td>
+<td align="right">0.109</td>
+<td align="right">0.930</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">(Intercept)</td>
+<td align="right">-9.214</td>
+<td align="right">-10.287</td>
+<td align="right">-1.073</td>
+<td align="right">2.011</td>
+<td align="right">1.702</td>
+<td align="right">2.388</td>
+<td align="right">-14.229</td>
+<td align="right">-6.345</td>
+<td align="right">7.884</td>
+<td align="right">0.918</td>
+</tr>
+<tr class="odd">
+<td align="left">Syn</td>
+<td align="left">age</td>
+<td align="right">2.343</td>
+<td align="right">2.239</td>
+<td align="right">-0.104</td>
+<td align="right">0.185</td>
+<td align="right">0.156</td>
+<td align="right">0.220</td>
+<td align="right">1.877</td>
+<td align="right">2.601</td>
+<td align="right">0.724</td>
+<td align="right">0.893</td>
+</tr>
+<tr class="even">
+<td align="left">Syn</td>
+<td align="left">hgt</td>
+<td align="right">0.190</td>
+<td align="right">0.205</td>
+<td align="right">0.015</td>
+<td align="right">0.027</td>
+<td align="right">0.023</td>
+<td align="right">0.033</td>
+<td align="right">0.152</td>
+<td align="right">0.259</td>
+<td align="right">0.107</td>
+<td align="right">0.892</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="missing-data-workflow" class="section level3">
 <h3><span class="header-section-number">5.1.2</span> Missing data workflow</h3>
+<div id="idea" class="section level4">
+<h4><span class="header-section-number">5.1.2.1</span> IDEA</h4>
+<ul>
+<li>Since synthpop messes up</li>
+</ul>
 <ol start="5" class="example" style="list-style-type: decimal">
 <li>Werken met boys data met missings.</li>
 <li>Maak superpopulatie obs van bootstrappen (binnen de for-loop)</li>
@@ -3845,6 +4322,7 @@ V = \bar{v}_M(1+\frac{1}{M}),
 <li>Gemiddelde over de bootstraps is de populatiewaarde.</li>
 <li>Check Qbar, bias, CI width en CI coverage van synthetische data.</li>
 </ol>
+</div>
 </div>
 <div id="ik-moet-lezen" class="section level3">
 <h3><span class="header-section-number">5.1.3</span> IK MOET LEZEN</h3>
