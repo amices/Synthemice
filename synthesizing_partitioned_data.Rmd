@@ -184,15 +184,26 @@ Necessity to further investigate structure of the data by means of, say, eigenva
 source("2.g Synthesize bootstrapped boys data.R")
 ```
 
+The results we obtain in this scenario are shown in the following output. First the variable `age` is sampled randomly from the actual data, then the variable `hgt` is synthesized, with only `age` as predictor. In the same fashion, `wgt` is synthesized with predictors `age` and `hgt`, and so on so forth. It can be seen that the confidence interval coverage of the bootstrapped sample is not optimal, and that the coverage of the synthetic data after $M = 10$ synthetic versions is actually nearly identical to that of the bootstrapped samples. 
+
 ```{r, echo = F}
 knitr::kable(summary_cart_10, digits = 3)
+```
 
-knitr::kable(summary_vs_10, digits = 3)
+When we increase the number of synthetic datasets to $M = 20$, the coverage is actually slightly worse than in the case of $M = 10$. This seems to be due to the fact that the bias remains and the confidence interval gets slightly narrower. 
+
+```{r, echo = F}
+#knitr::kable(summary_vs_10, digits = 3)
 
 knitr::kable(summary_cart_20, digits = 3)
 
-knitr::kable(summary_vs_20, digits = 3)
+#knitr::kable(summary_vs_20, digits = 3)
+```
 
+<!--Then we have the actual sample results on the complete boys dataset, without synthesizing. -->
+
+```{r, include = F}
+knitr::kable(broom::tidy(lm(wgt ~ age + hgt, boyscomp), conf.int = T))
 ```
 
 

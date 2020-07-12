@@ -1519,7 +1519,7 @@ div.tocify {
 <h1 class="title toc-ignore">Federated Imputation</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">11-07-2020</h4>
+<h4 class="date">12-07-2020</h4>
 
 </div>
 
@@ -3826,6 +3826,7 @@ V = \bar{v}_M(1+\frac{1}{M}),
 <li>Dan: gemiddelde over de bootstraps is de “populatiewaarde”.</li>
 <li>Check Qbar, bias, CI width en CI coverage van synthetische data.</li>
 </ol>
+<p>The results we obtain in this scenario are shown in the following output. First the variable <code>age</code> is sampled randomly from the actual data, then the variable <code>hgt</code> is synthesized, with only <code>age</code> as predictor. In the same fashion, <code>wgt</code> is synthesized with predictors <code>age</code> and <code>hgt</code>, and so on so forth. It can be seen that the confidence interval coverage of the bootstrapped sample is not optimal, and that the coverage of the synthetic data after <span class="math inline">\(M = 10\)</span> synthetic versions is actually nearly identical to that of the bootstrapped samples.</p>
 <table>
 <colgroup>
 <col width="11%"></col>
@@ -3944,124 +3945,7 @@ V = \bar{v}_M(1+\frac{1}{M}),
 </tr>
 </tbody>
 </table>
-<table>
-<colgroup>
-<col width="11%"></col>
-<col width="11%"></col>
-<col width="18%"></col>
-<col width="7%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="7%"></col>
-<col width="6%"></col>
-<col width="5%"></col>
-<col width="8%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">MeanSE</th>
-<th align="right">MinSE</th>
-<th align="right">MaxSE</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">CIW</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Real_Sample</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.214</td>
-<td align="right">-9.214</td>
-<td align="right">0.000</td>
-<td align="right">2.037</td>
-<td align="right">1.721</td>
-<td align="right">2.390</td>
-<td align="right">-13.207</td>
-<td align="right">-5.221</td>
-<td align="right">7.986</td>
-<td align="right">0.943</td>
-</tr>
-<tr class="even">
-<td align="left">Real_Sample</td>
-<td align="left">age</td>
-<td align="right">2.343</td>
-<td align="right">2.343</td>
-<td align="right">0.000</td>
-<td align="right">0.188</td>
-<td align="right">0.159</td>
-<td align="right">0.221</td>
-<td align="right">1.975</td>
-<td align="right">2.712</td>
-<td align="right">0.737</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="odd">
-<td align="left">Real_Sample</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.190</td>
-<td align="right">0.000</td>
-<td align="right">0.028</td>
-<td align="right">0.024</td>
-<td align="right">0.033</td>
-<td align="right">0.135</td>
-<td align="right">0.245</td>
-<td align="right">0.109</td>
-<td align="right">0.930</td>
-</tr>
-<tr class="even">
-<td align="left">Syn</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.214</td>
-<td align="right">-10.265</td>
-<td align="right">-1.051</td>
-<td align="right">2.057</td>
-<td align="right">1.711</td>
-<td align="right">2.394</td>
-<td align="right">-14.296</td>
-<td align="right">-6.234</td>
-<td align="right">8.062</td>
-<td align="right">0.913</td>
-</tr>
-<tr class="odd">
-<td align="left">Syn</td>
-<td align="left">age</td>
-<td align="right">2.343</td>
-<td align="right">2.241</td>
-<td align="right">-0.102</td>
-<td align="right">0.189</td>
-<td align="right">0.158</td>
-<td align="right">0.222</td>
-<td align="right">1.871</td>
-<td align="right">2.611</td>
-<td align="right">0.741</td>
-<td align="right">0.883</td>
-</tr>
-<tr class="even">
-<td align="left">Syn</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.205</td>
-<td align="right">0.015</td>
-<td align="right">0.028</td>
-<td align="right">0.023</td>
-<td align="right">0.033</td>
-<td align="right">0.150</td>
-<td align="right">0.260</td>
-<td align="right">0.110</td>
-<td align="right">0.890</td>
-</tr>
-</tbody>
-</table>
+<p>When we increase the number of synthetic datasets to <span class="math inline">\(M = 20\)</span>, the coverage is actually slightly worse than in the case of <span class="math inline">\(M = 10\)</span>. This seems to be due to the fact that the bias remains and the confidence interval gets slightly narrower.</p>
 <table>
 <colgroup>
 <col width="11%"></col>
@@ -4180,124 +4064,7 @@ V = \bar{v}_M(1+\frac{1}{M}),
 </tr>
 </tbody>
 </table>
-<table>
-<colgroup>
-<col width="11%"></col>
-<col width="11%"></col>
-<col width="18%"></col>
-<col width="7%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="7%"></col>
-<col width="6%"></col>
-<col width="5%"></col>
-<col width="8%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Method</th>
-<th align="left">Variable</th>
-<th align="right">Population estimate</th>
-<th align="right">Qbar</th>
-<th align="right">Bias</th>
-<th align="right">MeanSE</th>
-<th align="right">MinSE</th>
-<th align="right">MaxSE</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">CIW</th>
-<th align="right">Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Real_Sample</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.214</td>
-<td align="right">-9.214</td>
-<td align="right">0.000</td>
-<td align="right">2.037</td>
-<td align="right">1.721</td>
-<td align="right">2.390</td>
-<td align="right">-13.207</td>
-<td align="right">-5.221</td>
-<td align="right">7.986</td>
-<td align="right">0.943</td>
-</tr>
-<tr class="even">
-<td align="left">Real_Sample</td>
-<td align="left">age</td>
-<td align="right">2.343</td>
-<td align="right">2.343</td>
-<td align="right">0.000</td>
-<td align="right">0.188</td>
-<td align="right">0.159</td>
-<td align="right">0.221</td>
-<td align="right">1.975</td>
-<td align="right">2.712</td>
-<td align="right">0.737</td>
-<td align="right">0.932</td>
-</tr>
-<tr class="odd">
-<td align="left">Real_Sample</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.190</td>
-<td align="right">0.000</td>
-<td align="right">0.028</td>
-<td align="right">0.024</td>
-<td align="right">0.033</td>
-<td align="right">0.135</td>
-<td align="right">0.245</td>
-<td align="right">0.109</td>
-<td align="right">0.930</td>
-</tr>
-<tr class="even">
-<td align="left">Syn</td>
-<td align="left">(Intercept)</td>
-<td align="right">-9.214</td>
-<td align="right">-10.287</td>
-<td align="right">-1.073</td>
-<td align="right">2.011</td>
-<td align="right">1.702</td>
-<td align="right">2.388</td>
-<td align="right">-14.229</td>
-<td align="right">-6.345</td>
-<td align="right">7.884</td>
-<td align="right">0.918</td>
-</tr>
-<tr class="odd">
-<td align="left">Syn</td>
-<td align="left">age</td>
-<td align="right">2.343</td>
-<td align="right">2.239</td>
-<td align="right">-0.104</td>
-<td align="right">0.185</td>
-<td align="right">0.156</td>
-<td align="right">0.220</td>
-<td align="right">1.877</td>
-<td align="right">2.601</td>
-<td align="right">0.724</td>
-<td align="right">0.893</td>
-</tr>
-<tr class="even">
-<td align="left">Syn</td>
-<td align="left">hgt</td>
-<td align="right">0.190</td>
-<td align="right">0.205</td>
-<td align="right">0.015</td>
-<td align="right">0.027</td>
-<td align="right">0.023</td>
-<td align="right">0.033</td>
-<td align="right">0.152</td>
-<td align="right">0.259</td>
-<td align="right">0.107</td>
-<td align="right">0.892</td>
-</tr>
-</tbody>
-</table>
+<!--Then we have the actual sample results on the complete boys dataset, without synthesizing. -->
 </div>
 <div id="missing-data-workflow" class="section level3">
 <h3><span class="header-section-number">5.1.2</span> Missing data workflow</h3>
