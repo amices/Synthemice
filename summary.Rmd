@@ -1,0 +1,21 @@
+---
+title: "How synthetic data can be used to ease the imputation of confidential data"
+author: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+# Introduction
+
+

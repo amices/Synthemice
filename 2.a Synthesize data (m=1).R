@@ -17,20 +17,21 @@ source("1.c Functions.R")
 
 nsim <- 1000        # number of iterations
 plan(multisession)  # specify parallel processing
+seed <- as.integer(12345)
 
 # replicate the function 1000 times on the complete data in parallel
 syns_complete <- future_map_dfr(1:nsim, function(x) synthesize(boyscomp),
                                 .id = "sim", .progress = TRUE,
-                                .options = future_options(seed = as.integer(123)))
+                                .options = future_options(seed = seed))
 # replicate the function 1000 times on the same partitioned data
 syns_part <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, parts = part),
                             .id = "sim", .progress = TRUE,
-                            .options = future_options(seed = as.integer(123)))
+                            .options = future_options(seed = seed))
 # replicate the function 1000 times on a 1000 times partitioned dataset
 
 syns_resample_partition <- future_map_dfr(1:nsim, ~ synthesize(boyscomp, partition = TRUE,n.parts=5),
                                           .id = "sim", .progress= TRUE, 
-                                          .options = future_options(seed = as.integer(123)))
+                                          .options = future_options(seed = seed))
 
 # Specify the model to be run on all synthesized datasets
 syn_model <- function(data) lm(age ~ hgt + tv, data = data)

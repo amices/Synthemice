@@ -24,13 +24,14 @@ nsim <- 1000        # number of iterations
 
 plan(multisession) # specify parallel processing
 
+seed <- as.integer(12345)
+
 
 syn_meth <- c("cart", "cart", "cart", "~ I(wgt / (hgt/100)^2)", 
               "cart", "cart", "cart", "cart", "cart")
 
 syns_m5_complete1 <- future_map(1:nsim, ~ synthesize(boyscomp, m = 5, method = syn_meth),
-                               .progress = TRUE,
-                               .options = future_options(seed = as.integer(123)))
+                               .progress = TRUE, .options = future_options(seed = seed))
 
 
 cutoff <- qnorm(.975)

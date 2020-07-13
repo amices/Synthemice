@@ -20,6 +20,8 @@ real_coefs_rho0 <- test_rho0$coefs
 
 plan(multisession)
 
+seed <- as.integer(12345)
+
 # method for normal synthesis (based on a linear regression model)
 synds_norm <- c("norm", "norm", "norm", "norm")
 # method for synthesis based on classification and regression trees
@@ -28,9 +30,9 @@ synds_cart <- c("cart", "cart", "cart", "cart")
 # Generate random normal data, and run the synthesize function on it (bootstrap is a somewhat 
 # inappropriate name, because we sample directly from the population). 
 out_norm_rho0 <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho0, n = 100)$dat; normal_syn(data, method = synds_norm, formula = DV ~ -1 + IV1 + IV2 + IV3)},
-                                .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 out_cart_rho0 <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho0, n = 100)$dat; normal_syn(data, method = synds_cart, formula = DV ~ -1 + IV1 + IV2 + IV3)},
-                                .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 
 
 summary_norm_rho0 <- print_results(out_norm_rho0, real_coefs_rho0)
@@ -48,9 +50,9 @@ real_coefs_rho50 <- test_rho50$coefs
 
 # And run the same function as above, but now with correlated predictors
 out_norm_rho50 <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho50, n = 100)$dat; normal_syn(data, method = synds_norm, formula = DV ~ -1 + IV1 + IV2 + IV3)},
-                                 .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                 .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 out_cart_rho50 <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho50, n = 100)$dat; normal_syn(data, method = synds_cart, formula = DV ~ -1 + IV1 + IV2 + IV3)},
-                                 .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                 .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 # And collect the output
 summary_norm_rho50 <- print_results(out_norm_rho50, real_coefs_rho50)
 summary_cart_rho50 <- print_results(out_cart_rho50, real_coefs_rho50)
@@ -72,12 +74,12 @@ out_norm_rho0_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio
                                                         normal_syn(data, method = synds_norm, 
                                                                       formula = DV ~ -1 + IV1 + IV2 + IV3,
                                                                       pop.inf = T)},
-                                    .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                    .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 out_cart_rho0_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho0, n = 100)$dat
                                                         normal_syn(data, method = synds_cart, 
                                                                       formula = DV ~ -1 + IV1 + IV2 + IV3,
                                                                       pop.inf = T)},
-                                    .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                    .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 
 # Collect the results
 summary_norm_rho0_pop <- print_results(out_norm_rho0_pop, real_coefs_rho0)
@@ -89,12 +91,12 @@ out_norm_rho50_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, rati
                                                          normal_syn(data, method = synds_norm, 
                                                                        formula = DV ~ -1 + IV1 + IV2 + IV3,
                                                                        pop.inf = T)},
-                                     .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                     .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 out_cart_rho50_pop <- future_map_dfr(1:500, function(x) {data <- normal(.5, ratio, rho50, n = 100)$dat
                                                          normal_syn(data, method = synds_cart,
                                                                        formula = DV ~ -1 + IV1 + IV2 + IV3,
                                                                        pop.inf = T)},
-                                     .id = "sim", .progress = TRUE, .options = future_options(seed = as.integer(123)))
+                                     .id = "sim", .progress = TRUE, .options = future_options(seed = seed))
 
 summary_norm_rho50_pop <- print_results(out_norm_rho50_pop, real_coefs_rho50)
 summary_cart_rho50_pop <- print_results(out_cart_rho50_pop, real_coefs_rho50)
