@@ -18,4 +18,9 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 
 # Introduction
 
+Federated data analyses ensure the privacy and confidentiality of micro-data, i.e., data on the individual level, since the data itself is not available to the researcher. Instead of obtaining the data itself, the researcher get remote access to the data, which allows the researcher to analyse the data by means of a model of choice. Then, the output of the analyses, say, regression coefficients, are made available, so that the results of the research can be published. Eventually, one can extend this framework to multiple nodes. That is, data is collected on multiple locations, and after the data is harmonized, the results of the analyses run on each local node are combined. Federated data analysis meets the increasing demand of privacy and confidentiality on the side of the participant, which hopefully increases the willingness of respondents to participate. Advantages on the side of the researcher are the increased generalizability of the research itself and the improved opportunities for collaboration. 
+
+* See http://www.ete-online.com/content/10/1/12 for references with regard to these advantages.
+
+However, additionally there obstacles that must be overcome to implement the approach in practice. One of these obstacles is how one should deal with missing data. Locally, one could use multiple imputation to adjust for the fact that some observations might have missing values on one or multiple variables. However, in such instances the imputation model can only be based on the observations within a single node, and use the variables that are observed within that specific node. Therefore, observations within other nodes cannot be used, although these might contain relevant information that can be used to impute the missing values. 
 
