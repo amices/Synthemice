@@ -15,6 +15,7 @@ library(synthpop)
 
 ## Specify that we run the code in multiple sessions, to speed up the process
 plan(multisession)
+seed <- as.integer(12345)
 
 ## Set the number of simulations
 nsim <- 1000
@@ -40,7 +41,7 @@ out_cart <- future_map_dfr(1:nsim, function(x) {data <- normal(r2, ratio, rho, n
                                                 normal_syn(data, formula = f, pop.inf = T)},
                            .id = "sim", 
                            .progress = T, 
-                           .options = future_options(seed = as.integer(123)))
+                           .options = future_options(seed = seed))
 
 # Obtain a summary of the results (this are results previously obtained already).
 summary_out_cart <- out_cart %>% filter(Method == "Real_Sample" | Method == "Syn10") %>%
@@ -49,7 +50,8 @@ summary_out_cart <- out_cart %>% filter(Method == "Real_Sample" | Method == "Syn
 # Specify a small function for inside the future_map commands
 synth_sampled_data <- function(p, r2, ratio, rho, n, formula, pop.inf = T, method = NULL, M) {
   part <- normal(r2, ratio, rho, n)$dat %>% resample_partition(p)
-  syn_part_data(partitioned_data = part, M = M, formula = formula, pop.inf = pop.inf, method = method)
+  syn_part_data(partitioned_data = part, M = M, formula = formula, pop.inf = pop.inf, 
+                method = method, visit = 1:(length(ratio) + 1))
 }
 
 
@@ -62,7 +64,7 @@ normal(r2,ratio, rho, n1)$dat %>% resample_partition(p)
 # cart method
 out_cart_part_n100 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                   n = n1, formula = f, pop.inf = T, M = 10),
-                                .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                .id = "sim", .progress = T, .options = future_options(seed = seed))
 # Obtain the results
 summary_out_cart_part_n100 <- print_results(out_cart_part_n100, coefs = real_coefs)
 
@@ -72,7 +74,7 @@ n2 <- 1000
 # cart method
 out_cart_part_n1000 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                    n = n2, formula = f, pop.inf = T, M = 10),
-                                      .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                      .id = "sim", .progress = T, .options = future_options(seed = seed))
 # Obtain results
 summary_out_cart_part_n1000 <- print_results(out_cart_part_n1000, coefs = real_coefs)
 
@@ -82,7 +84,7 @@ n3 <- 10000
 # cart method
 out_cart_part_n10000 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                    n = n3, formula = f, pop.inf = T, M = 10),
-                                      .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                      .id = "sim", .progress = T, .options = future_options(seed = seed))
 
 summary_out_cart_part_n10000 <- print_results(out_cart_part_n10000, coefs = real_coefs)
 
@@ -103,7 +105,7 @@ norm <- rep("norm", length(ratio) + 1)
 out_norm_part_n100 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                   n = n1, formula = f, pop.inf = T, 
                                                                   method = norm, M = 10),
-                                     .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                     .id = "sim", .progress = T, .options = future_options(seed = seed))
 # Obtain results
 summary_out_norm_part_n100 <- print_results(out_norm_part_n100, coefs = real_coefs)
 
@@ -112,7 +114,7 @@ summary_out_norm_part_n100 <- print_results(out_norm_part_n100, coefs = real_coe
 out_norm_part_n1000 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                    n = n2, formula = f, pop.inf = T, 
                                                                    method = norm, M = 10),
-                                      .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                      .id = "sim", .progress = T, .options = future_options(seed = seed))
 
 # Obtain results
 summary_out_norm_part_n1000 <- print_results(out_norm_part_n1000, coefs = real_coefs)
@@ -122,7 +124,7 @@ summary_out_norm_part_n1000 <- print_results(out_norm_part_n1000, coefs = real_c
 out_norm_part_n10000 <- future_map_dfr(1:nsim, ~ synth_sampled_data(p = p, r2 = r2, ratio = ratio, rho = rho, 
                                                                    n = n3, formula = f, pop.inf = T, 
                                                                    method = norm, M = 10),
-                                      .id = "sim", .progress = T, .options = future_options(seed = as.integer(123)))
+                                      .id = "sim", .progress = T, .options = future_options(seed = seed))
 
 
 summary_out_norm_part_n10000 <- print_results(out_norm_part_n10000, coefs = real_coefs)

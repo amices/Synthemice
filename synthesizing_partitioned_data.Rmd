@@ -34,7 +34,7 @@ Without partitioning the data, we already saw that synthesizing does not distort
 $$Var(\beta) = \bar{v}_{M}(1 + \frac{1}{M}),$$
 where $\bar{v}_M$ is the average variance of the regression coefficient over the $M$ synthetic datasets.
 
-```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+```{r, echo = F}
 knitr::kable(summary_out_cart, digits = 3, caption = "Results of a linear regression model where DV is regression on the predictors IV1, IV2 and IV3, with the values sampled directly from the population in the first three rows, and the synthesized data with m=5 in the last three rows.")
 ```
 
@@ -47,7 +47,7 @@ CART Method: First variable is sampled from the observed data, the second variab
 When we first partition the sampled data from the multivariate normal distribution, the results change to quite some extent, which can be seen in the following table. The coverage seems to be very low, and far below the nominal level of $95\%$. 
 
 
-```{r, echo = F, cache=thomcache, cache.lazy=thomlazy}
+```{r, echo = F}
 bind_rows("n = 100" = summary_out_cart_part_n100, 
           "n = 1000" = summary_out_cart_part_n1000,
           "n = 10000" = summary_out_cart_part_n10000, .id = "Sample size") %>%
@@ -59,7 +59,7 @@ bind_rows("n = 100" = summary_out_cart_part_n100,
 
 Norm Method: The first variable is sampled from a univariate normal distribution, the second variable is drawn from a normal distribution with mean $\mu = \beta_1 * X_1$ and variance $\sigma^2 = \sigma^2_e$, the third variable is drawn based on the first two variables, and so on. This performs much better than the previous method, but this introduces bias, which is accompanied by a somewhat too low coverage.
 
-```{r, echo = F, cache = thomcache, cache.lazy=thomlazy}
+```{r, echo = F}
 bind_rows("n = 100" = summary_out_norm_part_n100,
           "n = 1000" = summary_out_norm_part_n1000, 
           "n = 10000" = summary_out_norm_part_n10000, .id = "Sample size") %>%
@@ -180,7 +180,38 @@ Necessity to further investigate structure of the data by means of, say, eigenva
 @. Dan: gemiddelde over de bootstraps is de "populatiewaarde".
 @. Check Qbar, bias, CI width en CI coverage van synthetische data.
 
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.g Synthesize bootstrapped boys data.R")
+```
+
+The results we obtain in this scenario are shown in the following output. First the variable `age` is sampled randomly from the actual data, then the variable `hgt` is synthesized, with only `age` as predictor. In the same fashion, `wgt` is synthesized with predictors `age` and `hgt`, and so on so forth. It can be seen that the confidence interval coverage of the bootstrapped sample is not optimal, and that the coverage of the synthetic data after $M = 10$ synthetic versions is actually nearly identical to that of the bootstrapped samples. 
+
+```{r, echo = F}
+knitr::kable(summary_cart_10, digits = 3)
+```
+
+When we increase the number of synthetic datasets to $M = 20$, the coverage is actually slightly worse than in the case of $M = 10$. This seems to be due to the fact that the bias remains and the confidence interval gets slightly narrower. 
+
+```{r, echo = F}
+#knitr::kable(summary_vs_10, digits = 3)
+
+knitr::kable(summary_cart_20, digits = 3)
+
+#knitr::kable(summary_vs_20, digits = 3)
+```
+
+<!--Then we have the actual sample results on the complete boys dataset, without synthesizing. -->
+
+```{r, include = F}
+knitr::kable(broom::tidy(lm(wgt ~ age + hgt, boyscomp), conf.int = T))
+```
+
+
 ### Missing data workflow
+
+#### IDEA
+
+* Since synthpop messes up 
 
 @. Werken met boys data met missings.
 @. Maak superpopulatie obs van bootstrappen (binnen de for-loop)
