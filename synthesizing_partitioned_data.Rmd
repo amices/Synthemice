@@ -190,6 +190,43 @@ The results we obtain in this scenario are shown in the following output. First 
 knitr::kable(summary_cart_10, digits = 3)
 ```
 
+```{r, echo = F, dpi = 300}
+boys_cart_results_10 %>%
+  filter(Variable == "(Intercept)") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Intercept") +
+  theme_classic() -> plot_intercept
+  
+boys_cart_results_10 %>%
+  filter(Variable == "age") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Age") +
+  theme_classic() -> plot_age
+  
+boys_cart_results_10 %>%
+  filter(Variable == "hgt") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Height") +
+  theme_classic() -> plot_height
+
+cowplot::plot_grid(cowplot::plot_grid(plot_intercept + theme(legend.position = "none"), 
+                                     plot_age + theme(legend.position = "none"), 
+                                     plot_height + theme(legend.position = "none"), 
+                                     nrow = 1, align = 'vh'),
+                  cowplot::get_legend(plot_age + theme(legend.position = "bottom")),
+                                      ncol = 1, rel_heights = c(1, .1))
+```
+
+
 When we increase the number of synthetic datasets to $M = 20$, the coverage is actually slightly worse than in the case of $M = 10$. This seems to be due to the fact that the bias remains and the confidence interval gets slightly narrower. 
 
 ```{r, echo = F}
@@ -204,6 +241,52 @@ knitr::kable(summary_cart_20, digits = 3)
 
 ```{r, include = F}
 knitr::kable(broom::tidy(lm(wgt ~ age + hgt, boyscomp), conf.int = T))
+```
+
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.h Synthesize bootstrapped boys7482 data.R")
+```
+
+When we additionally do this with the `boys7482` data from the package `AGD`, we get slightly beter results. However, there remains a problem with regard to the bootstrapped samples from the population. So apparently, the bootstrapping procedure induces more variance than would be expected based on the $95\%$ CI. I am not sure why this error is introduced. Additionally, the synthesizing method seems to be somewhat biased, which can be seen in the density plots displayed after the tables.
+
+```{r, echo = F}
+knitr::kable(summary_cart_10_7482, digits = 3)
+```
+
+```{r, echo = F, dpi = 300}
+boys_cart_results_10_7482 %>%
+  filter(Variable == "(Intercept)") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Intercept") +
+  theme_classic() -> plot_intercept_7482
+  
+boys_cart_results_10_7482 %>%
+  filter(Variable == "age") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Age") +
+  theme_classic() -> plot_age_7482
+  
+boys_cart_results_10_7482 %>%
+  filter(Variable == "hgt") %>%
+  ggplot(mapping = aes(x = Est, color = Method, fill = Method)) +
+  geom_density(alpha = .4) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  ggtitle("Height") +
+  theme_classic() -> plot_height_7482
+
+cowplot::plot_grid(cowplot::plot_grid(plot_intercept_7482 + theme(legend.position = "none"), 
+                                     plot_age_7482 + theme(legend.position = "none"), 
+                                     plot_height_7482 + theme(legend.position = "none"), 
+                                     nrow = 1, align = 'vh'),
+                  cowplot::get_legend(plot_age_7482 + theme(legend.position = "bottom")),
+                                      ncol = 1, rel_heights = c(1, .1))
 ```
 
 
