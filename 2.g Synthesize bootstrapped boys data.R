@@ -44,6 +44,10 @@ boys_vs_results_20 <- future_map_dfr(1:nsim, ~ synth_bootstrapped_data(p = p, da
                                                                     pop.inf = T, M = 20, visit = vs), 
                                   .id = "sim", .progress = T, .options = future_options(seed = seed))
 
+boys_vs2_results_10 <- future_map_dfr(1:nsim, ~ synth_bootstrapped_data(p = p, data = boyscomp, formula = f, method = meth, 
+                                                                        pop.inf = T, M = 10), 
+                                      .id = "sim", .progress = T, .options = future_options(seed = seed))
+
 get_coefs <- function(data) {
   data %>% 
     filter(Method == "Real_Sample") %>% 
@@ -57,6 +61,6 @@ summary_vs_10 <- boys_vs_results_10 %>% print_results(., get_coefs(.))
 summary_cart_20 <- boys_cart_results_20 %>% print_results(., get_coefs(.))
 summary_vs_20 <- boys_vs_results_20 %>% print_results(., get_coefs(.))
 
-
+boys_vs2_results_10 %>% print_results(., get_coefs(.))
 
 

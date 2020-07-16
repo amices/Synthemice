@@ -289,6 +289,25 @@ cowplot::plot_grid(cowplot::plot_grid(plot_intercept_7482 + theme(legend.positio
                                       ncol = 1, rel_heights = c(1, .1))
 ```
 
+```{r, include = F, cache=thomcache, cache.lazy=thomlazy}
+source("2.i Synthesize bootstrapped boys data wgt hgt.R")
+```
+
+#### Regular order of the variables
+
+The regular order of the variables corresponds to the column names of the `boys` dataset (that is, `r colnames(mice::boys)`). 
+
+```{r, echo = F}
+knitr::kable(summary_cart_10, digits = 3, caption = "Results after data synthesization of the variables in the order (1) age, (2) hgt, (3) wgt, (4) bmi, (5) hc, (6) gen, (7) phb, (8) tv, (9) reg, in which wgt is regressed age and hgt.")
+```
+
+#### Weight and height swapped
+
+The order of the synthesization of the variables now corresponds to the following: `r c("age", "wgt", "hgt", "bmi", "hc", "gen", "phb", "tv", "reg")`. 
+```{r, echo = F}
+knitr::kable(summary_wgt_hgt, digits = 3, caption = "Results after data synthesization of the variables in the order (1) age, (2) wgt, (3) hgt, (4) bmi, (5) hc, (6) gen, (7) phb, (8) tv, (9) reg, in which wgt is regressed age and hgt.")
+```
+
 
 ### Missing data workflow
 
