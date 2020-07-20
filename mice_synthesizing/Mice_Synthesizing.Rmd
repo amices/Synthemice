@@ -1,0 +1,19 @@
+---
+title: "Synthesizing by means of mice"
+author:
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+This is the markdown file for synthesizing data by means of mice.
