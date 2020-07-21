@@ -5,6 +5,8 @@ author:
 - Utrecht University
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
+  word_document:
+    toc: true
   html_document:
     theme: spacelab
     highlight: tango
@@ -16,4 +18,29 @@ bibliography: federated_imp.bib
 csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ---
 
-This is the markdown file for synthesizing data by means of mice.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
+library(tidyverse)
+```
+
+# Use mice to impute all data
+
+```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
+source("1.a Synthesize_Mice_Replace_All")
+```
+
+First, we again create 1 complete dataset, which is done by means of imputing the `boys` dataset in `mice` [@mice] with default settings, and complete the dataset. Then, based on this one true dataset, we extract the regression coefficients of a linear regression model in which weight is regressed on age and height, that are used to compare the estimates of the synthetic versions of the datasets. The true regression coefficients are equal to $\beta_0 = `r coefs[1]`$, $\beta_{age} = `r coefs[2]`$, $\beta_{height} = `r coefs[3]`$. Then, for a total of 200 iterations, we impute a matrix with the same dimensions as the boys dataset (that is, the sample size $n = `r nrow(truth)`$ and the number of predictors $k = `r ncol(truth)`$). This is done once with the default settings, that is, with `pmm` for the continuous variables, `polr` for binary variables and `polyreg` for ordinal variables with more than two categories. Furthermore, `bmi` is imputed passively, since it consists of a fixed combination of height and weight `bmi = (wgt / (hgt/100)^2`. Furthermore, the predictor matrix is adjusted so that imputations for `bmi` do not flow back into predictions of `hgt` and `wgt`. Then, for every synthetic dataset, the estimates, and corresponding variance of the estimates are calculated, as well as the $95\%~CI$ are calculated. Furthermore, an indicator is added, whether or not the confidence interval includes the true parameter estimates. Note that these confidence intervals are still based on imputations for missing data, instead of imputations for synthetic data. This is due to the fact that the calculation for the degrees of freedom for the estimates based imputing synthetic values might yield degrees of freedom that are so small that the corresponding $95\% ~ CI$ yields boundary values of $-\infty$ and $\infty$. 
+
+```{r, echo = F}
+bind_rows("Mice default" = results_def,
+          "Mice with cart" = results_cart, .id = "Imputation method")
+```
+
+Additionally, an approach is tested in which $\frac{5}{9}$ of the values are randomly selected to be imputed. Using this approach, eventually in two steps, all values can be replaced, while still using almost 50% of the information that is already in the data. Eventually, in a second step, the other almost 50% can be replaced, and the datafiles can be merged so that eventually the full dataset can be made synthetic again. However, currently this is not yet implemented.
+
+```{r, echo = F}
+bind_rows("Mice default" = results_def_50,
+          "Mice with cart" = results_cart_50, .id = "Imputation method")
+```
+
