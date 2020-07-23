@@ -19,23 +19,21 @@ plan(multisession)
 nsim <- 200
 
 def <- rep("pmm", ncol(truth))
-names(pmm) <- colnames(truth)
-pmm['bmi'] <- "~I(wgt / (hgt/100)^2)"
-pmm[c('gen', 'phb')] <- "polr"
-pmm['reg'] <- "polyreg"
+names(def) <- colnames(truth)
+def['bmi'] <- "~I(wgt / (hgt/100)^2)"
+def[c('gen', 'phb')] <- "polr"
+def['reg'] <- "polyreg"
 
 
 cart <- rep("cart", ncol(truth))
 names(cart) <- colnames(truth)
-
-meth['bmi'] <- "~I(wgt / (hgt/100)^2)"
 
 pred <- make.predictorMatrix(truth)
 pred[c("wgt", "hgt"), "bmi"] <- 0
 
 all_syns_def <- future_map(1:nsim, ~ {
   truth %>% mice(m = 5, 
-                 method = pmm, 
+                 method = def, 
                  predictorMatrix = pred, 
                  where = matrix(TRUE, nrow(truth), ncol(truth)), 
                  print = F)
@@ -123,7 +121,7 @@ impute <- function(data, meth, pred) {
                 print = F) %$% lm(wgt ~ age + hgt) %>% pool %>% summary
 }
 
-est_def_50 <- future_map(1:nsim, ~ impute(truth, meth = pmm, pred = pred),
+est_def_50 <- future_map(1:nsim, ~ impute(truth, meth = def, pred = pred),
                              .progress = TRUE, .options = future_options(seed = as.integer(123)))
 
 est_cart_50 <- future_map(1:nsim, ~ impute(truth, meth = cart, pred = pred),
