@@ -16,85 +16,242 @@ bibliography: federated_imp.bib
 csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
 library(tidyverse)
+library(magrittr)
+library(knitr)
+library(kableExtra)
+library(mice)
+library(ggplot2)
 ```
 
 # Use mice to impute all data
 
 ```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
 source("1.a Synthesize_Mice_Replace_All.R")
+source("functions.R")
 ```
+
 
 First, we again create 1 complete dataset, which is done by means of imputing the `boys` dataset in `mice` [@mice] with default settings, and complete the dataset. Then, based on this one true dataset, we extract the regression coefficients of a linear regression model in which weight is regressed on age and height, that are used to compare the estimates of the synthetic versions of the datasets. The true regression coefficients are equal to $\beta_0 = `r round(coefs[1],3)`$, $\beta_{age} = `r round(coefs[2], 3)`$, $\beta_{height} = `r round(coefs[3], 3)`$. Then, for a total of 200 iterations, we impute a matrix with the same dimensions as the boys dataset (that is, the sample size $n = `r nrow(truth)`$ and the number of predictors $k = `r ncol(truth)`$). This is done once with the default settings, that is, with `pmm` for the continuous variables, `polr` for binary variables and `polyreg` for ordinal variables with more than two categories. Furthermore, `bmi` is imputed passively, since it consists of a fixed combination of height and weight `bmi = (wgt / (hgt/100)^2`. Furthermore, the predictor matrix is adjusted so that imputations for `bmi` do not flow back into predictions of `hgt` and `wgt`. Then, for every synthetic dataset, the estimates, and corresponding variance of the estimates are calculated, as well as the $95\%~CI$ are calculated. Furthermore, an indicator is added, whether or not the confidence interval includes the true parameter estimates. Note that these confidence intervals are still based on imputations for missing data, instead of imputations for synthetic data. This is due to the fact that the calculation for the degrees of freedom for the estimates based imputing synthetic values might yield degrees of freedom that are so small that the corresponding $95\% ~ CI$ yields boundary values of $-\infty$ and $\infty$. 
 
+
+---
+
+
 ## True results
-```{r, echo = F}
+
+
+```{r, echo = T}
 broom::tidy(truemodel, conf.int=TRUE) %>%
-  mutate(CIW = conf.high - conf.low) %>% knitr::kable(digits = 3)
-```
-
-## Impute all values
-
-```{r, echo = F}
-bind_rows("Mice default" = results_def,
-          "Mice with cart" = results_cart, .id = "Imputation method") %>% knitr::kable(digits = 3)
-```
-
-## Impute part of the values
-
-Additionally, an approach is tested in which $\frac{5}{9}$ of the values are randomly selected to be imputed. Using this approach, eventually in two steps, all values can be replaced, while still using almost 50% of the information that is already in the data. Eventually, in a second step, the other almost 50% can be replaced, and the datafiles can be merged so that eventually the full dataset can be made synthetic again. However, currently this is not yet implemented.
-
-```{r, echo = F}
-bind_rows("Mice default" = results_def_50,
-          "Mice with cart" = results_cart_50, .id = "Imputation method") %>% knitr::kable(digits = 3)
+  mutate(CIW = conf.high - conf.low) %>% 
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 
-```{r, include = F, cache = thomcache}
-future::plan(future::multisession)
-all_syns_wgt_hgt <- future_map(1:nsim, ~ {
-  truth %>% mice(m = 5, 
-                 method = cart,
-                 visitSequence = c("age", "wgt", "hgt", "bmi", "hc", "gen", "phb", "tv", "reg"),
-                 predictorMatrix = pred,
-                 where = matrix(TRUE, nrow(truth), ncol(truth)),
-                 print = F)
-}, .options = future_options(seed = as.integer(123)), .progress = TRUE, .id = "syn")
-```
+---
 
 
-## Different visiting sequence
+## Use mice to synthesize and to pool
 
 
-```{r, echo = F}
-est_wgt_hgt <- all_syns_wgt_hgt %>% map(function(x) with(x, lm(wgt ~ age + hgt)) %>% pool %>% summary)
+### Pool the results of the synthetic datasets with the default mice settings.
 
-CIs_wgt_hgt <- map(est_wgt_hgt, function(x) {
+
+```{r, message = F}
+default_fit <- syns_def %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt) %>% pool %>% summary) %>%
+  map_dfr(function(x) {
+    var      <- x[,1]
+    true_est <- coefs
+    est      <- x[,2]
+    true_se  <- sqrt(diag(vcov(truemodel)))
+    se       <- x[,3]
+    df       <- x[,5]
+    lower    <- est + se * qt(.025, df)
+    upper    <- est + se * qt(.975, df)
+    cov      <- lower < coefs & coefs < upper
   
-  var      <- x[,1]
-  true_est <- coefs
-  est      <- x[,2]
-  true_se  <- sqrt(diag(vcov(truemodel)))
-  se       <- x[,3]
-  lower    <- x[,2] + x[,3] * qt(.025, x[,5])
-  upper    <- x[,2] + x[,3] * qt(.975, x[,5])
-  cov      <- lower < coefs & coefs < upper
-  
-  bind_cols(var = var, true_est = true_est, est = est, true_se = true_se, se = se, lower = lower, upper = upper, cov = cov)
-})
+    bind_cols(var = var, true_est = true_est, est = est, true_se = true_se, 
+                               se = se, df = df, lower = lower, upper = upper, cov = cov)
+    })
 
-results_wgt_hgt <- CIs_wgt_hgt %>% bind_rows %>% group_by(var) %>%
+results_def <- default_fit %>%
+  group_by(var) %>%
   summarise("True Est" = unique(true_est),
             "Syn Est"  = mean(est),
             "Bias"     = mean(est - true_est),
             "True SE"  = unique(true_se),
             "Syn SE"   = mean(se),
+            "df"       = mean(df),
+            "Lower"    = mean(lower),
+            "Upper"    = mean(upper),
             "CIW"      = mean(upper - lower),
             "Coverage" = mean(cov))
+```
+
+
+### Pool the results of the synthetic dataset with CART.
+
+
+```{r, message = F}
+cart_fit <- syns_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt) %>% pool %>% summary) %>%
+  map_dfr(function(x) {
+    var      <- x[,1]
+    true_est <- coefs
+    est      <- x[,2]
+    true_se  <- sqrt(diag(vcov(truemodel)))
+    se       <- x[,3]
+    df       <- x[,5]
+    lower    <- est + se * qt(.025, df)
+    upper    <- est + se * qt(.975, df)
+    cov      <- lower < coefs & coefs < upper
+
+    bind_cols(var = var, true_est = true_est, est = est, true_se = true_se,
+              se = se, df = df, lower = lower, upper = upper, cov = cov)
+    })
+
+ results_cart <- cart_fit %>%
+   group_by(var) %>%
+   summarise("True Est" = unique(true_est),
+             "Syn Est"  = mean(est),
+             "Bias"     = mean(est - true_est),
+             "True SE"  = unique(true_se),
+             "Syn SE"   = mean(se),
+             "df"       = mean(df),
+             "Lower"    = mean(lower),
+             "Upper"    = mean(upper),
+             "CIW"      = mean(upper - lower),
+             "Coverage" = mean(cov))
+```
+
+
+### Results for both synthesization methods
+
+
+```{r, message = F}
+bind_rows("Mice default" = results_def,
+          "Mice with cart" = results_cart, .id = "Imputation method") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+---
+
+
+## Use mice to synthesize with pooling rules from Drechsler
+
+For now, we forget about the default mice imputation method, because it leads to flawed results. Therefore, we continue with the CART results only. We fit the `lm` model in which `wgt` is regressed on `age` and `hgt`.
+
+```{r, code = readLines("functions.R")}
+```
+
+```{r, message = F}
+models <- syns_cart %>% map(function(x) x %$% lm(wgt ~ age + hgt))
+```
+
+Then, we use the custom pooling function to pool the estimates.
+
+```{r, message = F}
+pooled <- models %>% map_dfr(pool.syn)
+```
+
+And another custom function to summarise all results, and obtain the confidence interval coverage.
+
+```{r, message = F}
+ci_cov(pooled, truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+It can be seen that the coverage of the confidence interval is nearly equal to one. Since we currently only want to make inferences with regard to the sample, this is okay. Namely, if the CI coverage with regard to the sample would be $95\%$, the CI coverage with regard to the population would be $`r .95^2`\%$. Inferences with regard to the population will be discussed in the next paragraph. 
+
+However, what is questionable, is the fact that the confidence interval width has increased, even though the variance has decreased. Since the confidence interval width is a function of only the standard error and the degrees of freedom, this must be due to the fact that the degrees of freedom are smaller than the degrees of freedom as returned by the mice pooling function.
+
+```{r}
+mice_df <- data.frame(term = cart_fit$var, df = cart_fit$df)
+syn_df <- data.frame(term = pooled$term, df = pooled$df)
+
+df <- bind_rows("Mice" = mice_df, "Synthetic" = syn_df, .id = "Method")
+
+ggplot(data = df, aes(x = df, color = Method, fill = Method)) +
+  geom_density(alpha = .7) +
+  facet_wrap(~ term, nrow = 1, scales = "free") +
+  scale_color_viridis_d(begin = .30, end = .65) +
+  scale_fill_viridis_d(begin = .30, end = .65) +
+  theme_classic()
+```
+
+---
+
+
+## Different synthesizing sequence
+
+Now we have established that the mice synthesizing algorithm works as good as the synthpop synthesizing algorithm, we can check whether changing the order in which `hgt` and `wgt` are synthesized influences the result of the algorithm.
+
+```{r, message = F}
+cart_wgt_hgt %>% 
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+
+---
+
+
+# Bootstrap boys data
+
+```{r, message = F}
+synthetic_results <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+true_results <- bootstrap_boys %>%
+  map(~ lm(wgt ~ age + hgt, .x)) %>%
+  map_dfr(~ broom::tidy(.x, conf.int = TRUE)) %>%
+  mutate(true_coef = rep(coef(truemodel), nsim),
+         true_se   = rep(sqrt(diag(vcov(truemodel))), nsim),
+         cover     = conf.low < true_coef & true_coef < conf.high) %>%
+  group_by(term) %>%
+  summarise("True Est" = unique(true_coef),
+            "Boot Est"  = mean(estimate),
+            "Bias"     = mean(estimate - true_coef),
+            "True SE"  = unique(true_se),
+            "Boot SE"   = mean(std.error),
+            "DF"       = 745,
+            "Lower"    = mean(conf.low),
+            "Upper"    = mean(conf.high),
+            "CIW"      = mean(conf.high - conf.low),
+            "Coverage" = mean(cover)) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
+
+
+
+```{r, echo = F}
+true_results
+synthetic_results
+```
+
+
+---
+
+
+
 # References
 
