@@ -28,7 +28,9 @@ library(mice)
 library(ggplot2)
 ```
 
-# Use mice to impute all data
+
+# Introduction
+
 
 ```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
 source("1.a Synthesize_Mice_Replace_All.R")
@@ -42,7 +44,19 @@ First, we again create 1 complete dataset, which is done by means of imputing th
 ---
 
 
-## True results
+# Simulations
+
+
+---
+
+
+## Single dataset approach
+
+
+---
+
+
+### True results
 
 
 ```{r, echo = T}
@@ -56,10 +70,11 @@ broom::tidy(truemodel, conf.int=TRUE) %>%
 ---
 
 
-## Use mice to synthesize and to pool
+### Use mice to synthesize and to pool
 
+---
 
-### Pool the results of the synthetic datasets with the default mice settings.
+#### Pool the results of the synthetic datasets with the default mice settings.
 
 
 ```{r, message = F}
@@ -95,7 +110,8 @@ results_def <- default_fit %>%
 ```
 
 
-### Pool the results of the synthetic dataset with CART.
+
+#### Pool the results of the synthetic dataset with CART.
 
 
 ```{r, message = F}
@@ -131,7 +147,8 @@ cart_fit <- syns_cart %>%
 ```
 
 
-### Results for both synthesization methods
+
+#### Results for both synthesization methods
 
 
 ```{r, message = F}
@@ -145,7 +162,7 @@ bind_rows("Mice default" = results_def,
 ---
 
 
-## Use mice to synthesize with pooling rules from Drechsler
+### Use mice to synthesize with pooling rules from Drechsler
 
 For now, we forget about the default mice imputation method, because it leads to flawed results. Therefore, we continue with the CART results only. We fit the `lm` model in which `wgt` is regressed on `age` and `hgt`.
 
@@ -174,7 +191,7 @@ It can be seen that the coverage of the confidence interval is nearly equal to o
 
 However, what is questionable, is the fact that the confidence interval width has increased, even though the variance has decreased. Since the confidence interval width is a function of only the standard error and the degrees of freedom, this must be due to the fact that the degrees of freedom are smaller than the degrees of freedom as returned by the mice pooling function.
 
-```{r}
+```{r, fig.fullwidth = TRUE, dpi = 500}
 mice_df <- data.frame(term = cart_fit$var, df = cart_fit$df)
 syn_df <- data.frame(term = pooled$term, df = pooled$df)
 
@@ -188,10 +205,11 @@ ggplot(data = df, aes(x = df, color = Method, fill = Method)) +
   theme_classic()
 ```
 
+
 ---
 
 
-## Different synthesizing sequence
+### Different synthesizing sequence
 
 Now we have established that the mice synthesizing algorithm works as good as the synthpop synthesizing algorithm, we can check whether changing the order in which `hgt` and `wgt` are synthesized influences the result of the algorithm.
 
@@ -209,7 +227,7 @@ cart_wgt_hgt %>%
 ---
 
 
-# Bootstrap boys data
+## Bootstrapped boys data
 
 ```{r, message = F}
 synthetic_results <- boot_cart %>%
