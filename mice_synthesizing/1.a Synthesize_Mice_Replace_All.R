@@ -87,4 +87,21 @@ boot_cart <- bootstrap_boys %>%
          print = F)
     }, .options = future_options(seed = as.integer(123)), .progress = T)
 
+# change cart settings (maxit = 1, minbucket = 3, cp = 1e-08), so that the variance
+# in the imputed datasets increases (and hopefully the bias decreases).
+syns_cart_iter_cp_min3 <- future_map(1:nsim, ~ {
+  truth %>% mice(m = 5,
+                 maxit = 1,
+                 method = cart,
+                 minbucket = 3,
+                 cp = 1e-08,
+                 predictorMatrix = pred,
+                 where = matrix(TRUE, nrow(truth), ncol(truth)),
+                 print = F)
+}, .options = future_options(seed = as.integer(123)), .progress = TRUE)
+
+syns_cart_iter_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel)
 
