@@ -23,7 +23,7 @@ coefs <- coef(truemodel)
 plan(multisession)
 
 # number of iterations
-nsim <- 200
+nsim <- 500
 
 # default method - pmm for all continuous predictors
 def <- rep("pmm", ncol(truth))
@@ -73,6 +73,19 @@ cart_wgt_hgt <- future_map(1:nsim, ~ {
                  print = F)
 }, .options = future_options(seed = as.integer(123)), .progress = T, .id = "syn")
 
+# change cart settings (maxit = 1, minbucket = 3, cp = 1e-08), so that the variance
+# in the imputed datasets increases (and hopefully the bias decreases).
+syns_cart_maxit_cp_min3 <- future_map(1:nsim, ~ {
+  truth %>% mice(m = 5,
+                 maxit = 1,
+                 method = cart,
+                 minbucket = 3,
+                 cp = 1e-08,
+                 predictorMatrix = pred,
+                 where = matrix(TRUE, nrow(truth), ncol(truth)),
+                 print = F)
+}, .options = future_options(seed = as.integer(123)), .progress = TRUE)
+
 # create nsim bootstrapped datasets
 bootstrap_boys <- bootstrap(truth, nsim) %$% strap %>% map(as.data.frame)
 
@@ -87,21 +100,17 @@ boot_cart <- bootstrap_boys %>%
          print = F)
     }, .options = future_options(seed = as.integer(123)), .progress = T)
 
-# change cart settings (maxit = 1, minbucket = 3, cp = 1e-08), so that the variance
-# in the imputed datasets increases (and hopefully the bias decreases).
-syns_cart_iter_cp_min3 <- future_map(1:nsim, ~ {
-  truth %>% mice(m = 5,
-                 maxit = 1,
-                 method = cart,
-                 minbucket = 3,
-                 cp = 1e-08,
-                 predictorMatrix = pred,
-                 where = matrix(TRUE, nrow(truth), ncol(truth)),
-                 print = F)
+# impute the bootstrapped boys datasets with parameters that induce more variability
+# and hopefully less bias
+boot_cart_maxit_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% mice(m = 5, 
+               maxit = 1,
+               method = cart,
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               where = matrix(TRUE, nrow(truth), ncol(truth)),
+               print = F)
 }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
-
-syns_cart_iter_cp_min3 %>%
-  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
-  map_dfr(pool.syn) %>%
-  ci_cov(., truemodel)
 

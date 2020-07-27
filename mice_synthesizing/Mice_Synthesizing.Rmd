@@ -223,7 +223,6 @@ cart_wgt_hgt %>%
 ```
 
 
-
 ---
 
 
@@ -328,6 +327,32 @@ When we look at the confidence interval width, we find that the bootstrap CI is 
 
 ---
 
+
+## Improving the bias/variance tradeoff
+
+The fact that there is bias introduced, might be due to the fact that there is too little variance in the estimates of the synthetic values. Therefore, an approach that increases the variance of the estimates might yield estimates that display less bias. This can be achieved by decreasing the number of iterations, that is, setting the mice parameter `maxit` to 1, instead of 5. Additionally, the complexity parameter can be set to $`r 1e-08`$ instead of $`r 1e-04`$, so that more splits will be made. Also, the value of the `rpart` parameter `minbucket`, that is, the minimum number of observations in any terminal node, is set to 3 instead of 5, so that, once again, more splits can be made. By means of these changes, the within variance increases, while the between-imputations variability decreases. The results with `r nsim` iterations on the same, singly imputed boys dataset can be seen below.
+
+```{r}
+syns_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+  
+```
+
+
+It can be seen that the bias indeed decreases, while the standard error of the estimates increases. This is due to the fact that the within-imputation variance increases, while the between-imputation variance decreases somewhat. When we use the same approach to estimate the bootstrapped boys data, we get the following results.
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
 
 
 # References

@@ -19,7 +19,7 @@ pool.syn <- function(mira) {
               ubar    = mean(std.error^2),
               var_u   = (1 + 1/m) * bm - ubar,
               var     = if_else(var_u > 0, var_u, ubar),
-              df      = max(1, (m - 1) * (1 - ubar / ((1 + 1/m) * bm))^2),
+              df      = max(1, (m - 1) * (1 - ubar / (bm + bm/m))^2),
               lower   = est - qt(.975, df) * sqrt(var),
               upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
   pooled
