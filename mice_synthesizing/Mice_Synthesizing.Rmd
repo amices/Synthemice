@@ -191,7 +191,7 @@ It can be seen that the coverage of the confidence interval is nearly equal to o
 
 However, what is questionable, is the fact that the confidence interval width has increased, even though the variance has decreased. Since the confidence interval width is a function of only the standard error and the degrees of freedom, this must be due to the fact that the degrees of freedom are smaller than the degrees of freedom as returned by the mice pooling function.
 
-```{r, fig.fullwidth = TRUE, dpi = 500}
+```{r, fig.fullwidth = TRUE, dpi = 1000}
 mice_df <- data.frame(term = cart_fit$var, df = cart_fit$df)
 syn_df <- data.frame(term = pooled$term, df = pooled$df)
 
@@ -237,6 +237,16 @@ synthetic_results <- boot_cart %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
+norm_results <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  mutate(df = NA,
+         lower = est - qnorm(.975) * sqrt(var),
+         upper = est + qnorm(.975) * sqrt(var)) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3, caption = "Normal CI approximation") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
 true_results <- bootstrap_boys %>%
   map(~ lm(wgt ~ age + hgt, .x)) %>%
   map_dfr(~ broom::tidy(.x, conf.int = TRUE)) %>%
@@ -264,6 +274,8 @@ true_results <- bootstrap_boys %>%
 ```{r, echo = F}
 true_results
 synthetic_results
+norm_results
+
 ```
 
 
