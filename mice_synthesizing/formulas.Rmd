@@ -1,0 +1,42 @@
+---
+title: "Formulas"
+authors: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Missing data
+
+Inferences for an unknown scalar parameter $Q$, say, a regression coefficient, are based on a point estimate $q$, a variance estimate $u$, and a normal or Student's $t$ reference distribution. For analysis of the imputed datasets, let $q^{(i)}$ and $u^{(i)}$ for $i = 1, 2, \dots, m$ be the point and variance estimates achieved from each of the $m$ completed datasets. To get a final estimate over all imputations, these estimates have to be combined using the combining rules described by Rubin (1978). The following quantities are needed for inferences for scalar $Q$:
+$$
+\begin{aligned}
+\bar{q}_m &= \sum_{i = 1}^m \frac{q^{(i)}}{m}, \\
+b_m &= \sum_{i = 1}^m \frac{(q^{(i)} - \bar{q}_m)^2}{m-1}, \\
+\bar{u}_m &= \sum_{i = 1}^m \frac{u^{(i)}}{m}.
+\end{aligned}
+$$
+The analyst then can use $\bar{q}_m$ to estimate $Q$ and
+$$
+T_m = \bar{u}_m + (1 + \frac{1}{m}) b_m
+$$
+to estimate the variance of $\bar{q}_m$. Then, $\bar{u}_m$ can be regarded as the "within-imputation" variance, and $b_m$ as the "between-imputation" variance. The factor $(1 + \frac{1}{m})$ reflects the fact that only a finite number of completed-data estimates $q^{(i)}$ are averaged together to obtain the final point estimate.
+
+The quantity $r = (1 + \frac{1}{m}) \frac{b_m}{T_m}$ estimates the fraction of information about $Q$ that is missing due to nonresponse. Inferences from multiply imputed data are based on $\bar{q}_m$, $T_m$, and a Student's $t$ reference distribution. Rubin and Schenker (1986) provide the approximate value $\nu_{RS} = \frac{m - 1}{r^2}$ for the degrees of freedom of the $t$ distribution under the assumption that with complete data a normal reference distribution would have been appropriate. Barnard and Rubin (1999) relax the assumption of Rubin and Schenker (1986) to allow for a $t$ reference distribution with complete data and suggest the value $\nu_{BR} = (\frac{1}{\nu_{RS}} + \frac{1}{\hat{\nu}_{obs}})^{-1}$ for the degrees of freedom in the multiple imputation analysis, where $\hat{\nu}_{obs} = \frac{(1- r)(\nu_{com})(\nu_{com} + 1)}{\nu_{com} + 1}$ and $\nu_{com}$ denotes the complete-data degrees of freedom.
+
+
+
+
