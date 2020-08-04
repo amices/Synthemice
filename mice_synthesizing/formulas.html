@@ -1515,7 +1515,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Formulas</h1>
-<h4 class="date">02-08-2020</h4>
+<h4 class="date">04-08-2020</h4>
 
 </div>
 
@@ -1532,6 +1532,63 @@ b_m &amp;= \sum_{i = 1}^m \frac{(q^{(i)} - \bar{q}_m)^2}{m-1}, \\
 T_m = \bar{u}_m + (1 + \frac{1}{m}) b_m
 \]</span> to estimate the variance of <span class="math inline">\(\bar{q}_m\)</span>. Then, <span class="math inline">\(\bar{u}_m\)</span> can be regarded as the “within-imputation” variance, and <span class="math inline">\(b_m\)</span> as the “between-imputation” variance. The factor <span class="math inline">\((1 + \frac{1}{m})\)</span> reflects the fact that only a finite number of completed-data estimates <span class="math inline">\(q^{(i)}\)</span> are averaged together to obtain the final point estimate.</p>
 <p>The quantity <span class="math inline">\(r = (1 + \frac{1}{m}) \frac{b_m}{T_m}\)</span> estimates the fraction of information about <span class="math inline">\(Q\)</span> that is missing due to nonresponse. Inferences from multiply imputed data are based on <span class="math inline">\(\bar{q}_m\)</span>, <span class="math inline">\(T_m\)</span>, and a Student’s <span class="math inline">\(t\)</span> reference distribution. Rubin and Schenker (1986) provide the approximate value <span class="math inline">\(\nu_{RS} = \frac{m - 1}{r^2}\)</span> for the degrees of freedom of the <span class="math inline">\(t\)</span> distribution under the assumption that with complete data a normal reference distribution would have been appropriate. Barnard and Rubin (1999) relax the assumption of Rubin and Schenker (1986) to allow for a <span class="math inline">\(t\)</span> reference distribution with complete data and suggest the value <span class="math inline">\(\nu_{BR} = (\frac{1}{\nu_{RS}} + \frac{1}{\hat{\nu}_{obs}})^{-1}\)</span> for the degrees of freedom in the multiple imputation analysis, where <span class="math inline">\(\hat{\nu}_{obs} = \frac{(1- r)(\nu_{com})(\nu_{com} + 1)}{\nu_{com} + 1}\)</span> and <span class="math inline">\(\nu_{com}\)</span> denotes the complete-data degrees of freedom.</p>
+<hr />
+</div>
+<div id="fully-synthetic-datasets" class="section level1">
+<h1><span class="header-section-number">2</span> Fully synthetic datasets</h1>
+<p>We again have scalar population parameter <span class="math inline">\(Q\)</span>, with <span class="math inline">\(q^{(i)}\)</span> and <span class="math inline">\(u^{(i)}\)</span> as it’s estimates from each of the <span class="math inline">\(m\)</span> synthetic datasets. The following quantities are needed for inferences for scalar <span class="math inline">\(Q\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\bar{q}_m &amp;= \sum_{i=1}^m \frac{q^{(i)}}{m}, \\
+b_m &amp;= \sum_{i=1}^m \frac{(q^{(i)} - \bar{q}_m)^2}{m-1}, \\
+\bar{u}_m &amp;= \sum_{i=1}^m \frac{u^{(i)}}{m}.
+\end{aligned}
+\]</span></p>
+<p>The analyst then can use <span class="math inline">\(\bar{q}_m\)</span> to estimate <span class="math inline">\(Q\)</span> and <span class="math display">\[
+T_f = (1 + \frac{1}{m})b_m - \bar{u}_m
+\]</span> to estimate the variance of <span class="math inline">\(\bar{q}_m\)</span>. The difference in this variance estimate compared with the variance estimate for standard multiple imputation is due to the additional sampling from the synthetic units for fully synthetic datasets. Hence, the variance <span class="math inline">\(b_m\)</span> between the datasets already reflects the variance within each imputation. When <span class="math inline">\(n\)</span> is large, inferences for scalar <span class="math inline">\(Q\)</span> can be based on <span class="math inline">\(t\)</span> distributions with degrees of freedom <span class="math display">\[
+\nu_f = (m - 1) \Bigg{(}1 - \frac{\bar{u}_m}{(1 + \frac{1}{m})b_m}\Bigg{)}^2.
+\]</span> Derivations of these methods are presented in Raghunathan et al. (2003). A disadvantage of this variance estimate is that it can become negative. For that reason, Reiter (2002) suggests a slightly modified variance estimator that is always positive <span class="math inline">\(T_f^{*} = \text{max}(0, T_f) + \delta \Big{(}\frac{n_{syn}}{n}\bar{u}_m \Big{)}\)</span>, where <span class="math inline">\(\delta = 1\)</span> if <span class="math inline">\(T_f &lt; 0\)</span> and <span class="math inline">\(\delta = 0\)</span> otherwise.</p>
+<hr />
+</div>
+<div id="partially-synthetic-datasets" class="section level1">
+<h1><span class="header-section-number">3</span> Partially synthetic datasets</h1>
+<p>Following Reiter (2003, 2004), let <span class="math inline">\(Z_j = 1\)</span> if unit <span class="math inline">\(j\)</span> is selected to have any of its observed data replaced, and let <span class="math inline">\(Z_j = 0\)</span> otherwise. Let <span class="math inline">\(Z = (Z_1, \dots, Z_s)\)</span>, where <span class="math inline">\(s\)</span> is the number of records in the observed data. Let <span class="math inline">\(Y = (Y_{rep}, Y_{nrep})\)</span> be the data collected in the original survey, where <span class="math inline">\(Y_{rep}\)</span> includes all values to be replaced with multiple imputations and <span class="math inline">\(Y_{nrep}\)</span> includes all values not replaced with imputations. Let <span class="math inline">\(Y_{rep}^{(i)}\)</span> be the replacement values for <span class="math inline">\(Y_{rep}\)</span> in synthetic dataset <span class="math inline">\(i\)</span>. Each <span class="math inline">\(Y_{rep}^{(i)}\)</span> is generated by simulating values from the posterior predictive distribution <span class="math inline">\(f(Y_{rep}^{(i)} | Y, Z)\)</span>, or some close approximation to the distribution such as those of Raghunathan et al. (2001). The agency repeats the process <span class="math inline">\(m\)</span> times, creating <span class="math inline">\(D^{(i)} = (Y_{nrep}, Y_{rep}^{(i)})\)</span> for <span class="math inline">\(i = 1, \dots, m\)</span>, and releases <span class="math inline">\(\textbf{D} = \{D^{(1)}, \dots, D^{(m)}\}\)</span> to the public.</p>
+<p>To get valid inferences, secondary data users can use the combining rules presented by Reiter (2003). For scalar <span class="math inline">\(Q\)</span>, with <span class="math inline">\(q^{(i)}\)</span> and <span class="math inline">\(u^{(i)}\)</span> the point estimate and the corresponding variance estimate in synthetic dataset <span class="math inline">\(D^{(i)}\)</span> for <span class="math inline">\(i = 1, \dots, m\)</span>, the following quantities are needed for inferences:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\bar{q}_m &amp;= \sum_{i=1}^m \frac{q^{(i)}}{m}, \\
+b_m &amp;= \sum_{i=1}^m \frac{(q^{(i)} - \bar{q}_m)}{m-1}, \\
+\bar{u}_m &amp;= \sum_{i=1}^m \frac{u^{(i)}}{m}.
+\end{aligned}
+\]</span></p>
+<p>The analyst can use <span class="math inline">\(\bar{q}_m\)</span> to estimate <span class="math inline">\(Q\)</span> and <span class="math display">\[
+T_p = \frac{b_m}{m} + \bar{u}_m
+\]</span> to estimate the variance of <span class="math inline">\(\bar{q}_m\)</span>. Then, <span class="math inline">\(\frac{b_m}{m}\)</span> is the correction factor for the additional variance due to using a finite number of imputations. However, the additional <span class="math inline">\(b_m\)</span> necessary in the missing-data context is not necessary here, since <span class="math inline">\(\bar{u}_m\)</span> already captures the variance of <span class="math inline">\(Q\)</span> given the observed data. This is different in the missing data case, where <span class="math inline">\(\bar{u}_m\)</span> is the variance of <span class="math inline">\(Q\)</span> given the completed data, and <span class="math inline">\(\bar{u} + b_m\)</span> is the variance of <span class="math inline">\(Q\)</span> given the observed data. When <span class="math inline">\(n\)</span> is large, inferences for scalar <span class="math inline">\(Q\)</span> can be based on <span class="math inline">\(t\)</span> distributions with degrees of freedom <span class="math inline">\(\nu_p = (m-1) \Big{(}1 + \frac{\bar{u}_m \cdot m}{b_m}\Big{)}^2.\)</span></p>
+<hr />
+</div>
+<div id="nonresponse-and-partially-synthetic-data" class="section level1">
+<h1><span class="header-section-number">4</span> Nonresponse and partially synthetic data</h1>
+<p>Since the generation of synthetic datasets is based on the ideas of multiple imputation, it is reasonable to use the approach to impute missing values and generate synthetic values simultaneously. At first glance, it seems logical to impute missing values and generate synthetic values in one step using the same model as for the originally observed values. However, as Reiter (2004) points out, this can lead to biased imputations of only a subset of the data should be replaced with synthetic values, but the imputation model for the missing values is based on the entire dataset. To allow for different models, Reiter (2004) suggests imputation in two stages. In the first stage, all missing values are imputed <span class="math inline">\(m\)</span> times using the standard multiple-imputation approach for nonresponse. In the second stage, all values that need to be replaced are synthesized <span class="math inline">\(r\)</span> times in every first-stage nest, leading to a total of <span class="math inline">\(M = m \cdot r\)</span> datasets that are released to the public.</p>
+<p>Again, let <span class="math inline">\(Q\)</span> be an estimand, and suppose that, given the original data, the analyst estimates <span class="math inline">\(Q\)</span> with some point estimator <span class="math inline">\(q\)</span> and the variance of <span class="math inline">\(q\)</span> with some estimator <span class="math inline">\(u\)</span>. Let <span class="math inline">\(q^{(i,j)}\)</span> and <span class="math inline">\(u^{(i,j)}\)</span> be the values of <span class="math inline">\(q\)</span> and <span class="math inline">\(u\)</span> in synthetic dataset <span class="math inline">\(D^{(i,j)}\)</span> for <span class="math inline">\(i = 1, \dots, m\)</span> and <span class="math inline">\(j = 1, \dots, r\)</span>. The analyst computes <span class="math inline">\(q^{(i,j)}\)</span> and <span class="math inline">\(u^{(i,j)}\)</span> by acting as if each <span class="math inline">\(D^{(i,j)}\)</span> is the genuine data. The following quantities are needed for inferences for scalar <span class="math inline">\(Q\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\bar{q}_M &amp;= \sum_{i=1}^m \sum_{j=1}^r \frac{q^{(i,j)}}{m \cdot r} = \sum_{i=1}^m \frac{\bar{q}^{(i)}}{m}, \\
+\bar{b}_M &amp;= \sum_{i=1}^m \sum_{j=1}^r \frac{(q^{(i,j)} - \bar{q}^{(i)})^2}{m(r-1)} = \sum_{i=1}^m \frac{b^{(i)}}{m}, \\
+B_M &amp;= \sum_{i=1}^m \frac{(\bar{q}^{(i)}) - \bar{q}_M}{m-1}, \\
+\bar{u}_M = \sum_{i=1}^m \sum_{j=1}^r \frac{u^{i,j}}{m \cdot r}.
+\end{aligned}
+\]</span></p>
+<p>The analyst then can use <span class="math inline">\(\bar{q}_M\)</span> to estimate <span class="math inline">\(Q\)</span> and <span class="math display">\[
+T_P = (1 + \frac{1}{m}) B_M - \frac{\bar{b}_M}{r} + \bar{u}_M
+\]</span> to estimate the variance of <span class="math inline">\(\bar{q}_M\)</span>. When <span class="math inline">\(n\)</span> is large, inferences for scalar <span class="math inline">\(Q\)</span> can be based on <span class="math inline">\(t\)</span> distributions with degrees of freedom <span class="math display">\[
+\nu_P = \Bigg{(}\frac{((1 + \frac{1}{m})B_M)^2}{(m-1)T_M^2} + \frac{(\frac{\bar{b}_M}{r})^2}{m(r-1)T_M^2} \Bigg{)}^{-1}.
+\]</span></p>
+<p>Similar to the variance of the estimate for fully synthetic datasets, <span class="math inline">\(T_P\)</span> can become negative since <span class="math inline">\(\frac{\bar{b}_M}{r}\)</span> is substracted. In this case, Reiter (2008b) suggests using the conservative variance estimator <span class="math inline">\(T_P^{adj} = (1 = \frac{1}{m})B_M + \bar{u}_M\)</span>. This estimator is equivalent to the variance estimator for multiple imputation for missing data. Consequently, the degrees of freedom are given by <span class="math display">\[
+\nu_P^{adj} = (m - 1) \Bigg{(}1 + \frac{m \bar{u}_M)}{(m+1)B_M} \Bigg{)}^2.
+\]</span> Generally, negative variances can be avoided by increasing <span class="math inline">\(m\)</span> and <span class="math inline">\(r\)</span>.</p>
+<hr />
+<p>END OF DOCUMENT</p>
 </div>
 
 
