@@ -7,7 +7,12 @@
 
 pool.syn <- function(mira) {
   
-  fitlist <- mira %$% analyses
+  if(class(mira) == "mira") {
+    fitlist <- mira %$% analyses
+  }
+  else {
+    fitlist <- mira
+    }
   
   m <- length(fitlist)
   
