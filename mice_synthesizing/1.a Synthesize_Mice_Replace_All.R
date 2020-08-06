@@ -39,6 +39,7 @@ def['reg'] <- "polyreg"
 # cart method, all variables are imputed by means of cart
 cart <- rep("cart", ncol(truth))
 names(cart) <- colnames(truth)
+cart['bmi'] <- def['bmi']
 
 # alter the predictor matrix such that imputations for bmi do not flow
 # back into the predictions for wgt and hgt
