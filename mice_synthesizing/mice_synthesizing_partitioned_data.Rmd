@@ -1,0 +1,91 @@
+---
+title: "Mice synthesizing with partitioned data"
+author:
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+thomcache <- TRUE; thomlazy <- FALSE #obviously ;)
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(kableExtra)
+library(mice)
+library(ggplot2)
+```
+
+# Introduction
+
+As can be seen in the previous R Markdown file (Synthesizing by means of mice), it is possible to create fully synthetic data by means of mice. In the current document, we take this approach one step further, by trying to synthesize partitioned data. Therefore, we once again create 500 bootstrap samples, that are partitioned into $r = 5$ subsets, and then every subset is synthesized, which results in $m = 5$ synthetic versions of every $r = 5$ subset of the bootstrap sample, resulting in $r \cdot m$ separate data sets. Then, we create $m = 5$ completed datasets, by rowbinding all $r = 5$ subsets, which results in $m = 5$ datasets of the same dimension as the original data. These datasets are analysed by means of a linear regression model, and pooled by means of the fully synthetic data rules, as proposed by Raghunathan et al. (2003). 
+
+The data is synthesized by means of the data generating approach that seemed most promising in the previous `R Markdown` file. Thus, `cart` is used as a synthesizing method for all variables, except for `bmi`, which is synthesized passively, through it's relation with `wgt` and `hgt`, that is, `bmi = wgt / (hgt/100)^2`. Furthermore, the parameter `minbucket`, which is the minimum number of observations in any terminal node, is set to 1, the parameter `cp`, which is the complexity parameter now equals `1e-08`, and the number of iterations `maxit = 1`. With this method, we introduced somewhat more variance within every dataset, while the between-imputation variance decreases somewhat
+
+```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
+source("1.b Synthesize_partitioned_data_mice.R")
+source("functions.R")
+```
+
+
+---
+
+
+# Results
+
+
+```{r, eval = F}
+boot_boys <- truth %>% bootstrap(nsim) %$% strap %>% map(as.data.frame)
+
+n.parts <- 5
+
+parts <- rep(1/n.parts, n.parts)
+names(parts) <- paste0("P", 1:n.parts)
+
+boot_parts <- boot_boys %>%
+  future_map(function(x) {
+    resample_partition(x, parts) %>%
+      map(function(y) {
+        as.data.frame(y) %>%
+          mice(m = 5, 
+               maxit = 1,
+               method = cart,
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               where = matrix(1, nrow(.), ncol(.)),
+               print = F) %>% 
+          mice::complete(., action = "long")
+          }
+        ) %>% bind_rows %>%
+      plyr::dlply(~.imp)
+  }, .options = future_options(seed = as.integer(123)), .progress = T)
+```
+
+
+This approach yields `nsim` lists of length $m = 5$, containing the already binded $r = 5$ partitions of the data. Thus, every single list contains $m = 5$ complete synthetic datasets. These can be analysed by means of the `pool.syn` function, and these results can be summarised by means of the `ci_cov` function.
+
+```{r}
+boot_parts %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
