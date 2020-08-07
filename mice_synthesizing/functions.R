@@ -7,7 +7,7 @@
 
 pool.syn <- function(mira) {
   
-  if(class(mira) == "mira") {
+  if(class(mira)[1] == "mira") {
     fitlist <- mira %$% analyses
   }
   else {
@@ -50,5 +50,5 @@ ci_cov <- function(pooled, true_fit) {
               "Lower"    = mean(lower),
               "Upper"    = mean(upper),
               "CIW"      = mean(upper - lower),
-              "Coverage" = mean(cover))
+              "Coverage" = mean(cover), .groups = "drop")
 }
