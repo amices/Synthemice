@@ -30,6 +30,31 @@ pool.syn <- function(mira) {
   pooled
 }
 
+pool2.syn <- function(mira) {
+  
+  if(class(mira)[1] == "mira") {
+    fitlist <- mira %$% analyses
+  }
+  else {
+    fitlist <- mira
+  }
+  
+  m <- length(fitlist)
+  
+  pooled <- fitlist %>% 
+    map_dfr(broom::tidy) %>%
+    group_by(term) %>%
+    summarise(est     = mean(estimate),
+              bm      = sum((estimate - est)^2) / (m - 1),
+              ubar    = mean(std.error^2),
+              var_u   = (1 + 1/m) * bm - ubar,
+              var     = if_else(var_u > 0, var_u, ubar),
+              df      = max(m - 1, (m - 1) * (1 - ubar / (bm + bm/m))^2),
+              lower   = est - qt(.975, df) * sqrt(var),
+              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
+  pooled
+}
+
 ci_cov <- function(pooled, true_fit) {
   
   coefs <- coef(true_fit)
