@@ -130,3 +130,41 @@ boot_parts_5 %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+
+---
+
+
+# Adjusted degrees of freedom
+
+Alternatively, we can alter the minimum value for the degrees of freedom to $\text{max}(m - 1, \nu)$, as is done in Reiter and Drechsler (2010) as well.
+
+This approach yields the following results with `maxit` set to 1.
+
+```{r, include = F}
+source("functions.R")
+```
+
+```{r}
+boot_parts %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool2.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+And the following results when we fix `maxit` at five.
+
+```{r}
+boot_parts_5 %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool2.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
