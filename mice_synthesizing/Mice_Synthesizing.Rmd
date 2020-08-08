@@ -359,17 +359,24 @@ cart_default <- boot_cart %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   group_by(term) %>%
-  summarise(Within = mean(ubar), Between = mean(bm), Total = mean(var))
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
 
 cart_adj <- boot_cart_maxit_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   group_by(term) %>%
-  summarise(Within = mean(ubar), Between = mean(bm), Total = mean(var))
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
 
-cart_default
-
-cart_adj
+bind_rows("Cart default" = cart_default,
+          "Cart adjusted settings" = cart_adj, .id = "Method") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 # References
