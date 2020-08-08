@@ -115,3 +115,16 @@ boot_cart_maxit_cp_min3 <- bootstrap_boys %>%
                print = F)
 }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
 
+
+boot_cart_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% mice(m = 5, 
+               maxit = 5,
+               method = cart,
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               where = matrix(TRUE, nrow(truth), ncol(truth)),
+               print = F)
+  }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
+
