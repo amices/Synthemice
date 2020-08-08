@@ -23,7 +23,7 @@ coefs <- coef(truemodel)
 plan(multisession)
 
 # number of iterations
-nsim <- 500
+nsim <- 5
 
 # default method - pmm for all continuous predictors
 def <- rep("pmm", ncol(truth))
