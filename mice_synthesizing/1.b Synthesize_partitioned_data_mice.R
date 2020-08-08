@@ -59,3 +59,21 @@ boot_parts <- boot_boys %>%
       plyr::dlply(~.imp)
   }, .options = future_options(seed = as.integer(123)), .progress = T)
 
+boot_parts_5 <- boot_boys %>%
+  future_map(function(x) {
+    resample_partition(x, parts) %>%
+      map(function(y) {
+        as.data.frame(y) %>%
+          mice(m = 5, 
+               maxit = 5,
+               method = cart,
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               where = matrix(1, nrow(.), ncol(.)),
+               print = F) %>% 
+          mice::complete(., action = "long")
+      }
+      ) %>% bind_rows %>%
+      plyr::dlply(~.imp)
+  }, .options = future_options(seed = as.integer(123)), .progress = T)

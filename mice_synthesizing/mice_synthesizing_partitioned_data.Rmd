@@ -86,6 +86,47 @@ boot_parts %>%
   ci_cov(truemodel) %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
 ```
 
+Additionally, since I'm not sure whether or not it is allowed to set the number of iterations to 1, I additionally performed the same analysis with `maxit = 5`, the `mice` default for imputations.
+
+```{r, eval = F}
+boot_boys <- truth %>% bootstrap(nsim) %$% strap %>% map(as.data.frame)
+
+n.parts <- 5
+
+parts <- rep(1/n.parts, n.parts)
+names(parts) <- paste0("P", 1:n.parts)
+
+boot_parts_5 <- boot_boys %>%
+  future_map(function(x) {
+    resample_partition(x, parts) %>%
+      map(function(y) {
+        as.data.frame(y) %>%
+          mice(m = 5, 
+               maxit = 5,
+               method = cart,
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               where = matrix(1, nrow(.), ncol(.)),
+               print = F) %>% 
+          mice::complete(., action = "long")
+      }
+      ) %>% bind_rows %>%
+      plyr::dlply(~.imp)
+  }, .options = future_options(seed = as.integer(123)), .progress = T)
+```
+
+This approach yields the following results.
+
+```{r}
+boot_parts_5 %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
