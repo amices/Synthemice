@@ -101,8 +101,8 @@ $$
 \begin{aligned}
 \bar{q}_M &= \sum_{i=1}^m \sum_{j=1}^r \frac{q^{(i,j)}}{m \cdot r} = \sum_{i=1}^m \frac{\bar{q}^{(i)}}{m}, \\
 \bar{b}_M &= \sum_{i=1}^m \sum_{j=1}^r \frac{(q^{(i,j)} - \bar{q}^{(i)})^2}{m(r-1)} = \sum_{i=1}^m \frac{b^{(i)}}{m}, \\
-B_M &= \sum_{i=1}^m \frac{(\bar{q}^{(i)}) - \bar{q}_M}{m-1}, \\
-\bar{u}_M = \sum_{i=1}^m \sum_{j=1}^r \frac{u^{i,j}}{m \cdot r}.
+B_M &= \sum_{i=1}^m \frac{(\bar{q}^{(i)}) - \bar{q}_M)^2}{m-1}, \\
+\bar{u}_M &= \sum_{i=1}^m \sum_{j=1}^r \frac{u^{i,j}}{m \cdot r}.
 \end{aligned}
 $$
 
