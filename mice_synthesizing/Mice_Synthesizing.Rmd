@@ -223,36 +223,19 @@ cart_wgt_hgt %>%
 ```
 
 
-
 ---
 
 
 ## Bootstrapped boys data
 
 ```{r, message = F}
-synthetic_results <- boot_cart %>%
-  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
-  map_dfr(pool.syn) %>%
-  ci_cov(truemodel) %>%
-  kable(digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
-norm_results <- boot_cart %>%
-  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
-  map_dfr(pool.syn) %>%
-  mutate(df = NA,
-         lower = est - qnorm(.975) * sqrt(var),
-         upper = est + qnorm(.975) * sqrt(var)) %>%
-  ci_cov(truemodel) %>%
-  kable(digits = 3, caption = "Normal CI approximation") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
 true_results <- bootstrap_boys %>%
   map(~ lm(wgt ~ age + hgt, .x)) %>%
   map_dfr(~ broom::tidy(.x, conf.int = TRUE)) %>%
   mutate(true_coef = rep(coef(truemodel), nsim),
          true_se   = rep(sqrt(diag(vcov(truemodel))), nsim),
-         cover     = conf.low < true_coef & true_coef < conf.high) %>%
+         cover     = conf.low < true_coef & true_coef < conf.high) %T>% 
+  assign("boot_true", ., envir = globalenv()) %>%
   group_by(term) %>%
   summarise("True Est" = unique(true_coef),
             "Boot Est"  = mean(estimate),
@@ -267,6 +250,24 @@ true_results <- bootstrap_boys %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
+synthetic_results <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %T>% 
+  assign("boot_syn", ., envir = globalenv()) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+norm_results <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  mutate(df = NA,
+         lower = est - qnorm(.975) * sqrt(var),
+         upper = est + qnorm(.975) * sqrt(var)) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3, caption = "Normal CI approximation") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
 ```
 
 
@@ -275,12 +276,177 @@ true_results <- bootstrap_boys %>%
 true_results
 synthetic_results
 norm_results
+```
 
+
+We find that some bias has been introduced due to synthesizing the relationships, so we investigate this in further depth. Additionally, the coverage is somewhat too high, and the average confidence interval width has increased dramatically. Therefore, we will further investigate where this increase stems from.
+
+
+```{r, message = F, fig.fullwidth = TRUE, dpi = 1000}
+plot_dat <- bind_rows("Synthetic" = boot_syn %>% 
+                                    mutate(ciw = upper - lower) %>%
+                                    select(term, est, ciw = ciw), 
+                      "Real values" = boot_true %>% 
+                                      mutate(ciw = conf.high - conf.low) %>%
+                                      select(term, est = estimate, ciw = ciw),
+                      .id = "Method")
+
+
+ggplot(plot_dat, aes(x = est, color = Method, fill = Method)) +
+  geom_density(alpha = .7) +
+  facet_wrap(~ term, nrow = 1, scales = "free") +
+  scale_color_viridis_d(begin = .30, end = .65) +
+  scale_fill_viridis_d(begin = .30, end = .65) +
+  theme_classic()
+```
+
+It can be seen that the bias is systematic, and thus not due to any extreme values that pull the average estimate to zero. Additionally, it seems that the pooled standard error indicated in the table is somewhat too low for the synthetic data. Namely, it appears in the plot that the spread in the synthetic data is roughly equal to the spread in the bootstrapped, but real, data. However, in the table above, the synthetic standard errors are much smaller than the mean over the manually calculated standard error of the bootstrapped estimates. When the standard errors are calculated over the obtained regression estimates, we find that the synthetic standard error increases much more when we calculate it over the observed synthetic estimates.
+
+```{r, message = F}
+boot_se <- boot_true %>% group_by(term) %>% summarise("Bootstrapped SE" = sd(estimate))
+boot_syn_se <- boot_syn %>% group_by(term) %>% summarise("Synthetic bootstrapped SE" = sd(est))
+
+bind_cols(boot_se, boot_syn_se[,2]) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r, fig.fullwidth = TRUE, dpi = 1000}
+ggplot(plot_dat, aes(x = ciw, color = Method, fill = Method)) +
+  geom_density(alpha = .7) +
+  facet_wrap(~ term, nrow = 1, scales = "free") +
+  scale_color_viridis_d(begin = .30, end = .65) +
+  scale_fill_viridis_d(begin = .30, end = .65) +
+  theme_classic()
+```
+
+
+When we look at the confidence interval width, we find that the bootstrap CI is of approximately the same length in all iterations, while the CI's of the synthetic results spread out much more.
+
+
+---
+
+
+## Improving the bias/variance tradeoff
+
+The fact that there is bias introduced, might be due to the fact that there is too little variance in the estimates of the synthetic values. Therefore, an approach that increases the variance of the estimates might yield estimates that display less bias. This can be achieved by decreasing the number of iterations, that is, setting the mice parameter `maxit` to 1, instead of 5. Additionally, the complexity parameter can be set to $`r 1e-08`$ instead of $`r 1e-04`$, so that more splits will be made. Also, the value of the `rpart` parameter `minbucket`, that is, the minimum number of observations in any terminal node, is set to 3 instead of 5, so that, once again, more splits can be made. By means of these changes, the within variance increases, while the between-imputations variability decreases. The results with `r nsim` iterations on the same, singly imputed boys dataset can be seen below.
+
+```{r}
+syns_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+  
+```
+
+Additionally, the same approach is used to synthesize the `r nsim` bootstrapped samples from the completed boys data.
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+However, I'm not sure whether it is sensible to set the number of iterations to `maxit = 1`. Therefore, I additionally included an example that shows the same approach, that is, with the complexity parameter `cp = 1e-08` and the parameter `minbucket = 3`, but with maximum number of iterations fixed at `maxit = 5`.
+
+
+```{r}
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+It can be seen that the bias indeed decreases, while the standard error of the estimates increases. This is due to the fact that the within-imputation variance increases, while the between-imputation variance decreases somewhat. 
+
+
+```{r}
+cart_default <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  group_by(term) %>%
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
+
+cart_adj_maxit <- boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  group_by(term) %>%
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
+
+cart_adj <- boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  group_by(term) %>%
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
+
+bind_rows("Cart default" = cart_default,
+          "Cart with adjusted settings and maxit = 1" = cart_adj_maxit,
+          "Cart adjusted settings" = cart_adj, .id = "Method") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 
 ---
 
+
+# Adjusted degrees of freedom
+
+
+Next to the analyses displayed previously, I adjusted the degrees of freedom to $\text{max}(m - 1, \nu)$, as is done in Reiter and Drechsler (2010). This yields the following results for the initial analyses, that is, bootstrapping with the mice default settings, but with the method set to `cart`. Note that this concerns `r nsim` bootstrap samples from the complete data.
+
+
+```{r}
+boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %T>% 
+  assign("boot_syn", ., envir = globalenv()) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+Additionally, the results can be computed for the data with the smaller bias settings. That is, setting `maxit = 1`, `cp = 1e-08` and `minbucket = 3`.
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+And, once again, the same analysis as the previous one, but with `maxit = 5`.
+
+```{r}
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
 
 
 # References

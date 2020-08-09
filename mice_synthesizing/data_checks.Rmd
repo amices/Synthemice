@@ -1,0 +1,109 @@
+---
+title: "Synthetic data (confidentiality) checks"
+authors: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+thomcache <- TRUE
+```
+
+# Introduction
+
+To see how confidential the data imputed by mice, it is a straightforward approach to see how many observations in the synthetic data are duplicates from the original data. This is done by means of creating one completed `boys` dataset, generating 100 imputed versions of this dataset, and see how often there are duplicated observations in any of the 100 synthetic versions of the data.
+
+```{r, results = F, message = F, warning=F}
+library(mice) # imputations
+library(tidyverse) # (d)plyr
+library(magrittr) # pipes
+```
+
+First, load the required packages. Then, we set the method for imputing the data (with passive imputations for `bmi`) and make sure that imputations for `bmi` do not flow back into the predictions of `hgt` and `wgt`. Then, we impute the boys dataset containing missing values once, so that we have a fully observed dataset that can be used for creating synthetic versions.
+
+```{r}
+meth <- make.method(mice::boys)
+meth['bmi'] <- "~I(wgt / (hgt/100)^2)"
+pred <- make.predictorMatrix(boys)
+pred[c("wgt", "hgt"), "bmi"] <- 0
+
+data <- mice::boys %>% 
+  mice(m = 1, method = meth, predictorMatrix = pred, print = FALSE, seed = 123) %>% 
+  complete()
+```
+Now we have a complete dataset, we can overimpute the complete dataset, so that we have synthetic data. First, we set the synthesizing method to `cart`. Then, we use mice to generate 100 synthetic versions of the completed dataset.
+
+```{r, cache = thomcache}
+cart <- meth; cart[!names(meth) %in% 'bmi'] <- "cart"
+
+syns <- data %>% 
+  mice(m = 100, 
+       method = cart, 
+       predictorMatrix = pred, 
+       where = matrix(TRUE, nrow(data), ncol(data)),
+       print = FALSE,
+       seed = 123)
+```
+
+
+Now we have 100 synthetic versions of the same dataset, we can create 100 completed datasets.
+
+```{r}
+completed <- complete(syns, action = "all")
+```
+
+Now we have 100 complete synthetic datasets, we can inspect the number of duplicate cases in every synthetic dataset with regard to the original dataset.
+
+```{r}
+duplicate_obs <- map(completed, function(x) bind_rows(data, x) %>% duplicated)
+
+duplicate_obs %>% map_dbl(sum) %>% sum # total number of duplicated rows over all 100 synthetic datasets
+```
+
+It appears that in all 100 synthetic versions of the data, there is not a single observation that is an exact copy of the actually observed observations. Now, let's find out if the synthetic data resembles the actually observed data (univariately). That is, we compare the distributions of the variables in the observed and the synthetic data.
+
+```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
+completed %>%
+  map_dfr(function(x) x) %>%
+  bind_rows(., data, .id = "Imputed") %>%
+  mutate(Imputed = as.numeric(Imputed)) %>%
+  select_if(is.numeric) %>%
+  pivot_longer(cols = -"Imputed",
+               names_to = c("Variable")) %>%
+  mutate(Imputed = recode(Imputed, `1` = "Synthetic data", `2` = "Observed data")) %>%
+  ggplot(., mapping = aes(x = value, fill = Imputed)) +
+  geom_histogram(aes(y = ..density..), position = "dodge2", ) +
+  facet_wrap(~ Variable, nrow = 3, ncol = 2, scales = "free") +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
+
+```{r, dpi = 300, fig.fullwidth = TRUE}
+completed %>%
+  map_dfr(function(x) x) %>%
+  bind_rows(., data, .id = "Imputed") %>%
+  select_if(negate(is.numeric)) %>%
+  map_dfr(function(x) as.character(x)) %>%
+  pivot_longer(cols = -"Imputed",
+               names_to = c("Variable")) %>%
+  mutate(Imputed = recode(Imputed, `1` = "Synthetic data", `2` = "Observed data")) %>%
+  ggplot(., mapping = aes(x = value, fill = Imputed, group = Imputed)) +
+  geom_bar(aes(y = ..prop..), position = "dodge2") +
+  facet_wrap(~ Variable, nrow = 3, ncol = 2, scales = "free") +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
+
+Over all imputed datasets, the synthetic data are univariately very much alike the observed data. Both the histograms and barplots shows that the relative frequencies of the values for the continuous variables or the categories for the categorical variables are highly similar.
