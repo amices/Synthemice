@@ -1,0 +1,111 @@
+---
+title: "Synthesizing by means of mice with partially synthetic data rules"
+author:
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+# Introduction
+
+Load the required packages.
+
+```{r, results=FALSE, message=FALSE, warning=FALSE}
+source("functions.R")
+library(mice)
+library(magrittr)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+```
+
+```{r, include = FALSE}
+load("~/Documents/Federated_imputation/mice_synthesizing/Mice_Synthesizing_cache/html/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData")
+```
+
+
+Since using `mice`, we basically overimpute the already observed data. This corresponds to the method of partially synthetic data, although we overimpute every single value. Nevertheless, it is worthwhile to check the results when we use the partially synthetic data rules, since the pooling rules to combine this with missing data already exist. Therefore, we see how this method performs on the bootstrapped samples from the boys data.
+
+We can use the same data as in the previous file, but we need to use a new pooling function, with a different variance calculation, namely
+$$
+T_p = \bar{u}_m + \frac{b_m}{m},
+$$
+with corresponding degrees of freedom
+$$
+\begin{aligned}
+\nu_p &= (m - 1)(1 + \frac{\bar{u}_m}{\frac{b_m}{m}}) \\
+&= (m - 1)(1 + \frac{m \cdot \bar{u}_m}{b_m}).
+\end{aligned}
+$$
+
+When we use the default `cart` approach in mice, this yields the following results.
+
+# Default CART
+
+```{r, message = FALSE}
+true_results <- bootstrap_boys %>%
+  map(~ lm(wgt ~ age + hgt, .x)) %>%
+  map_dfr(~ broom::tidy(.x, conf.int = TRUE)) %>%
+  mutate(true_coef = rep(coef(truemodel), nsim),
+         true_se   = rep(sqrt(diag(vcov(truemodel))), nsim),
+         cover     = conf.low < true_coef & true_coef < conf.high) %T>% 
+  assign("boot_true", ., envir = globalenv()) %>%
+  group_by(term) %>%
+  summarise("True Est" = unique(true_coef),
+            "Boot Est"  = mean(estimate),
+            "Bias"     = mean(estimate - true_coef),
+            "True SE"  = unique(true_se),
+            "Boot SE"   = mean(std.error),
+            "DF"       = 745,
+            "Lower"    = mean(conf.low),
+            "Upper"    = mean(conf.high),
+            "CIW"      = mean(conf.high - conf.low),
+            "Coverage" = mean(cover)) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+synthetic_results <- boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool3.syn) %T>% 
+  assign("boot_syn", ., envir = globalenv()) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```{r}
+true_results
+synthetic_results
+```
+
+# Adjusted CART
+
+Just as in the previous file, we increase the within-imputation variance somewhat, which results in a smaller bias, and therefore, hopefully, more accurate results.
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool3.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool3.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
