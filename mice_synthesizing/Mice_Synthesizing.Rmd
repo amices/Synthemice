@@ -342,8 +342,7 @@ syns_cart_maxit_cp_min3 %>%
   
 ```
 
-
-It can be seen that the bias indeed decreases, while the standard error of the estimates increases. This is due to the fact that the within-imputation variance increases, while the between-imputation variance decreases somewhat. When we use the same approach to estimate the bootstrapped boys data, we get the following results.
+Additionally, the same approach is used to synthesize the `r nsim` bootstrapped samples from the completed boys data.
 
 ```{r}
 boot_cart_maxit_cp_min3 %>%
@@ -353,6 +352,23 @@ boot_cart_maxit_cp_min3 %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+
+However, I'm not sure whether it is sensible to set the number of iterations to `maxit = 1`. Therefore, I additionally included an example that shows the same approach, that is, with the complexity parameter `cp = 1e-08` and the parameter `minbucket = 3`, but with maximum number of iterations fixed at `maxit = 5`.
+
+
+```{r}
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+It can be seen that the bias indeed decreases, while the standard error of the estimates increases. This is due to the fact that the within-imputation variance increases, while the between-imputation variance decreases somewhat. 
+
 
 ```{r}
 cart_default <- boot_cart %>%
@@ -364,7 +380,16 @@ cart_default <- boot_cart %>%
             Total = mean(var),
             .groups = 'drop')
 
-cart_adj <- boot_cart_maxit_cp_min3 %>%
+cart_adj_maxit <- boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool.syn) %>%
+  group_by(term) %>%
+  summarise(Within = mean(ubar), 
+            Between = mean(bm), 
+            Total = mean(var),
+            .groups = 'drop')
+
+cart_adj <- boot_cart_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   group_by(term) %>%
@@ -374,10 +399,55 @@ cart_adj <- boot_cart_maxit_cp_min3 %>%
             .groups = 'drop')
 
 bind_rows("Cart default" = cart_default,
+          "Cart with adjusted settings and maxit = 1" = cart_adj_maxit,
           "Cart adjusted settings" = cart_adj, .id = "Method") %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+
+---
+
+
+# Adjusted degrees of freedom
+
+
+Next to the analyses displayed previously, I adjusted the degrees of freedom to $\text{max}(m - 1, \nu)$, as is done in Reiter and Drechsler (2010). This yields the following results for the initial analyses, that is, bootstrapping with the mice default settings, but with the method set to `cart`. Note that this concerns `r nsim` bootstrap samples from the complete data.
+
+
+```{r}
+boot_cart %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %T>% 
+  assign("boot_syn", ., envir = globalenv()) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+Additionally, the results can be computed for the data with the smaller bias settings. That is, setting `maxit = 1`, `cp = 1e-08` and `minbucket = 3`.
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+And, once again, the same analysis as the previous one, but with `maxit = 5`.
+
+```{r}
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool2.syn) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
 
 # References
 
