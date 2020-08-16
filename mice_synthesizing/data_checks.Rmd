@@ -107,3 +107,67 @@ completed %>%
 ```
 
 Over all imputed datasets, the synthetic data are univariately very much alike the observed data. Both the histograms and barplots shows that the relative frequencies of the values for the continuous variables or the categories for the categorical variables are highly similar.
+
+# Adjusted settings
+
+```{r, cache = thomcache}
+syns_adj <- data %>% 
+  mice(m = 100, 
+       maxit = 5,
+       method = cart,
+       minbucket = 3,
+       cp = 1e-08,
+       predictorMatrix = pred, 
+       where = matrix(TRUE, nrow(data), ncol(data)),
+       print = FALSE,
+       seed = 123)
+```
+
+
+```{r}
+completed_adj <- complete(syns_adj, action = "all") 
+
+completed_adj %>%
+  map(function(x) bind_rows(data, x) %>% duplicated) %>%
+  map_dbl(sum) %>% 
+  sum # total number of duplicated rows over all 100 synthetic datasets
+
+completed_adj %>%
+  map(function(x) bind_rows(data, x) %>% duplicated) %>%
+  lapply(function(x) which(x)) %>%
+  unlist() - nrow(data)
+```
+
+```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
+completed_adj %>%
+  map_dfr(function(x) x) %>%
+  bind_rows(., data, .id = "Imputed") %>%
+  mutate(Imputed = as.numeric(Imputed)) %>%
+  select_if(is.numeric) %>%
+  pivot_longer(cols = -"Imputed",
+               names_to = c("Variable")) %>%
+  mutate(Imputed = recode(Imputed, `1` = "Synthetic data", `2` = "Observed data")) %>%
+  ggplot(., mapping = aes(x = value, fill = Imputed)) +
+  geom_histogram(aes(y = ..density..), position = "dodge2", ) +
+  facet_wrap(~ Variable, nrow = 3, ncol = 2, scales = "free") +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
+
+```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
+completed_adj %>%
+  map_dfr(function(x) x) %>%
+  bind_rows(., data, .id = "Imputed") %>%
+  select_if(negate(is.numeric)) %>%
+  map_dfr(function(x) as.character(x)) %>%
+  pivot_longer(cols = -"Imputed",
+               names_to = c("Variable")) %>%
+  mutate(Imputed = recode(Imputed, `1` = "Synthetic data", `2` = "Observed data")) %>%
+  ggplot(., mapping = aes(x = value, fill = Imputed, group = Imputed)) +
+  geom_bar(aes(y = ..prop..), position = "dodge2") +
+  facet_wrap(~ Variable, nrow = 3, ncol = 2, scales = "free") +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
