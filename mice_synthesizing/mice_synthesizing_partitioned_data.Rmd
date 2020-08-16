@@ -168,3 +168,37 @@ boot_parts_5 %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+
+---
+
+
+# Partially synthetic data pooling rules
+
+The results with the adjusted complexity parameter `cp = 1e-08`, `minbucket = 3` and `maxit = 1`.
+
+```{r}
+boot_parts %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool3.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+The results with the adjusted complexity parameter `cp = 1e-08`, `minbucket = 3` and `maxit = 5`.
+
+
+```{r}
+boot_parts_5 %>%
+  map_dfr(function(x) {
+    x %>% map(function(y) y %$% lm(wgt ~ age + hgt)) %>%
+      pool3.syn
+    }) %>%
+  ci_cov(truemodel) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
