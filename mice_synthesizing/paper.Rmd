@@ -1,0 +1,50 @@
+---
+title: "Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with *mice*"
+subtitle: "Anony*mice*d shareable data: Using *mice* to create multiply imputed synthetic datasets" 
+author:
+- Thom Volker, Gerko Vink & Stef van Buuren
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+
+# Introduction
+
+Open science, including open data, has been marked as the future of science [@gewin_data_2016], and the advantages of publicly available research data are numerous [@foster_open_science_2017; @walport_brest_sharing_2011]. Additionally, the fact that public funds are used for data collection results in increased demands for this data. However, research data is very often collected under the reassurance of privacy and confidentiality of the data, and simply anonimizing the data is not enough to fulfil these requirements [@ohm_broken_2009]. Over the years, several techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise [@drechsler_synthetic_2011]. However, these methods may distort relationships between variables, reducing the data quality drastically. 
+
+An alternative has been offered by @rubin_statistical_disclosure_1993, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, units are sampled randomly and independently from the sampling frame, and their, not observed, values are multiply imputed using a model fitted on the observed data. 
+
+**Explain approach**
+
+**INTRO**
+
+- think about fully / partially synthetic data.
+- explain the procedure of creating synthetic datasets
+- introduce mice for imputation of missing data
+- mice can also be used for the imputation of synthetic data
+- brief introduction of the mice algorithm???
+
+**METHODS**
+
+- explain simple synthetic data example
+- explain imputation settings
+- CART has been proposed by Reiter
+
+
+
+
+
+
+
+
+
+## References
