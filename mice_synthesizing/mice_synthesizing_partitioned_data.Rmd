@@ -39,6 +39,9 @@ source("1.b Synthesize_partitioned_data_mice.R")
 source("functions.R")
 ```
 
+```{r, include = F}
+source("functions.R")
+```
 
 ---
 
