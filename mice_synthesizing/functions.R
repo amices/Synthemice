@@ -82,10 +82,12 @@ pool3.syn <- function(mira) {
   pooled
 }
 
-ci_cov <- function(pooled, true_fit) {
+ci_cov <- function(pooled, true_fit = NULL, coefs = NULL, vars = NULL) {
   
-  coefs <- coef(true_fit)
-  vars   <- diag(vcov(true_fit))
+  if (!is.null(true_fit)) {
+    coefs <- coef(true_fit)
+    vars   <- diag(vcov(true_fit))
+  }
   
   nsim <- nrow(pooled) / length(coefs)
   
