@@ -1,0 +1,123 @@
+---
+title: "Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with *mice*"
+subtitle: "Anony*mice*d shareable data: Using *mice* to create multiply imputed synthetic datasets" 
+author:
+- Thom Volker, Gerko Vink & Stef van Buuren
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+---
+
+# OUTLINE
+
+**Intro**
+
+- Motivation/relevance
+- Synthetic data (fully/partially shortly explained)
+- How can this data be generated in practice (FCS - multivariate synthetic values)
+- Mice adopts FCS for missing data
+- It will be shown that mice is also capable of generating multivariate synthetic data
+- However, multiple rules for correct variance estimates have been proposed, but the choice of one optimal variance estimate is not straightforward. Therefore, the performance of the currently available variance estimators (as outlined below) will be contrasted
+- Goal: explain and show how `mice` can be used to create synthetic versions of the data at hand, and which variance estimator yields the best results.
+
+**Synthetic data explained**
+
+*Fully synthetic data*
+
+- Explain the idea in more depth than in the intro
+- Explain pooling rules by Raghunathan, Reiter & Rubin
+- Adjusted variance estimate by Reiter (restricted positive)
+- Simple variance estimator by `synthpop` authors.
+
+*Partially synthetic data*
+- Explain the idea in more depth than in the intro
+- Explain pooling rules by Reiter.
+- Adjusted estimate by `synthpop` authors.
+
+**Mice**
+
+- Explain algorithm (FCS) in more depth
+- Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.
+
+**Methods**
+
+- Boys dataset, considering using another dataset (two datasets with same results would prove the point even more).
+- Explain synthesizing procedure (by means of cart, using fcs as implemented in mice).
+- Imputation settings (CART, as proposed by Reiter).
+- What will be looked at: simple means / variances of variables (univariate relationships) and estimates of regression coefficients (of multiple models (at least 2 different models)).
+- Eventually: distinction between fully (everything replaced) and partially (only subset of variables replaced) synthetic data. 
+- Eventually: distinction between number of imputations (however, $m = 5$ proved to yield sufficient results already in the simulations run thus far).
+
+**Results**
+
+- Discuss results.
+
+**Discussion**
+
+Pros and cons of different methods, theoretically and practically.
+
+
+
+# Introduction
+
+Open science, including open data, has been marked as the future of science [@gewin_data_2016], and the advantages of publicly available research data are numerous [@foster_open_science_2017; @walport_brest_sharing_2011]. Additionally, the fact that public funds are used for data collection results in increased demands for this data. However, research data is very often collected under the reassurance of privacy and confidentiality of the data, and simply anonimizing the data is not enough to fulfil these requirements [@ohm_broken_2009]. Over the years, several techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise [@drechsler_synthetic_2011]. However, these methods may distort relationships between variables, reducing the data quality drastically. 
+
+An alternative has been offered by @rubin_statistical_disclosure_1993, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, all units that are in the population but not in the sample are treated as missing data. These values are imputed by means of conventional multiple imputation approaches, and simple random samples are drawn from the population, and released to the public. In practice, it is not required to impute the complete population, since random samples can be drawn from the sampling frame, so that only these sampled values have to be imputed. The imputed samples generated under this approach are labelled as *fully synthetic datasets*.
+
+A second procedure to creating synthetic datasets has been proposed by @little_statistical_1993, named *partially synthetic datasets*, which yields imputing only those values that are at a high risk of being disclosive. These values can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or it can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Similarly to the fully synthetic data approach, multiple datasets containing synthetic values are released to the public, although in this instance, a subset of the data remains constant over the imputations, due to it's non-identifying nature.
+
+-- -- NOT SURE YET: CONTRAST FULLY AND PARTIALLY SYNTHETIC DATA -- --
+
+-- -- SINCE PARTIALLY SYNTHETIC DATA POOLING RULES DO NOT REQUIRE ADJUSTED VARIANCE ESTIMATES -- --
+
+Imputing synthetic values is conceptually similar to the imputations of missing values. That is, conform fully conditional specification, values are drawn iteratively from the posterior predictive distribution of the variable of interest, conditional on all other variables, for each variable separately, where the previously imputed values are taken into account in the imputation model for the variables that are imputed later on. ***ADD MORE INFO FCS***
+
+-- -- CAN WE REGARD THE OBSERVED VALUES AS THE STARTING VALUES FOR THE IMPUTATIONS ? -- --
+
+The R-package `mice` [@mice] implements the fully conditional specification approach for missing data. Since the imputation approaches for missing data and synthetic data do not differ in terms of the imputation process, `mice` can be used for creating synthetic data as well, which will be shown in more detail in the remainder of this paper. In the next section, the pooling rules that are required to obtain inferences from the synthetic datasets are discussed. Thereafter, it will be investigated which variance estimator yields the best, that is, confidence valid, results in combination with the `mice` synthesizing approach. Also, it is shown that iterating over the conditional distributions in order to establish convergence is not required, due to the fact that new values are drawn directly from posterior distribution given the observed data.
+
+
+# FULLY/PARTIALLY synthetic data
+
+## Fully synthetic data
+
+DISCUSS APPROACH IN MORE DEPTH
+
+Explain pooling rules (variance estimates + adjusted variance estimates + simple estimator proposed by synthpop authors)
+
+## Partially synthetic data
+
+DISCUSS APPROACH IN MORE DEPTH
+
+Explain pooling rules (variance estimates)
+
+# Mice
+
+- Discuss mice, predominantly the imputation algorithm in greater depth
+- Procedure: observed values can be regarded as starting values, so that all variables can be used for the synthesis of all other variables.
+
+# Simulations
+
+## Methods
+
+- Boys data - bootstrapped to obtain a population.
+- explain simple synthetic data procedure
+- explain imputation settings
+- CART has been proposed by Reiter
+
+
+## Results
+
+
+
+
+
+## References

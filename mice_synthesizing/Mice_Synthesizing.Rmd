@@ -62,7 +62,8 @@ First, we again create 1 complete dataset, which is done by means of imputing th
 ```{r, echo = T}
 broom::tidy(truemodel, conf.int=TRUE) %>%
   mutate(CIW = conf.high - conf.low) %>% 
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Results of a single linear regression model on the completed dataset.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
@@ -154,7 +155,8 @@ cart_fit <- syns_cart %>%
 ```{r, message = F}
 bind_rows("Mice default" = results_def,
           "Mice with cart" = results_cart, .id = "Imputation method") %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Results of with mice default settings, and with CART settings, for the imputation of synthetic data, with the in-build mice pooling function.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
@@ -183,7 +185,8 @@ And another custom function to summarise all results, and obtain the confidence 
 
 ```{r, message = F}
 ci_cov(pooled, truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Imputation results of synthesizing by means of CART, with the pooling rules by Drechsler.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
@@ -247,7 +250,8 @@ true_results <- bootstrap_boys %>%
             "Upper"    = mean(conf.high),
             "CIW"      = mean(conf.high - conf.low),
             "Coverage" = mean(cover)) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Bootstrapped estimates of regression coefficients, with mean standard error and coverage based on the individual estimates of the standard error.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 synthetic_results <- boot_cart %>%
@@ -255,7 +259,8 @@ synthetic_results <- boot_cart %>%
   map_dfr(pool.syn) %T>% 
   assign("boot_syn", ., envir = globalenv()) %>%
   ci_cov(truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthetic (CART) results with pooling rules by Drechsler.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 norm_results <- boot_cart %>%
@@ -297,14 +302,15 @@ ggplot(plot_dat, aes(x = est, color = Method, fill = Method)) +
   facet_wrap(~ term, nrow = 1, scales = "free") +
   scale_color_viridis_d(begin = .30, end = .65) +
   scale_fill_viridis_d(begin = .30, end = .65) +
-  theme_classic()
+  theme_classic() +
+  ggtitle("Distribution of the bootstrapped and synthetic regression coefficients.")
 ```
 
 It can be seen that the bias is systematic, and thus not due to any extreme values that pull the average estimate to zero. Additionally, it seems that the pooled standard error indicated in the table is somewhat too low for the synthetic data. Namely, it appears in the plot that the spread in the synthetic data is roughly equal to the spread in the bootstrapped, but real, data. However, in the table above, the synthetic standard errors are much smaller than the mean over the manually calculated standard error of the bootstrapped estimates. When the standard errors are calculated over the obtained regression estimates, we find that the synthetic standard error increases much more when we calculate it over the observed synthetic estimates.
 
 ```{r, message = F}
-boot_se <- boot_true %>% group_by(term) %>% summarise("Bootstrapped SE" = sd(estimate))
-boot_syn_se <- boot_syn %>% group_by(term) %>% summarise("Synthetic bootstrapped SE" = sd(est))
+boot_se <- boot_true %>% group_by(term) %>% summarise("Mean bootstrapped SEs" = sd(estimate))
+boot_syn_se <- boot_syn %>% group_by(term) %>% summarise("Mean synthetic SEs" = sd(est))
 
 bind_cols(boot_se, boot_syn_se[,2]) %>%
   kable(digits = 3) %>%
@@ -318,7 +324,8 @@ ggplot(plot_dat, aes(x = ciw, color = Method, fill = Method)) +
   facet_wrap(~ term, nrow = 1, scales = "free") +
   scale_color_viridis_d(begin = .30, end = .65) +
   scale_fill_viridis_d(begin = .30, end = .65) +
-  theme_classic()
+  theme_classic() +
+  ggtitle("Distribution of the confidence interval width (CIW) of the bootstrapped and the synthetic datasets.")
 ```
 
 
@@ -337,7 +344,8 @@ syns_cart_maxit_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   ci_cov(., truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthesizing the same data.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
   
 ```
@@ -349,7 +357,8 @@ boot_cart_maxit_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   ci_cov(., truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthesizing bootstrap samples with adjusted imputation settings.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
@@ -362,7 +371,8 @@ boot_cart_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool.syn) %>%
   ci_cov(., truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthesizing bootstrap samples with adjusted imputation settings but with maxit = 5.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
@@ -401,7 +411,8 @@ cart_adj <- boot_cart_cp_min3 %>%
 bind_rows("Cart default" = cart_default,
           "Cart with adjusted settings and maxit = 1" = cart_adj_maxit,
           "Cart adjusted settings" = cart_adj, .id = "Method") %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Within, between and total imputation variance for default CART, and adjusted CART.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
