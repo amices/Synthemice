@@ -1518,13 +1518,55 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker, Gerko Vink &amp; Stef van Buuren</h4>
-<h4 class="date">19-08-2020</h4>
+<h4 class="date">20-08-2020</h4>
 
 </div>
 
 
+<div id="outline" class="section level1">
+<h1><span class="header-section-number">1</span> OUTLINE</h1>
+<p><strong>Intro</strong></p>
+<ul>
+<li>Motivation/relevance</li>
+<li>Synthetic data (fully/partially shortly explained)</li>
+<li>How can this data be generated in practice (FCS - multivariate synthetic values)</li>
+<li>Mice adopts FCS for missing data</li>
+<li>It will be shown that mice is also capable of generating multivariate synthetic data</li>
+<li>However, multiple rules for correct variance estimates have been proposed, but the choice of one optimal variance estimate is not straightforward. Therefore, the performance of the currently available variance estimators (as outlined below) will be contrasted</li>
+<li>Goal: explain and show how <code>mice</code> can be used to create synthetic versions of the data at hand, and which variance estimator yields the best results.</li>
+</ul>
+<p><strong>Synthetic data explained</strong></p>
+<p><em>Fully synthetic data</em></p>
+<ul>
+<li>Explain the idea in more depth than in the intro</li>
+<li>Explain pooling rules by Raghunathan, Reiter &amp; Rubin</li>
+<li>Adjusted variance estimate by Reiter (restricted positive)</li>
+<li>Simple variance estimator by <code>synthpop</code> authors.</li>
+</ul>
+<p><em>Partially synthetic data</em> - Explain the idea in more depth than in the intro - Explain pooling rules by Reiter. - Adjusted estimate by <code>synthpop</code> authors.</p>
+<p><strong>Mice</strong></p>
+<ul>
+<li>Explain algorithm (FCS) in more depth</li>
+<li>Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.</li>
+</ul>
+<p><strong>Methods</strong></p>
+<ul>
+<li>Boys dataset, considering using another dataset (two datasets with same results would prove the point even more).</li>
+<li>Explain synthesizing procedure (by means of cart, using fcs as implemented in mice).</li>
+<li>Imputation settings (CART, as proposed by Reiter).</li>
+<li>What will be looked at: simple means / variances of variables (univariate relationships) and estimates of regression coefficients (of multiple models (at least 2 different models)).</li>
+<li>Eventually: distinction between fully (everything replaced) and partially (only subset of variables replaced) synthetic data.</li>
+<li>Eventually: distinction between number of imputations (however, <span class="math inline">\(m = 5\)</span> proved to yield sufficient results already in the simulations run thus far).</li>
+</ul>
+<p><strong>Results</strong></p>
+<ul>
+<li>Discuss results.</li>
+</ul>
+<p><strong>Discussion</strong></p>
+<p>Pros and cons of different methods, theoretically and practically.</p>
+</div>
 <div id="introduction" class="section level1">
-<h1><span class="header-section-number">1</span> Introduction</h1>
+<h1><span class="header-section-number">2</span> Introduction</h1>
 <p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Foster &amp; Deardorff, 2017; Walport &amp; Brest, 2011)</span>. Additionally, the fact that public funds are used for data collection results in increased demands for this data. However, research data is very often collected under the reassurance of privacy and confidentiality of the data, and simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, reducing the data quality drastically.</p>
 <p>An alternative has been offered by <span class="citation">Rubin (1993)</span>, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, all units that are in the population but not in the sample are treated as missing data. These values are imputed by means of conventional multiple imputation approaches, and simple random samples are drawn from the population, and released to the public. In practice, it is not required to impute the complete population, since random samples can be drawn from the sampling frame, so that only these sampled values have to be imputed. The imputed samples generated under this approach are labelled as <em>fully synthetic datasets</em>.</p>
 <p>A second procedure to creating synthetic datasets has been proposed by <span class="citation">Little (1993)</span>, named <em>partially synthetic datasets</em>, which yields imputing only those values that are at a high risk of being disclosive. These values can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or it can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Similarly to the fully synthetic data approach, multiple datasets containing synthetic values are released to the public, although in this instance, a subset of the data remains constant over the imputations, due to it’s non-identifying nature.</p>
@@ -1532,23 +1574,32 @@ div.tocify {
 <p>– – SINCE PARTIALLY SYNTHETIC DATA POOLING RULES DO NOT REQUIRE ADJUSTED VARIANCE ESTIMATES – –</p>
 <p>Imputing synthetic values is conceptually similar to the imputations of missing values. That is, conform fully conditional specification, values are drawn iteratively from the posterior predictive distribution of the variable of interest, conditional on all other variables, for each variable separately, where the previously imputed values are taken into account in the imputation model for the variables that are imputed later on. <strong><em>ADD MORE INFO FCS</em></strong></p>
 <p>– – CAN WE REGARD THE OBSERVED VALUES AS THE STARTING VALUES FOR THE IMPUTATIONS ? – –</p>
-<p>The R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> implements the fully conditional specification approach for missing data. Since the imputation approaches for missing data and synthetic data do not differ in terms of the imputation process, <code>mice</code> can be used for creating synthetic data as well, which will be shown in more detail in the remainder of this paper. In the next section, the pooling rules that are required to obtain inferences from the synthetic datasets are discussed. Thereafter, it will be shown that creating confidence valid [TO DO: FULLY/PARTIALLY] synthetic data can be generated by means of <code>mice</code>. Also, it is shown that iterating over the conditional distributions in order to establish convergence is not required, due to the fact that new values are drawn directly from posterior distribution given the observed data.</p>
+<p>The R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> implements the fully conditional specification approach for missing data. Since the imputation approaches for missing data and synthetic data do not differ in terms of the imputation process, <code>mice</code> can be used for creating synthetic data as well, which will be shown in more detail in the remainder of this paper. In the next section, the pooling rules that are required to obtain inferences from the synthetic datasets are discussed. Thereafter, it will be investigated which variance estimator yields the best, that is, confidence valid, results in combination with the <code>mice</code> synthesizing approach. Also, it is shown that iterating over the conditional distributions in order to establish convergence is not required, due to the fact that new values are drawn directly from posterior distribution given the observed data.</p>
 </div>
 <div id="fullypartially-synthetic-data" class="section level1">
-<h1><span class="header-section-number">2</span> FULLY/PARTIALLY synthetic data</h1>
+<h1><span class="header-section-number">3</span> FULLY/PARTIALLY synthetic data</h1>
+<div id="fully-synthetic-data" class="section level2">
+<h2><span class="header-section-number">3.1</span> Fully synthetic data</h2>
 <p>DISCUSS APPROACH IN MORE DEPTH</p>
+<p>Explain pooling rules (variance estimates + adjusted variance estimates + simple estimator proposed by synthpop authors)</p>
+</div>
+<div id="partially-synthetic-data" class="section level2">
+<h2><span class="header-section-number">3.2</span> Partially synthetic data</h2>
+<p>DISCUSS APPROACH IN MORE DEPTH</p>
+<p>Explain pooling rules (variance estimates)</p>
+</div>
 </div>
 <div id="mice" class="section level1">
-<h1><span class="header-section-number">3</span> Mice</h1>
+<h1><span class="header-section-number">4</span> Mice</h1>
 <ul>
 <li>Discuss mice, predominantly the imputation algorithm in greater depth</li>
 <li>Procedure: observed values can be regarded as starting values, so that all variables can be used for the synthesis of all other variables.</li>
 </ul>
 </div>
 <div id="simulations" class="section level1">
-<h1><span class="header-section-number">4</span> Simulations</h1>
+<h1><span class="header-section-number">5</span> Simulations</h1>
 <div id="methods" class="section level2">
-<h2><span class="header-section-number">4.1</span> Methods</h2>
+<h2><span class="header-section-number">5.1</span> Methods</h2>
 <ul>
 <li>Boys data - bootstrapped to obtain a population.</li>
 <li>explain simple synthetic data procedure</li>
@@ -1557,7 +1608,7 @@ div.tocify {
 </ul>
 </div>
 <div id="results" class="section level2">
-<h2><span class="header-section-number">4.2</span> Results</h2>
+<h2><span class="header-section-number">5.2</span> Results</h2>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2>References</h2>
