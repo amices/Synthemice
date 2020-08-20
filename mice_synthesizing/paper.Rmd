@@ -63,7 +63,7 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 
 **Discussion**
 
-Pros and cons of different methods, theoretically and practically.
+- Pros and cons of different methods, theoretically and practically.
 
 
 
