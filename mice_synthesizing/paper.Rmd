@@ -38,6 +38,7 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 - Simple variance estimator by `synthpop` authors.
 
 *Partially synthetic data*
+
 - Explain the idea in more depth than in the intro
 - Explain pooling rules by Reiter.
 - Adjusted estimate by `synthpop` authors.
