@@ -42,7 +42,8 @@ DISCUSS APPROACH IN MORE DEPTH
 
 # Mice
 
-Discuss mice, predominantly the imputation algorithm in greater depth
+- Discuss mice, predominantly the imputation algorithm in greater depth
+- Procedure: observed values can be regarded as starting values, so that all variables can be used for the synthesis of all other variables.
 
 # Simulations
 
