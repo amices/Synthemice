@@ -1518,63 +1518,61 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker, Gerko Vink &amp; Stef van Buuren</h4>
-<h4 class="date">21-08-2020</h4>
+<h4 class="date">24-08-2020</h4>
 
 </div>
 
 
 <div id="outline" class="section level1">
 <h1><span class="header-section-number">1</span> OUTLINE</h1>
-<p><strong>Intro</strong></p>
+<div id="introduction" class="section level2">
+<h2><span class="header-section-number">1.1</span> Introduction</h2>
 <ul>
-<li>Motivation/relevance</li>
-<li>Synthetic data (fully/partially shortly explained)</li>
-<li>How can this data be generated in practice (FCS - multivariate synthetic values)</li>
-<li>Mice adopts FCS for missing data</li>
-<li>It will be shown that mice is also capable of generating multivariate synthetic data</li>
-<li>However, multiple rules for correct variance estimates have been proposed, but the choice of one optimal variance estimate is not straightforward. Therefore, the performance of the currently available variance estimators (as outlined below) will be contrasted</li>
-<li>Goal: explain and show how <code>mice</code> can be used to create synthetic versions of the data at hand, and which variance estimator yields the best results.</li>
-</ul>
-<p><strong>Synthetic data explained</strong></p>
-<p><em>Fully synthetic data</em></p>
-<ul>
-<li>Explain the idea in more depth than in the intro</li>
-<li>Explain pooling rules by Raghunathan, Reiter &amp; Rubin</li>
-<li>Adjusted variance estimate by Reiter (restricted positive)</li>
-<li>Simple variance estimator by <code>synthpop</code> authors.</li>
-</ul>
-<p><em>Partially synthetic data</em></p>
-<ul>
-<li>Explain the idea in more depth than in the intro</li>
-<li>Explain pooling rules by Reiter.</li>
-<li>Adjusted estimate by <code>synthpop</code> authors.</li>
-</ul>
-<p><strong>Mice</strong></p>
-<ul>
-<li>Explain algorithm (FCS) in more depth</li>
-<li>Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.</li>
-</ul>
-<p><strong>Methods</strong></p>
-<ul>
-<li>Boys dataset, considering using another dataset (two datasets with same results would prove the point even more).</li>
-<li>Explain synthesizing procedure (by means of cart, using fcs as implemented in mice).</li>
-<li>Imputation settings (CART, as proposed by Reiter).</li>
-<li>What will be looked at: simple means / variances of variables (univariate relationships) and estimates of regression coefficients (of multiple models (at least 2 different models)).</li>
-<li>Eventually: distinction between fully (everything replaced) and partially (only subset of variables replaced) synthetic data.</li>
-<li>Eventually: distinction between number of imputations (however, <span class="math inline">\(m = 5\)</span> proved to yield sufficient results already in the simulations run thus far).</li>
-</ul>
-<p><strong>Results</strong></p>
-<ul>
-<li>Discuss results.</li>
-</ul>
-<p><strong>Discussion</strong></p>
-<ul>
-<li>Pros and cons of different methods, theoretically and practically.</li>
+<li>What is synthetic data</li>
+<li>Why is it useful</li>
+<li>Why should it be easy to generate</li>
+<li>Parrallel to missing data</li>
+<li>If similar to missing data then why not use mice</li>
+<li>All fun and game, but statistical properties should be intact</li>
+<li>In this paper we demonstrate a straigthforward workflow for generating synthetic data sets and we investigate how to obtain valid inferences from synthesized data.</li>
 </ul>
 </div>
-<div id="introduction" class="section level1">
+<div id="generating-synthetic-data-with-mice" class="section level2">
+<h2><span class="header-section-number">1.2</span> Generating synthetic data with mice</h2>
+<ul>
+<li>Explain FCS in short</li>
+<li>Demonstrate procedure with where matrix and explain rationale</li>
+<li>Demonstrate that it is a reasonable approach based figure that shows obs relations and synth relations side-by-side (e.g. wgt ~ age | gen)</li>
+<li>Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.</li>
+</ul>
+</div>
+<div id="drawing-inferences-from-mice-synthesized-data" class="section level2">
+<h2><span class="header-section-number">1.3</span> Drawing inferences from mice synthesized data</h2>
+<ul>
+<li>What ways are there (with minimal - if any - escapes to partial/fully synthesized)</li>
+<li>If based on your earlier work, cite the online reference for your simulations and give URL. No need to go into detail about it here.</li>
+</ul>
+<div id="simulation" class="section level3">
+<h3><span class="header-section-number">1.3.1</span> Simulation</h3>
+<ul>
+<li>Simulation set-up</li>
+<li>Evaluation criteria explained: the bias cov ciw triangle</li>
+<li>Table with demonstrate bias cov ciw for all methods</li>
+</ul>
+</div>
+</div>
+<div id="discussion" class="section level2">
+<h2><span class="header-section-number">1.4</span> Discussion</h2>
+<ul>
+<li>Summarize findings</li>
+<li>Stress that only holds for sampled data. Explain that for fully observed populations, one would need no sampling variance.</li>
+<li>Revisit the simplicity and the readily available solution within the mice workflow (if adjusted pool is required, add to mice and direct to that function)</li>
+</ul>
+</div>
+</div>
+<div id="introduction-1" class="section level1">
 <h1><span class="header-section-number">2</span> Introduction</h1>
-<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Foster &amp; Deardorff, 2017; Walport &amp; Brest, 2011)</span>. HIER EEN VOORBEELD Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, reducing the data quality drastically.</p>
+<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Foster and Deardorff 2017; Walport and Brest 2011)</span>. HIER EEN VOORBEELD Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler 2011)</span>. However, these methods may distort relationships between variables, reducing the data quality drastically.</p>
 <p>An alternative has been offered by <span class="citation">Rubin (1993)</span>, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, all units that are in the population but not in the sample are treated as missing data. These values are imputed by means of conventional multiple imputation approaches, and simple random samples are drawn from the population. Ultimately, these samples are released to the public. In practice, it is not required to impute the complete population, since random samples can be drawn from the sampling frame, so that only these sampled values have to be imputed. The datasets generated under this approach are labelled as <em>fully synthetic datasets</em>. However, note that, if one draws simple random samples from the sampling frame, the possibility exists that actual observations are included.</p>
 <p>A second procedure to creating synthetic datasets has been proposed by <span class="citation">Little (1993)</span>, named <em>partially synthetic datasets</em>, which originated as a procedure that required synthesizing only those values that are at a high risk of being disclosive. These values can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or it can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Similarly to the fully synthetic data approach, multiple datasets containing synthetic values are released to the public, although in this instance, only the values at a high risk vary over the synthetic datasets. However, nothing keeps us from treating all values in the dataset as bearing a high disclosure risk, resulting in datasets that are completely existing of synthetic values. This approach basically implements the idea of fully synthetic data, based on the partially synthetic data procedure.</p>
 <p>– – HIER MIST NOG EEN OVERGANG WAAR IK NOG NIET UIT BEN – –</p>
@@ -1624,25 +1622,25 @@ div.tocify {
 <h2>References</h2>
 <div id="refs" class="references">
 <div id="ref-drechsler_synthetic_2011">
-<p>Drechsler, J. (2011). <em>Synthetic datasets for statistical disclosure control: Theory and implementation</em> (Vol. 201). Springer Science &amp; Business Media.</p>
+<p>Drechsler, Jörg. 2011. <em>Synthetic Datasets for Statistical Disclosure Control: Theory and Implementation</em>. Vol. 201. Springer Science &amp; Business Media.</p>
 </div>
 <div id="ref-foster_open_science_2017">
-<p>Foster, E. D., &amp; Deardorff, A. (2017). Open science framework (osf). <em>Journal of the Medical Library Association: JMLA</em>, <em>105</em>(2), 203.</p>
+<p>Foster, Erin D, and Ariel Deardorff. 2017. “Open Science Framework (Osf).” <em>Journal of the Medical Library Association: JMLA</em> 105 (2): 203.</p>
 </div>
 <div id="ref-gewin_data_2016">
-<p>Gewin, V. (2016). Data sharing: An open mind on open data. <em>Nature</em>, <em>529</em>(7584), 117–119. <a href="https://doi.org/10.1038/nj7584-117a">https://doi.org/10.1038/nj7584-117a</a></p>
+<p>Gewin, Virginia. 2016. “Data Sharing: An Open Mind on Open Data.” <em>Nature</em> 529 (7584): 117–19. <a href="https://doi.org/10.1038/nj7584-117a">https://doi.org/10.1038/nj7584-117a</a>.</p>
 </div>
 <div id="ref-little_statistical_1993">
-<p>Little, R. J. (1993). Statistical analysis of masked data. <em>Journal of Official Statistics</em>, <em>9</em>(2), 407.</p>
+<p>Little, Roderick JA. 1993. “Statistical Analysis of Masked Data.” <em>Journal of Official Statistics</em> 9 (2): 407.</p>
 </div>
 <div id="ref-ohm_broken_2009">
-<p>Ohm, P. (2009). Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization. <em>UCLA Law Review</em>, <em>57</em>(6), 1701–1778. Retrieved from <a href="https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713">https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713</a></p>
+<p>Ohm, Paul. 2009. “Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization.” <em>UCLA Law Review</em> 57 (6): 1701–78. <a href="https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713">https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713</a>.</p>
 </div>
 <div id="ref-rubin_statistical_disclosure_1993">
-<p>Rubin, D. B. (1993). Statistical disclosure limitation. <em>Journal of Official Statistics</em>, <em>9</em>(2), 461–468.</p>
+<p>Rubin, Donald B. 1993. “Statistical Disclosure Limitation.” <em>Journal of Official Statistics</em> 9 (2): 461–68.</p>
 </div>
 <div id="ref-walport_brest_sharing_2011">
-<p>Walport, M., &amp; Brest, P. (2011). Sharing research data to improve public health. <em>The Lancet</em>, <em>377</em>(9765), 537–539.</p>
+<p>Walport, Mark, and Paul Brest. 2011. “Sharing Research Data to Improve Public Health.” <em>The Lancet</em> 377 (9765): 537–39.</p>
 </div>
 </div>
 </div>

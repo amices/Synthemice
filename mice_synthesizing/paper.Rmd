@@ -13,57 +13,40 @@ output:
     toc_float: true
     number_sections: true
 bibliography: federated_imp.bib
-csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 ---
 
 # OUTLINE
 
-**Intro**
-
-- Motivation/relevance
-- Synthetic data (fully/partially shortly explained)
-- How can this data be generated in practice (FCS - multivariate synthetic values)
-- Mice adopts FCS for missing data
-- It will be shown that mice is also capable of generating multivariate synthetic data
-- However, multiple rules for correct variance estimates have been proposed, but the choice of one optimal variance estimate is not straightforward. Therefore, the performance of the currently available variance estimators (as outlined below) will be contrasted
-- Goal: explain and show how `mice` can be used to create synthetic versions of the data at hand, and which variance estimator yields the best results.
-
-**Synthetic data explained**
-
-*Fully synthetic data*
-
-- Explain the idea in more depth than in the intro
-- Explain pooling rules by Raghunathan, Reiter & Rubin
-- Adjusted variance estimate by Reiter (restricted positive)
-- Simple variance estimator by `synthpop` authors.
-
-*Partially synthetic data*
-
-- Explain the idea in more depth than in the intro
-- Explain pooling rules by Reiter.
-- Adjusted estimate by `synthpop` authors.
-
-**Mice**
-
-- Explain algorithm (FCS) in more depth
+## Introduction
+ 
+ - What is synthetic data
+ - Why is it useful
+ - Why should it be easy to generate
+ - Parrallel to missing data
+ - If similar to missing data then why not use mice
+ - All fun and game, but statistical properties should be intact
+ - In this paper we demonstrate a straigthforward workflow for generating synthetic data sets and we investigate how to obtain valid inferences from synthesized data. 
+ 
+## Generating synthetic data with mice
+- Explain FCS in short
+- Demonstrate procedure with where matrix and explain rationale
+- Demonstrate that it is a reasonable approach based figure that shows obs relations and synth relations side-by-side (e.g. wgt ~ age | gen)
 - Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.
 
-**Methods**
+## Drawing inferences from mice synthesized data
+- What ways are there (with minimal - if any - escapes to partial/fully synthesized)
+- If based on your earlier work, cite the online reference for your simulations and give URL. No need to go into detail about it here. 
 
-- Boys dataset, considering using another dataset (two datasets with same results would prove the point even more).
-- Explain synthesizing procedure (by means of cart, using fcs as implemented in mice).
-- Imputation settings (CART, as proposed by Reiter).
-- What will be looked at: simple means / variances of variables (univariate relationships) and estimates of regression coefficients (of multiple models (at least 2 different models)).
-- Eventually: distinction between fully (everything replaced) and partially (only subset of variables replaced) synthetic data. 
-- Eventually: distinction between number of imputations (however, $m = 5$ proved to yield sufficient results already in the simulations run thus far).
+### Simulation
+- Simulation set-up
+- Evaluation criteria explained: the bias cov ciw triangle
+- Table with demonstrate bias cov ciw for all methods
 
-**Results**
+## Discussion
+- Summarize findings
+- Stress that only holds for sampled data. Explain that for fully observed populations, one would need no sampling variance. 
+- Revisit the simplicity and the readily available solution within the mice workflow (if adjusted pool is required, add to mice and direct to that function)
 
-- Discuss results.
-
-**Discussion**
-
-- Pros and cons of different methods, theoretically and practically.
 
 
 
