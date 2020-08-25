@@ -1518,7 +1518,7 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker, Gerko Vink &amp; Stef van Buuren</h4>
-<h4 class="date">21-08-2020</h4>
+<h4 class="date">25-08-2020</h4>
 
 </div>
 
@@ -1574,7 +1574,7 @@ div.tocify {
 </div>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">2</span> Introduction</h1>
-<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Foster &amp; Deardorff, 2017; Walport &amp; Brest, 2011)</span>. HIER EEN VOORBEELD Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, reducing the data quality drastically.</p>
+<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Molloy, 2011; Walport &amp; Brest, 2011)</span>. As collecting research data requires an enormous investment both in terms of time and monetary resources, openly accessible research data bears the potential of increasing the scientific returns. Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, reducing the data quality drastically.</p>
 <p>An alternative has been offered by <span class="citation">Rubin (1993)</span>, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, all units that are in the population but not in the sample are treated as missing data. These values are imputed by means of conventional multiple imputation approaches, and simple random samples are drawn from the population. Ultimately, these samples are released to the public. In practice, it is not required to impute the complete population, since random samples can be drawn from the sampling frame, so that only these sampled values have to be imputed. The datasets generated under this approach are labelled as <em>fully synthetic datasets</em>. However, note that, if one draws simple random samples from the sampling frame, the possibility exists that actual observations are included.</p>
 <p>A second procedure to creating synthetic datasets has been proposed by <span class="citation">Little (1993)</span>, named <em>partially synthetic datasets</em>, which originated as a procedure that required synthesizing only those values that are at a high risk of being disclosive. These values can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or it can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Similarly to the fully synthetic data approach, multiple datasets containing synthetic values are released to the public, although in this instance, only the values at a high risk vary over the synthetic datasets. However, nothing keeps us from treating all values in the dataset as bearing a high disclosure risk, resulting in datasets that are completely existing of synthetic values. This approach basically implements the idea of fully synthetic data, based on the partially synthetic data procedure.</p>
 <p>– – HIER MIST NOG EEN OVERGANG WAAR IK NOG NIET UIT BEN – –</p>
@@ -1626,14 +1626,14 @@ div.tocify {
 <div id="ref-drechsler_synthetic_2011">
 <p>Drechsler, J. (2011). <em>Synthetic datasets for statistical disclosure control: Theory and implementation</em> (Vol. 201). Springer Science &amp; Business Media.</p>
 </div>
-<div id="ref-foster_open_science_2017">
-<p>Foster, E. D., &amp; Deardorff, A. (2017). Open science framework (osf). <em>Journal of the Medical Library Association: JMLA</em>, <em>105</em>(2), 203.</p>
-</div>
 <div id="ref-gewin_data_2016">
 <p>Gewin, V. (2016). Data sharing: An open mind on open data. <em>Nature</em>, <em>529</em>(7584), 117–119. <a href="https://doi.org/10.1038/nj7584-117a">https://doi.org/10.1038/nj7584-117a</a></p>
 </div>
 <div id="ref-little_statistical_1993">
 <p>Little, R. J. (1993). Statistical analysis of masked data. <em>Journal of Official Statistics</em>, <em>9</em>(2), 407.</p>
+</div>
+<div id="ref-molloy_open_2011">
+<p>Molloy, J. C. (2011). The open knowledge foundation: Open data means better science. <em>PLoS Biol</em>, <em>9</em>(12), e1001195.</p>
 </div>
 <div id="ref-ohm_broken_2009">
 <p>Ohm, P. (2009). Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization. <em>UCLA Law Review</em>, <em>57</em>(6), 1701–1778. Retrieved from <a href="https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713">https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713</a></p>
