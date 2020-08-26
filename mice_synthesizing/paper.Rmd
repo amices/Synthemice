@@ -23,8 +23,8 @@ csl: "apa-6th-edition.csl"
 - [x] What is synthetic data?
 - [x] Why is it useful?
 - [x] Why should it be easy to generate?
-- [ ] Parallel to missing data
-- [ ] If similar to missing data, then why not use `mice`?
+- [x] Parallel to missing data
+- [x] If similar to missing data, then why not use `mice`?
 - [ ] `mice` can only be exploited if the statistical properties are correct.
 - [ ] In this paper we demonstrate a straightforward workflow for generating synthetic datasets and we investigate how to obtain valid inferences from synthesized data.
 
@@ -63,19 +63,7 @@ Conceptually, the synthetic data framework is based upon the building blocks of 
 
 Potentially, this approach could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data are highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these datasets should be kept at a minimum.
 
-Since multiple imputation of synthetic data is closely linked to multiple imputation for missing data, using existing missing data software that research are familiar with already, would dramatically reduce the effort of creating synthetic data. The R-package `mice` [@mice] is particularly suited for generating synthetic data, since it already implements multiple imputation for missing data in a straightforward and user-friendly manner. However, `mice` is not restricted to imputation for missing data, since it can be easily adjusted to impute every observed value. 
-
-***IK DENK DAT HET GOED IS OM HIER NOG TWEE KORTE ZINNEN OVER MICE NEER TE ZETTEN, MAAR IK VERWACHT DAT JULLIE BETER WETEN HOE EN WAT*** 
-
-
-
-To fully utilize the potential gains of synthetic data, while keeping the costs
-
-To fully 
-
-Thus, the potential gains of using synthetic data are very high, if the costs of creating it can be kept at a minimum. 
-
-If the approach to creating synthetic datasets can be simplified
+Since multiple imputation of synthetic data is closely linked to multiple imputation for missing data, using existing missing data software that research are familiar with already, would dramatically reduce the effort of creating synthetic data. The R-package `mice` [@mice] implements multiple imputation for missing data in a straightforward and user-friendly manner, but is not restricted to the imputation of missing data. Since `mice` can be easily adjusted to impute all observed values, or a subset hereof, we propose that it is able to ease the creation of synthetic datasets. 
 
 
 
