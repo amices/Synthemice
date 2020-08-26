@@ -57,11 +57,28 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 
 Open science, including open data, has been marked as the future of science [@gewin_data_2016], and the advantages of publicly available research data are numerous [@molloy_open_2011; @walport_brest_sharing_2011]. As collecting research data requires an enormous investment both in terms of time and monetary resources, openly accessible research data bears the potential of increasing the scientific returns. Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements [@ohm_broken_2009]. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise [@drechsler_synthetic_2011]. However, these methods may distort relationships between variables, reducing the data quality drastically. 
 
+An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differed to some extent, the general concept was to release multiply imputed synthetic datasets, instead of the actually observed data. Based on some imputation model, values from the actually observed data are replaced by multiple draws from the posterior predictive distribution of the observed data. The values that are to be replaced can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Additionally, a researcher can opt to simply replace all values of every observation.
+
+Potentially, this approach could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. 
+
+
+The goal then is to release multiply imputed datasets that bear no risk of releasing confidential or identifying information, while the multivariate relationships should be preserved as in the observed data.
+
+
+
+
+The fact that the then released data is synthetic could potentially fulfil the needs for openly accessible data, without running into barriers with regard to privacy and confidentiality constraints.
+
+
+, based on the multiple imputation framework [@rubin_multiple_1987]. 
+
+
+Potentially, these approaches  However, there is no such thing as a free lunch: data collectors have to put effort in creating synthetic data, and using incorrect models to generate synthetic data might yield biased results for potential analysts of the data. It thus is crucial that the synthesizing process will be as easy as it gets, so that the step to release synthetic data is as small as possible.
+
+
 An alternative has been offered by @rubin_statistical_disclosure_1993, who, building on the framework of multiple imputation, proposed to release multiple synthetic datasets to the public. Conform this approach, all units that are in the population but not in the sample are treated as missing data. These values are imputed by means of conventional multiple imputation approaches, and simple random samples are drawn from the population. Ultimately, these samples are released to the public. In practice, it is not required to impute the complete population, since random samples can be drawn from the sampling frame, so that only these sampled values have to be imputed. The datasets generated under this approach are labelled as *fully synthetic datasets*. However, note that, if one draws simple random samples from the sampling frame, the possibility exists that actual observations are included. 
 
 A second procedure to creating synthetic datasets has been proposed by @little_statistical_1993, named *partially synthetic datasets*, which originated as a procedure that required synthesizing only those values that are at a high risk of being disclosive. These values can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or it can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Similarly to the fully synthetic data approach, multiple datasets containing synthetic values are released to the public, although in this instance, only the values at a high risk vary over the synthetic datasets. However, nothing keeps us from treating all values in the dataset as bearing a high disclosure risk, resulting in datasets that are completely existing of synthetic values. This approach basically implements the idea of fully synthetic data, based on the partially synthetic data procedure.
-
-Potentially, these approaches could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating synthetic data, and using incorrect models to generate synthetic data might yield biased results for potential analysts of the data. It thus is crucial that the synthesizing process will be as easy as it gets, so that the step to release synthetic data is as small as possible.
 
 -- -- HIER MIST NOG EEN OVERGANG WAAR IK NOG NIET UIT BEN -- -- 
 
