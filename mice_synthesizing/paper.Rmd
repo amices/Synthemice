@@ -13,7 +13,7 @@ output:
     toc_float: true
     number_sections: true
 bibliography: federated_imp.bib
-csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
+csl: "apa-6th-edition.csl"
 ---
 
 # OUTLINE
@@ -57,9 +57,36 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 
 Open science, including open data, has been marked as the future of science [@gewin_data_2016], and the advantages of publicly available research data are numerous [@molloy_open_2011; @walport_brest_sharing_2011]. As collecting research data requires an enormous investment both in terms of time and monetary resources, openly accessible research data bears the potential of increasing the scientific returns. Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements [@ohm_broken_2009]. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise [@drechsler_synthetic_2011]. However, these methods may distort relationships between variables, reducing the data quality drastically. 
 
-An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differed to some extent, the general concept was to release multiply imputed synthetic datasets, instead of the actually observed data. Based on some imputation model, values from the actually observed data are replaced by multiple draws from the posterior predictive distribution of the observed data. The values that are to be replaced can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold. Additionally, a researcher can opt to simply replace all values of every observation.
+An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differed to some extent, the general concept was to release multiply imputed synthetic datasets, instead of the actually observed data. Based on some imputation model, values from the actually observed data are replaced by multiple draws from the posterior predictive distribution of the observed data. Using this approach, the researcher could replace the observed dataset as a whole with multiple synthetic versions. Additionally, the researcher could opt to only replace a subset of the observed data. The values that are to be replaced can be complete variables that could be compared with publicly available datasets or registers, such as addresses, or can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold.
 
-Potentially, this approach could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. 
+Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation for missing data, as proposed by @rubin_multiple_1987. Now, instead of replacing the missing values with multiple draws from the posterior predictive distribution, the sensitive values are replaced accordingly. Similarly to analysing multiply imputed datasets dealing with missing data, multiply imputed synthetic datasets can be analysed using conventional analysing techniques. The results of the analyses on each synthetic dataset should be pooled, so that the researcher obtains the estimates of the quantity of interest, as well as the estimate of its variance that adequately account for the additional variability that is induced by the imputation procedure. 
+
+Potentially, this approach could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data are highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these datasets should be kept at a minimum.
+
+Since multiple imputation of synthetic data is closely linked to multiple imputation for missing data, using existing missing data software that research are familiar with already, would dramatically reduce the effort of creating synthetic data. The R-package `mice` [@mice] is particularly suited for generating synthetic data, since it already implements multiple imputation for missing data in a straightforward and user-friendly manner. However, `mice` is not restricted to imputation for missing data, since it can be easily adjusted to impute every observed value. 
+
+***IK DENK DAT HET GOED IS OM HIER NOG TWEE KORTE ZINNEN OVER MICE NEER TE ZETTEN, MAAR IK VERWACHT DAT JULLIE BETER WETEN HOE EN WAT*** 
+
+
+
+To fully utilize the potential gains of synthetic data, while keeping the costs
+
+To fully 
+
+Thus, the potential gains of using synthetic data are very high, if the costs of creating it can be kept at a minimum. 
+
+If the approach to creating synthetic datasets can be simplified
+
+
+
+
+
+
+
+<!--
+
+It is easy to draw
+
 
 
 The goal then is to release multiply imputed datasets that bear no risk of releasing confidential or identifying information, while the multivariate relationships should be preserved as in the observed data.
