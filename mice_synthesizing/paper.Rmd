@@ -67,7 +67,7 @@ Since multiple imputation of synthetic data is closely linked to multiple imputa
 
 
 
-
+KEY: Het moet niet mogelijk zijn om de echte waarden te reverse engineeren. De stochastische component van multiple imputation zorgt er voor dat dit onmogelijk is. Wat wel kan worden afgeleid is het ware data genererende model - en dat is nou precies de bedoeling. 
 
 
 
