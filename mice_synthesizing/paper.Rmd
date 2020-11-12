@@ -71,6 +71,10 @@ The remainder of this paper is organized as follows. First, we will shortly desc
 
 # Generating synthetic data with `mice`
 
+The `mice` package has been developed originally for multiple imputation of missing data, but can be easily extended to the synthetic data framework. It proceeds by drawing missing or synthetic values from the joint distribution of the observed data. This joint density is generally hard or impossible to derive, which can be overcome by employing fully conditional specification (FCS). Consider a $n \times k$ data matrix $Y$, with values to be replaced $Y^{old}$, the values to be kept $Y^{keep}$ and the values that are already replaced $Y^{new}$, under the assumption that there are no missing values in the observed data set. Instead of drawing from the joint distribution, we draw from $k$ univariate conditional densities for each variable. That is, we draw from the distribution $P\big{(}Y_j^{old} | Y^{keep}, Y^{new}, Y^{old}_{-j}, \theta \big{)}$, where the drawn values are conditional upon the values that are to be kept, the synthetic values that are drawn at an earlier iteration and the values that still are to be replaced, with $j = 1, 2, \dots, k$ and $\theta$ indicating the parameter specifying the distribution of $Y_j^{old}$. Thus, the synthetic values are generated variable by variable. This procedure is executed $i = 1, 2, \dots, m$ times, resulting in $\textbf{D} = \{D{(1)}, \dots, D^{(m)}\}$ synthetic datasets, with $D^{(i)} = (Y^{keep}, Y^{i, new})$.
+
+To select the values that are to be replaced, one can utilize the `where` parameter in the `mice` function. This parameter allows one to set which values of the data are to be imputed. 
+
 
 
 
