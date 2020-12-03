@@ -1518,7 +1518,7 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker, Gerko Vink &amp; Stef van Buuren</h4>
-<h4 class="date">10-09-2020</h4>
+<h4 class="date">29-11-2020</h4>
 
 </div>
 
@@ -1538,9 +1538,9 @@ Why should it be easy to generate?</li>
 Parallel to missing data</li>
 <li><input type="checkbox" disabled checked></input>
 If similar to missing data, then why not use <code>mice</code>?</li>
-<li><input type="checkbox" disabled></input>
+<li><input type="checkbox" disabled checked></input>
 <code>mice</code> can only be exploited if the statistical properties are correct.</li>
-<li><input type="checkbox" disabled></input>
+<li><input type="checkbox" disabled checked></input>
 In this paper we demonstrate a straightforward workflow for generating synthetic datasets and we investigate how to obtain valid inferences from synthesized data.</li>
 </ul>
 </div>
@@ -1591,11 +1591,32 @@ Revisit the simplicity and the readily available solution within the <code>mice<
 </div>
 <div id="introduction-1" class="section level1">
 <h1><span class="header-section-number">2</span> Introduction</h1>
-<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Molloy, 2011; Walport &amp; Brest, 2011)</span>. Because collecting research data requires an enormous investment both in terms of time and monetary resources, openly accessible research data bears the potential of increasing the scientific returns. Additionally, the fact that public funds are used for data collection results in increased demands for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfill these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, thereby drastically reducing the data quality and the usability for further research.</p>
-<p>An alternative solution has been proposed separately by <span class="citation">Rubin (1993)</span> and <span class="citation">Little (1993)</span>. Although their approaches differed to some extent, the general thought is to use actually observed data to generated multiply imputed synthetic datasets that can be freely disclosed. Based on some imputation model, values from the actually observed data are replaced by multiple draws from the posterior predictive distribution of the observed data. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Additionally, the researcher could opt to only replace a subset of the observed data. The values that are to be replaced can be complete variables that could be compared with publicly available data sets or registers, such as addresses, or can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold.</p>
-<p>Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation for missing data, as proposed by <span class="citation">Rubin (1987)</span>. Instead of replacing just the missing values with multiple draws from the posterior predictive distribution, one could easily <em>overimpute</em> any observed sensitive values. Doing this multiple times would allow for drawing correct statistical inferences, similar to those obtained from ordinary multiple imputation for incomplete data sets. The results of the multiply synthetisized data sets should be pooled into an single inference, so that the researcher can draw valid inference from a single pooled analysis. To that respect, the variance should reflect the added variability that is induced by the imputation procedure.</p>
-<p>Potentially, this approach could fulfill the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data are highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these datasets should be kept at a minimum.</p>
-<p>Since multiple imputation of synthetic data is closely linked to multiple imputation for missing data, using existing missing data software that research are familiar with already, would dramatically reduce the effort of creating synthetic data. The R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> implements multiple imputation for missing data in a straightforward and user-friendly manner, but is not restricted to the imputation of missing data. Since <code>mice</code> can be easily adjusted to impute all observed values, or a subset hereof, we propose that it is able to ease the creation of synthetic datasets.</p>
+<p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Molloy, 2011; Walport &amp; Brest, 2011)</span>. Because collecting research data requires an enormous investment both in terms of time and monetary resources, openly accessible research data bears the potential of increasing the scientific returns. Additionally, the fact that public funds are used for data collection results in increasing demand for the collected data. Nevertheless, the possibilities to share research data directly are often very limited due to restrictions with regard to privacy and confidentiality. Simply anonimizing the data is not enough to fulfil these requirements <span class="citation">(Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above a certain threshold or adding random noise <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort relationships between variables, thereby drastically reducing the data quality and the usability for further research.</p>
+<p>An alternative solution has been proposed separately by <span class="citation">Rubin (1993)</span> and <span class="citation">Little (1993)</span>. Although their approaches differed to some extent, the general idea is to use actually observed data to generate multiply imputed synthetic datasets that can be freely disclosed. Based on some imputation model, values from the actually observed data are replaced by multiple draws from the posterior predictive distribution of the observed data. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. The values that are to be replaced can be complete variables that could be compared with publicly available data sets or registers, such as addresses, or can be certain values that bear a high risk of being disclosive, say, income values above a certain threshold.</p>
+<p>Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation of missing data, as proposed by <span class="citation">Rubin (1987)</span>. Instead of replacing just the missing values with multiple draws from the posterior predictive distribution, one could easily <em>overimpute</em> any observed sensitive values. Similarly to multiple imputation of missing data, the multiple synthetic datasets allow for correct statistical inferences. The results of the multiple synthetic data sets should be pooled into a single inference, so that the researcher can draw valid conclusions from the pooled results. To that respect, the variance should reflect the added variability that is induced by the imputation procedure.</p>
+<p>Potentially, this approach could fulfil the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data is highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these high-quality data sets should be kept at a minimum.</p>
+<p>To minimize additional effort of creating synthetic datasets on behalf of the researcher, software aimed at multiple imputation of missing data can be employed. Especially if researchers used this software at an earlier stage in the research process, or acquired familiarity with it during earlier projects, the additional burden of creating synthetic datasets is relatively small. The R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> implements multiple imputation of missing data in a straightforward and user-friendly manner. However, the functionality of <code>mice</code> is not restricted to the imputation of missing data, but allows to impute any value in the data. Consequently, <code>mice</code> can be utilized for the creation of multiply imputed synthetic datasets.</p>
+<p>After creating the multiply imputed synthetic data sets, the goal is to obtain valid statistical inferences. In the missing data framework, this is done by performing statistical analyses on all imputed data sets, and pooling the results of the analyses according to Rubin’s rules <span class="citation">(1987)</span>. In the synthetic data framework, the same procedure is followed. However, valid statistical results can only be obtained under the premise that the statistical properties of the analyses are correct. Analyzing synthetic data specifically requires appropriate variance estimates. Notably, the variance estimator that is suitable for analyzing multiply imputed datasets for missing data is inappropriate when multiply imputed synthetic datasets are analyzed. As a result, multiple variance estimators have been proposed to make correct inferences from multiply imputed synthetic datasets. These estimators differ according to whether the data consists entirely of synthetic values, or only a subset of the data is synthetic.</p>
+<p>The remainder of this paper is organized as follows. First, we will shortly describe the <code>mice</code> algorithm for the creation of synthetic data that reassures the privacy and confidentiality of the participants. Second, we will demonstrate a straightforward workflow for imputation of synthetic data with <code>mice</code>. The third step is to summarize the variance estimators that have been proposed in the past. Finally, we will assess which variance estimator provides valid inferences from the synthetic data.</p>
+</div>
+<div id="generating-synthetic-data-with-mice-1" class="section level1">
+<h1><span class="header-section-number">3</span> Generating synthetic data with <code>mice</code></h1>
+<p>The <code>mice</code> package has been developed originally for multiple imputation of missing data. In this context, the aim is to replace missing values due to nonresponse by plausible values from the posterior predictive distribution of the variable containing the missings. Doing so, <code>mice</code> makes use of fully conditional specification (FCS), which breaks down the multivariate distribution of the data <span class="math inline">\(\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})\)</span> into <span class="math inline">\(j = 1, 2, \dots, k\)</span> univariate conditional densities, with <span class="math inline">\(k\)</span> the number of variables in the data. Using FCS, for every variable containing missing values a model is constructed, to impute the missing values <span class="math inline">\(Y_{j, mis}\)</span> with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> on a variable by variable basis. Note that the predictor matrix <span class="math inline">\(Y_{-j}\)</span> may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied <span class="math inline">\(m\)</span> times, resulting in <span class="math inline">\(m\)</span> completed datasets <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>, with <span class="math inline">\(\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})\)</span>. <strong>MAYBE ADD AN EXAMPLE OF HOW TO DO IT IN <code>mice</code></strong></p>
+<p><strong>DISCUSS ESTIMATORS FOR MISSING DATA HERE, OR AT A LATER POINT</strong></p>
+<p>This approach can be straightforwardly extended to a synthetic data framework. However, rather than imputing missing data, we overimpute actually observed data, that is, we replace observed values by multiple imputations. For simplicity, assume that the data is completely observed (i.e., <span class="math inline">\(\textbf{Y} = \textbf{Y}_{obs}\)</span>). Following the notation of <span class="citation">Reiter &amp; Raghunathan (2007)</span>, let <span class="math inline">\(Z_j = 1\)</span> if any of the values of unit <span class="math inline">\(j\)</span> are to be replaced by imputations, and <span class="math inline">\(Z_j = 0\)</span> otherwise, with <span class="math inline">\(\textbf{Z} = (Z_1, Z_2, \dots, Z_n)\)</span>. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., <span class="math inline">\(\textbf{Y}^{(l)} = (\textbf{Y}^{(l)}_{rep}, \textbf{Y}_{nrep})\)</span>. Note the superscript <span class="math inline">\(^{(l)}\)</span> indicating the <span class="math inline">\(l\)</span>th synthetic data set, with <span class="math inline">\(l = 1, 2, \dots, m\)</span>. Now, instead of imputing <span class="math inline">\(\textbf{Y}^{(l)}_{mis}\)</span> with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> as in the missing data case, we impute <span class="math inline">\(\textbf{Y}^{(l)}_{rep}\)</span> from the posterior distribution of <span class="math inline">\((Y_{rep} | \textbf{Y}, \textbf{Z}, \theta)\)</span>. This process results in the synthetic data <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>.</p>
+<p>By default, <code>mice</code> imputes all values that are coded as missing in the dataset. Using the <code>where</code> parameter within the mice function, one can choose to impute any value in the dataset. As input, the <code>where</code> parameter requires a matrix of the same dimensions of the data, (i.e., a <span class="math inline">\(n \times k\)</span> matrix, with <span class="math inline">\(n\)</span> the number of observations in the collected data) containing logical values.</p>
+<!--
+
+Now, we aim to generate the replacement values for the actually observed data $Y_{syn}$, instead of values that replace missing values $Y_{imp}$. 
+
+Using FCS, for every variable containing missing values, a model is constructed to impute the missing values on a given variable conditional on all other variables in the data, and the posterior distribution of the parameters used in the model at hand, on a variable by variable basis, which yields $P(Y_{mis} | X, \theta)$. 
+
+
+The `mice` package has been developed originally for multiple imputation of missing data, but can be easily extended to the synthetic data framework. It proceeds by drawing missing or synthetic values from the joint distribution of the observed data. This joint density is generally hard or impossible to derive, which can be overcome by employing fully conditional specification (FCS). Consider a $n \times k$ data matrix $Y$, with values to be replaced $Y^{old}$, the values to be kept $Y^{keep}$ and the values that are already replaced $Y^{new}$, under the assumption that there are no missing values in the observed data set. Instead of drawing from the joint distribution, we draw from $k$ univariate conditional densities for each variable. That is, we draw from the distribution $P\big{(}Y_j^{old} | Y^{keep}, Y^{new}, Y^{old}_{-j}, \theta \big{)}$, where the drawn values are conditional upon the values that are to be kept, the synthetic values that are drawn at an earlier iteration and the values that still are to be replaced, with $j = 1, 2, \dots, k$ and $\theta$ indicating the parameter specifying the distribution of $Y_j^{old}$. Thus, the synthetic values are generated variable by variable. This procedure is executed $i = 1, 2, \dots, m$ times, resulting in $\textbf{D} = \{D^{(1)}, \dots, D^{(m)}\}$ synthetic datasets, with $D^{(i)} = (Y^{keep}, Y^{i, new})$.
+
+To select the values that are to be replaced, one can utilize the `where` parameter in the `mice` function. This parameter allows one to set which values of the data are to be imputed. 
+
+-->
 <p>KEY: Het moet niet mogelijk zijn om de echte waarden te reverse engineeren. De stochastische component van multiple imputation zorgt er voor dat dit onmogelijk is. Wat wel kan worden afgeleid is het ware data genererende model - en dat is nou precies de bedoeling.</p>
 <!--
 
@@ -1671,8 +1692,8 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 <li>All fun and game, but statistical properties should be intact</li>
 <li>In this paper we demonstrate a straigthforward workflow for generating synthetic data sets and we investigate how to obtain valid inferences from synthesized data.</li>
 </ul>
-<div id="generating-synthetic-data-with-mice-1" class="section level2">
-<h2><span class="header-section-number">2.1</span> Generating synthetic data with mice</h2>
+<div id="generating-synthetic-data-with-mice-2" class="section level2">
+<h2><span class="header-section-number">3.1</span> Generating synthetic data with mice</h2>
 <ul>
 <li>Explain FCS in short</li>
 <li>Demonstrate procedure with where matrix and explain rationale</li>
@@ -1681,13 +1702,13 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 </ul>
 </div>
 <div id="drawing-inferences-from-mice-synthesized-data-1" class="section level2">
-<h2><span class="header-section-number">2.2</span> Drawing inferences from mice synthesized data</h2>
+<h2><span class="header-section-number">3.2</span> Drawing inferences from mice synthesized data</h2>
 <ul>
 <li>What ways are there (with minimal - if any - escapes to partial/fully synthesized)</li>
 <li>If based on your earlier work, cite the online reference for your simulations and give URL. No need to go into detail about it here.</li>
 </ul>
 <div id="simulation-1" class="section level3">
-<h3><span class="header-section-number">2.2.1</span> Simulation</h3>
+<h3><span class="header-section-number">3.2.1</span> Simulation</h3>
 <ul>
 <li>Simulation set-up</li>
 <li>Evaluation criteria explained: the bias cov ciw triangle</li>
@@ -1696,7 +1717,7 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 </div>
 </div>
 <div id="discussion-1" class="section level2">
-<h2><span class="header-section-number">2.3</span> Discussion</h2>
+<h2><span class="header-section-number">3.3</span> Discussion</h2>
 <ul>
 <li>Summarize findings</li>
 <li>Stress that only holds for sampled data. Explain that for fully observed populations, one would need no sampling variance.</li>
@@ -1705,20 +1726,20 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 </div>
 </div>
 <div id="fullypartially-synthetic-data" class="section level1">
-<h1><span class="header-section-number">3</span> FULLY/PARTIALLY synthetic data</h1>
+<h1><span class="header-section-number">4</span> FULLY/PARTIALLY synthetic data</h1>
 <div id="fully-synthetic-data" class="section level2">
-<h2><span class="header-section-number">3.1</span> Fully synthetic data</h2>
+<h2><span class="header-section-number">4.1</span> Fully synthetic data</h2>
 <p>DISCUSS APPROACH IN MORE DEPTH</p>
 <p>Explain pooling rules (variance estimates + adjusted variance estimates + simple estimator proposed by synthpop authors)</p>
 </div>
 <div id="partially-synthetic-data" class="section level2">
-<h2><span class="header-section-number">3.2</span> Partially synthetic data</h2>
+<h2><span class="header-section-number">4.2</span> Partially synthetic data</h2>
 <p>DISCUSS APPROACH IN MORE DEPTH</p>
 <p>Explain pooling rules (variance estimates)</p>
 </div>
 </div>
 <div id="mice" class="section level1">
-<h1><span class="header-section-number">4</span> Mice</h1>
+<h1><span class="header-section-number">5</span> Mice</h1>
 <ul>
 <li>Discuss the FCS algorithm in more detail.</li>
 <li>Discuss mice, predominantly the imputation algorithm in greater depth</li>
@@ -1726,9 +1747,9 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 </ul>
 </div>
 <div id="simulations" class="section level1">
-<h1><span class="header-section-number">5</span> Simulations</h1>
+<h1><span class="header-section-number">6</span> Simulations</h1>
 <div id="methods" class="section level2">
-<h2><span class="header-section-number">5.1</span> Methods</h2>
+<h2><span class="header-section-number">6.1</span> Methods</h2>
 <ul>
 <li>Boys data - bootstrapped to obtain a population.</li>
 <li>explain simple synthetic data procedure</li>
@@ -1737,7 +1758,7 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 </ul>
 </div>
 <div id="results" class="section level2">
-<h2><span class="header-section-number">5.2</span> Results</h2>
+<h2><span class="header-section-number">6.2</span> Results</h2>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2>References</h2>
@@ -1749,25 +1770,28 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 <p>Gewin, V. (2016). Data sharing: An open mind on open data. <em>Nature</em>, <em>529</em>(7584), 117–119. <a href="https://doi.org/10.1038/nj7584-117a">https://doi.org/10.1038/nj7584-117a</a></p>
 </div>
 <div id="ref-little_statistical_1993">
-<p>Little, R. J. (1993). Statistical analysis of masked data. <em>Journal of Official Statistics</em>, <em>9</em>(2), 407.</p>
+<p>Little, R. J. (1993). Statistical analysis of masked data. <em>Journal of Official Statistics</em>, <em>9</em>(2), 407–426.</p>
 </div>
 <div id="ref-molloy_open_2011">
 <p>Molloy, J. C. (2011). The open knowledge foundation: Open data means better science. <em>PLoS Biol</em>, <em>9</em>(12), e1001195.</p>
 </div>
 <div id="ref-ohm_broken_2009">
-<p>Ohm, P. (2009). Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization. <em>UCLA Law Review</em>, <em>57</em>(6), 1701–1778. Retrieved from <a href="https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713">https://heinonline.org/HOL/P?h=hein.journals/uclalr57&amp;i=1713</a></p>
+<p>Ohm, P. (2009). Broken Promises of Privacy: Responding to the Surprising Failure of Anonymization. <em>UCLA Law Review</em>, <em>57</em>, 1701–1778.</p>
+</div>
+<div id="ref-reiter_raghunathan_multiple_2007">
+<p>Reiter, J. P., &amp; Raghunathan, T. E. (2007). The multiple adaptations of multiple imputation. <em>Journal of the American Statistical Association</em>, <em>102</em>, 1462–1471.</p>
 </div>
 <div id="ref-rubin_multiple_1987">
-<p>Rubin, D. B. (1987). <em>Multiple imputation for nonresponse in surveys</em> (p. 258). Wiley.</p>
+<p>Rubin, D. B. (1987). <em>Multiple imputation for nonresponse in surveys</em>. Wiley.</p>
 </div>
 <div id="ref-rubin_statistical_disclosure_1993">
-<p>Rubin, D. B. (1993). Statistical disclosure limitation. <em>Journal of Official Statistics</em>, <em>9</em>(2), 461–468.</p>
+<p>Rubin, D. B. (1993). Statistical disclosure limitation. <em>Journal of Official Statistics</em>, <em>9</em>, 461–468.</p>
 </div>
 <div id="ref-mice">
 <p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in r. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
 </div>
 <div id="ref-walport_brest_sharing_2011">
-<p>Walport, M., &amp; Brest, P. (2011). Sharing research data to improve public health. <em>The Lancet</em>, <em>377</em>(9765), 537–539.</p>
+<p>Walport, M., &amp; Brest, P. (2011). Sharing research data to improve public health. <em>The Lancet</em>, <em>377</em>, 537–539.</p>
 </div>
 </div>
 </div>
