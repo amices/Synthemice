@@ -1,7 +1,7 @@
 ---
-title: "Confidence validity of bootstrap estimates"
+title: "Confidence validity of bootstrap regression estimates"
 author: "Gerko Vink"
-date: "7/20/2020"
+date: "Markup Languages and Reproducible Programming in Statistics"
 output: 
   html_document:
     toc: true
@@ -102,7 +102,7 @@ truemodel <- origin %$%
 ---
 
 # Draw the bootstrap sets
-We use the `replicate()` function to draw `nsim =``r nsim` bootstrap sets from the `origin`
+We use the `replicate()` function to draw `nsim =`$10^4$ bootstrap sets from the 748 rows in the `origin`.
 ```{r cache=TRUE}
 simdata <- replicate(nsim, 
                      origin[sample(1:748, 748, replace = TRUE), ], 
@@ -223,7 +223,7 @@ covage <- data.frame(est = estimates[, 3],
 ---
 
 # Results
-Below are the coverages for each of the investigated scenarios. Results are depicted for the coverage of the confidence intervals over the regression estimates for `r nsim` simulations.
+Below are the coverages for each of the investigated scenarios. Results are depicted for the coverage of the confidence intervals over the regression estimates for $10^4$ simulations.
 ```{r}
 output <- rbind(colMeans(cov), 
                 colMeans(manual), 
@@ -240,5 +240,17 @@ kable(output, "html") %>%
 
 ---
 
+# Replication
+The replication of these results [can be found here]()
+
+---
+
 END OF DOCUMENT
+
+---
+
+```{r}
+sessionInfo()
+```
+
 
