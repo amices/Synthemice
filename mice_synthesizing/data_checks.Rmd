@@ -23,15 +23,22 @@ thomcache <- TRUE
 
 To see how confidential the data imputed by mice, it is a straightforward approach to see how many observations in the synthetic data are duplicates from the original data. This is done by means of creating one completed `boys` dataset, generating 100 imputed versions of this dataset, and see how often there are duplicated observations in any of the 100 synthetic versions of the data.
 
+## Load packages
+
 ```{r, results = F, message = F, warning=F}
 library(mice) # imputations
 library(tidyverse) # (d)plyr
 library(magrittr) # pipes
+library(furrr) # parallel imputation
 ```
 
 First, load the required packages. Then, we set the method for imputing the data (with passive imputations for `bmi`) and make sure that imputations for `bmi` do not flow back into the predictions of `hgt` and `wgt`. Then, we impute the boys dataset containing missing values once, so that we have a fully observed dataset that can be used for creating synthetic versions.
 
+# Create fully observed data
 ```{r}
+nsyn <- 1000 # number of synthetic datasets
+
+# mice uses the actually observed data for imputing bmi, which is why it is the same in every dataset, and about equal to the true value
 meth <- make.method(mice::boys)
 meth['bmi'] <- "~I(wgt / (hgt/100)^2)"
 pred <- make.predictorMatrix(boys)
@@ -41,36 +48,122 @@ data <- mice::boys %>%
   mice(m = 1, method = meth, predictorMatrix = pred, print = FALSE, seed = 123) %>% 
   complete()
 ```
+
 Now we have a complete dataset, we can overimpute the complete dataset, so that we have synthetic data. First, we set the synthesizing method to `cart`. Then, we use mice to generate 100 synthetic versions of the completed dataset.
 
+# Create `r nsyn` synthetic data sets
 ```{r, cache = thomcache}
-cart <- meth; cart[!names(meth) %in% 'bmi'] <- "cart"
+cart <- meth
+cart[!names(meth) %in% 'bmi'] <- "cart"
 
-syns <- data %>% 
-  mice(m = 100, 
-       method = cart, 
-       predictorMatrix = pred, 
-       where = matrix(TRUE, nrow(data), ncol(data)),
-       print = FALSE,
-       seed = 123)
+plan(multisession)
+syns <- future_map(1:nsyn, function(x) {
+  data %>%
+    mice(m = 1,
+         method = cart,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(data), ncol(data)),
+         print = FALSE)
+}, .progress = FALSE, .options = future_options(seed = as.integer(123)))
+
 ```
 
+## Complete all synthetic datasets
 
-Now we have 100 synthetic versions of the same dataset, we can create 100 completed datasets.
+Now we have `r nsyn` synthetic versions of the same dataset, we can create `r nsyn` completed datasets.
 
 ```{r}
-completed <- complete(syns, action = "all")
+completed <- map(syns, function(x) complete(x))
 ```
 
-Now we have 100 complete synthetic datasets, we can inspect the number of duplicate cases in every synthetic dataset with regard to the original dataset.
+Now we have `r nsyn` complete synthetic datasets, we can inspect the number of duplicate cases in every synthetic dataset with regard to the original dataset.
 
+## Exact duplicate rows
+
+I excluded the variable `bmi`, because something's gone wrong with imputing it.
 ```{r}
-duplicate_obs <- map(completed, function(x) bind_rows(data, x) %>% duplicated)
+duplicate_obs <- map(completed, function(x) {
+  bind_rows(data %>% select(-bmi), x %>% select(-bmi)) %>% duplicated
+  }
+)
+
 
 duplicate_obs %>% map_dbl(sum) %>% sum # total number of duplicated rows over all 100 synthetic datasets
 ```
 
-It appears that in all 100 synthetic versions of the data, there is not a single observation that is an exact copy of the actually observed observations. Now, let's find out if the synthetic data resembles the actually observed data (univariately). That is, we compare the distributions of the variables in the observed and the synthetic data.
+It appears that in all `r nsyn` synthetic versions of the data, there are seven observations that are an exact copy of actually sampled observations. 
+
+However, if we look at the proportion of the observations that has gotten his own value replaced by a value within $0.02$ times the range of the data, we find that between $0.39$ and $0.56$ of the values gets a replacement that is highly similar (`bmi` not counted, as for `bmi` every observation got his own value imputed due to some settings). 
+
+```{r}
+out <- map(completed, function(x) {
+  syn_num_vars <- 
+    x %>% 
+      select(where(is.numeric))
+  
+  true_num_vars <- 
+    data %>%
+      select(where(is.numeric))
+  
+  map2(syn_num_vars, true_num_vars, function(z, y) {
+    abs(z - y) < (max(y) - min(y)) / 50
+  }) %>% bind_cols
+})
+
+map_dfr(out, function(x) {
+  map(x, function(z) sum(z))
+}) %>% colMeans() / nrow(data)
+```
+
+Then, we check how often the nearly exact same value is imputed. 
+
+```{r}
+out <- map(completed, function(x) {
+  syn_num_vars <- 
+    x %>% 
+      select(where(is.numeric))
+  
+  true_num_vars <- 
+    data %>%
+      select(where(is.numeric))
+  
+  map2(syn_num_vars, true_num_vars, function(z, y) {
+    abs(z - y) < (max(y) - min(y)) / 10000
+  }) %>% bind_cols
+})
+
+map_dfr(out, function(x) {
+  map(x, function(z) sum(z))
+}) %>% colMeans() / nrow(data)
+```
+
+
+
+```{r}
+out_cat <- map(completed, function(x) {
+  syn_cat_vars <- 
+    x %>%
+      select(-where(is.numeric))
+  
+  true_cat_vars <- 
+    data %>%
+      select(-where(is.numeric))
+  
+  map2(syn_cat_vars, true_cat_vars, function(z, y) {
+    z == y
+  }) %>% bind_cols
+})
+
+map_dfr(out_cat, function(x) {
+  map(x, function(z) sum(z))
+}) %>% colMeans() / nrow(data)
+```
+
+For the categorical data, the same holds. The majority of all imputations gets his own value replaced, rather than a new value.
+
+## Plot imputed data against the observed data
+
+Now, let's find out if the synthetic data resembles the actually observed data (univariately). That is, we compare the distributions of the variables in the observed and the synthetic data.
 
 ```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
 completed %>%
@@ -108,24 +201,26 @@ completed %>%
 
 Over all imputed datasets, the synthetic data are univariately very much alike the observed data. Both the histograms and barplots shows that the relative frequencies of the values for the continuous variables or the categories for the categorical variables are highly similar.
 
+<!--
 # Adjusted settings
 
-```{r, cache = thomcache}
-syns_adj <- data %>% 
-  mice(m = 100, 
-       maxit = 5,
-       method = cart,
-       minbucket = 3,
-       cp = 1e-08,
-       predictorMatrix = pred, 
-       where = matrix(TRUE, nrow(data), ncol(data)),
-       print = FALSE,
-       seed = 123)
+```{r, cache = thomcache, eval = F}
+syns_adj <- future_map(1:nsyn, function(x) {
+  data %>%
+    mice(m = 1,
+         maxit = 5,
+         method = cart,
+         minbucket = 3,
+         cp = 1e-08,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(data), ncol(data)),
+         print = FALSE)
+}, .progress = FALSE, .options = future_options(seed = as.integer(123)))
 ```
 
 
-```{r}
-completed_adj <- complete(syns_adj, action = "all") 
+```{r, eval = F}
+completed_adj <- map(syns_adj, function(x) complete(x)) 
 
 completed_adj %>%
   map(function(x) bind_rows(data, x) %>% duplicated) %>%
@@ -138,7 +233,7 @@ completed_adj %>%
   unlist() - nrow(data)
 ```
 
-```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
+```{r, dpi = 300, fig.fullwidth = TRUE, message = F, eval = F}
 completed_adj %>%
   map_dfr(function(x) x) %>%
   bind_rows(., data, .id = "Imputed") %>%
@@ -155,7 +250,7 @@ completed_adj %>%
   theme(legend.position = "bottom")
 ```
 
-```{r, dpi = 300, fig.fullwidth = TRUE, message = F}
+```{r, dpi = 300, fig.fullwidth = TRUE, message = F, eval = F}
 completed_adj %>%
   map_dfr(function(x) x) %>%
   bind_rows(., data, .id = "Imputed") %>%
@@ -171,3 +266,5 @@ completed_adj %>%
   scale_fill_brewer(palette = "Set1") +
   theme(legend.position = "bottom")
 ```
+
+-->

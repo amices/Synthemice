@@ -1,0 +1,27 @@
+---
+title: "Mice udpates for synthetic data"
+author: "Thom Volker"
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+bibliography: federated_imp.bib
+csl: "apa-6th-edition.csl"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Functions that must be added for working with synthetic data
+
+1. Correct pooling function
+2. Correct plot function (that uses the observed data and the imputed data)
+3. Passive imputation apparently uses the observed data if available, which is not what we want when synthesizing data. 
+4. Function to check the confidentiality of the actual data
+5. Update parlmice (can only impute missing data, and does not work with the where matrix).
