@@ -1670,7 +1670,7 @@ div.tocify {
 <span id="cb5-6"><a href="#cb5-6"></a></span>
 <span id="cb5-7"><a href="#cb5-7"></a>duplicate_obs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map_dbl</span>(sum) <span class="op">%&gt;%</span><span class="st"> </span>sum <span class="co"># total number of duplicated rows over all 100 synthetic datasets</span></span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
-<p>It appears that in all 1000 synthetic versions of the data, there is not a single observation that is an exact copy of the actually observed observations.</p>
+<p>It appears that in all 1000 synthetic versions of the data, there are seven observations that are an exact copy of actually sampled observations.</p>
 <p>However, if we look at the proportion of the observations that has gotten his own value replaced by a value within <span class="math inline">\(0.02\)</span> times the range of the data, we find that between <span class="math inline">\(0.39\)</span> and <span class="math inline">\(0.56\)</span> of the values gets a replacement that is highly similar (<code>bmi</code> not counted, as for <code>bmi</code> every observation got his own value imputed due to some settings).</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>out &lt;-<span class="st"> </span><span class="kw">map</span>(completed, <span class="cf">function</span>(x) {</span>
 <span id="cb7-2"><a href="#cb7-2"></a>  syn_num_vars &lt;-<span class="st"> </span></span>
