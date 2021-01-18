@@ -168,7 +168,7 @@ bind_rows("Mice default" = results_def,
 
 For now, we forget about the default mice imputation method, because it leads to flawed results. Therefore, we continue with the CART results only. We fit the `lm` model in which `wgt` is regressed on `age` and `hgt`.
 
-```{r, code = readLines("functions.R")}
+```{r, code = readLines("simulations/functions.R")}
 ```
 
 ```{r, message = F}
