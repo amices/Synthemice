@@ -35,12 +35,8 @@ As can be seen in the previous R Markdown file (Synthesizing by means of mice), 
 The data is synthesized by means of the data generating approach that seemed most promising in the previous `R Markdown` file. Thus, `cart` is used as a synthesizing method for all variables, except for `bmi`, which is synthesized passively, through it's relation with `wgt` and `hgt`, that is, `bmi = wgt / (hgt/100)^2`. Furthermore, the parameter `minbucket`, which is the minimum number of observations in any terminal node, is set to 1, the parameter `cp`, which is the complexity parameter now equals `1e-08`, and the number of iterations `maxit = 1`. With this method, we introduced somewhat more variance within every dataset, while the between-imputation variance decreases somewhat
 
 ```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
-source("1.b Synthesize_partitioned_data_mice.R")
-source("functions.R")
-```
-
-```{r, include = F}
-source("functions.R")
+source("simulations/1.b Synthesize_partitioned_data_mice.R")
+source("simulations/functions.R")
 ```
 
 ---
@@ -145,7 +141,7 @@ Alternatively, we can alter the minimum value for the degrees of freedom to $\te
 This approach yields the following results with `maxit` set to 1.
 
 ```{r, include = F}
-source("functions.R")
+source("simulations/functions.R")
 ```
 
 ```{r}
@@ -194,7 +190,6 @@ boot_parts %>%
 
 The results with the adjusted complexity parameter `cp = 1e-08`, `minbucket = 3` and `maxit = 5`.
 
-
 ```{r}
 boot_parts_5 %>%
   map_dfr(function(x) {
@@ -205,3 +200,4 @@ boot_parts_5 %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+

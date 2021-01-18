@@ -21,7 +21,7 @@ csl: "/Users/thomvolker/Documents/styles/apa-6th-edition.csl"
 Load the required packages.
 
 ```{r, results=FALSE, message=FALSE, warning=FALSE}
-source("functions.R")
+source("simulations/functions.R")
 library(mice)
 library(magrittr)
 library(tidyverse)
@@ -31,7 +31,7 @@ library(ggplot2)
 ```
 
 ```{r, include = FALSE}
-load("~/Documents/Federated_imputation/mice_synthesizing/Mice_Synthesizing_cache/html/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData")
+load("Mice_Synthesizing_cache/html/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData")
 ```
 
 

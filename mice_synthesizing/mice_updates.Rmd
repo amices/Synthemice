@@ -1,5 +1,5 @@
 ---
-title: "Mice udpates for synthetic data"
+title: "Mice updates for synthetic data"
 author: "Thom Volker"
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
@@ -25,3 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 3. Passive imputation apparently uses the observed data if available, which is not what we want when synthesizing data. 
 4. Function to check the confidentiality of the actual data
 5. Update parlmice (can only impute missing data, and does not work with the where matrix).
+
+
+
+

@@ -35,6 +35,7 @@ library(furrr) # parallel imputation
 First, load the required packages. Then, we set the method for imputing the data (with passive imputations for `bmi`) and make sure that imputations for `bmi` do not flow back into the predictions of `hgt` and `wgt`. Then, we impute the boys dataset containing missing values once, so that we have a fully observed dataset that can be used for creating synthetic versions.
 
 # Create fully observed data
+
 ```{r}
 nsyn <- 1000 # number of synthetic datasets
 
