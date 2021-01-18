@@ -6,7 +6,7 @@ library(magrittr)
 library(broom)
 
 source("/Users/thomvolker/Documents/Federated_imputation/synthpop_synthesizing/1.a Create data - boys complete.R")
-source("/Users/thomvolker/Documents/Federated_imputation/synthpop_synthesizing/1.c Functions.R")
+source("/Users/thomvolker/Documents/Federated_imputation/synthpop_synthesizing/functions.R")
 
 set.seed(1996)
 

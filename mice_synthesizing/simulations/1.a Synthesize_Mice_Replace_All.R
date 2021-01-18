@@ -115,7 +115,8 @@ boot_cart_maxit_cp_min3 <- bootstrap_boys %>%
                print = F)
 }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
 
-
+# Impute the bootstrapped boys datasets similarly to the previous simulations
+# but with 5 iterations instead of 1
 boot_cart_cp_min3 <- bootstrap_boys %>%
   future_map(function(x) {
     x %>% mice(m = 5, 
