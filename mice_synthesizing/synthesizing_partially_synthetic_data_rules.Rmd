@@ -30,18 +30,20 @@ library(kableExtra)
 library(ggplot2)
 ```
 
-```{r, include = FALSE}
+```{r, message = F}
 load("Mice_Synthesizing_cache/html/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData")
 ```
 
 
-Since using `mice`, we basically overimpute the already observed data. This corresponds to the method of partially synthetic data, although we overimpute every single value. Nevertheless, it is worthwhile to check the results when we use the partially synthetic data rules, since the pooling rules to combine this with missing data already exist. Therefore, we see how this method performs on the bootstrapped samples from the boys data.
+By using `mice` [@mice], we basically overimpute the already observed data. This corresponds to the method of partially synthetic data, although we overimpute every single value. Nevertheless, it is worthwhile to check the results when we use the partially synthetic data pooling rules as developed by @reiter_partially_inference_2003, especially since these pooling rules have been extended for the case when missing data occurs in the observed dataset. Therefore, we examine how this method performs on the bootstrapped samples from the boys data.
 
-We can use the same data as in the previous file, but we need to use a new pooling function, with a different variance calculation, namely
+We can use the same data as in the previous file `Mice_Synthesizing.Rmd`, but we need to use a new pooling function, with a different variance calculation, namely
+
 $$
 T_p = \bar{u}_m + \frac{b_m}{m},
 $$
 with corresponding degrees of freedom
+
 $$
 \begin{aligned}
 \nu_p &= (m - 1)(1 + \frac{\bar{u}_m}{\frac{b_m}{m}}) \\
@@ -49,7 +51,9 @@ $$
 \end{aligned}
 $$
 
-When we use the default `cart` approach in mice, this yields the following results.
+When we use the default `cart` approach in mice, this yields the following results. Note that we used the results of the simulations as specified in the file `simulations/1.a Synthesize_Mice_Replace_All.R`, cached from evaluating this R-file in the R Markdown document `Mice_Synthesizing.Rmd`. 
+
+---
 
 # Default CART
 
@@ -72,7 +76,9 @@ true_results <- bootstrap_boys %>%
             "Upper"    = mean(conf.high),
             "CIW"      = mean(conf.high - conf.low),
             "Coverage" = mean(cover)) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3, 
+        caption = "True regression estimates after bootstrapping 
+        and analysing the boys dataset 500 times.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 synthetic_results <- boot_cart %>%
@@ -80,32 +86,104 @@ synthetic_results <- boot_cart %>%
   map_dfr(pool3.syn) %T>% 
   assign("boot_syn", ., envir = globalenv()) %>%
   ci_cov(truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3, 
+        caption = "Synthetic regression estimates after bootstrapping, 
+        synthesizing (with mice default CART settings) and 
+        analysing the boys dataset 500 times.") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r}
 true_results
+```
+
+Note the fact that the confidence interval coverage of the bootstrapped datasets is somewhat below the nomimal $95\%$ level, due to the fact that the bootstrap variance is somewhat larger than the estimated variances. 
+
+```{r}
 synthetic_results
 ```
 
-# Adjusted CART
+It can be seen in the tables that there is substantial bias in the estimates of the synthetic data estimates, resulting in suboptimal confidence interval coverage. The fact that there is bias introduced, might be due to the fact that there is too little variance in the estimates of the synthetic values. Therefore, an approach that increases the variance of the estimates might yield estimates that display less bias. This can be achieved by decreasing the number of iterations, that is, setting the mice parameter `maxit` to 1, instead of 5. Additionally, the complexity parameter `cp` can be set to $10^{−8}$ instead of $10^{−4}$, so that more splits will be made. Also, the value of the `rpart` parameter `minbucket`, that is, the minimum number of observations in any terminal node, is set to 3 instead of 5, so that, once again, more splits can be made. By means of these changes, the within variance increases, while the between-imputations variability decreases. The results with 500 iterations on the same, singly imputed boys dataset can be seen below.
 
-Just as in the previous file, we increase the within-imputation variance somewhat, which results in a smaller bias, and therefore, hopefully, more accurate results.
+---
+
+# Adjusted CART
 
 ```{r}
 boot_cart_maxit_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool3.syn) %>%
   ci_cov(., truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping, 
+        synthesizing (with adjusted mice CART settings) and analysing
+        the boys dataset 500 times") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 boot_cart_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool3.syn) %>%
   ci_cov(., truemodel) %>%
-  kable(digits = 3) %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping, 
+        synthesizing (with adjusted mice CART settings) and analysing
+        the boys dataset 500 times") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
+It can indeed be seen that the bias decreases substantially after altering the complexity parameter `cp` and the minimum number of observations in any final node `minbucket` results in less biased estimates, resulting in higher confidence interval coverage. Altering the number of iterations does not seem to make a difference, and in fact, since the missingness pattern is monotone, there is no need to iterate from the posterior distribution.
+
+--- 
+
+# Visualization of results
+
+```{r, fig.height = 10, fig.width=10}
+true_results <- bootstrap_boys %>%
+  map(~ lm(wgt ~ age + hgt, .x)) %>%
+  map_dfr(~ broom::tidy(.x, conf.int = TRUE)) %>%
+  select(term, estimate)
+
+def_syn_results <- boot_syn %>%
+  select(term, estimate = est)
+
+cart_maxit_cp_min3_syn_results <- boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool3.syn) %>%
+  select(term, estimate = est)
+
+cart_cp_min3_syn_results <- boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(pool3.syn) %>%
+  select(term, estimate = est)
+
+bind_rows("1. Default synthetic results" = def_syn_results,
+          "2. Maxit; cp; min3 synthetic results" = cart_maxit_cp_min3_syn_results,
+          "3. Cp; min3 synthetic results" = cart_cp_min3_syn_results, 
+          .id = "Method") %>%
+  bind_cols(True = rep(true_results$estimate, 3)) %>%
+  ggplot(aes(x = estimate)) +
+  geom_density(aes(fill = "Synthetic"), alpha = .5) +
+  geom_density(aes(x = True, fill = "True"), alpha = .5) +
+  facet_wrap(term ~ Method, scales = "free") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+```
+
+Increasing the within-imputation variance, and thereby decreasing the between-imputation variance results in less bias, as shown by the densities of the true and synthetic data estimates, that are more overlapping in the second and third column of the graphs. Additionally, it can be seen that the difference between 1 iteration and 5 iterations is negligible. 
+
+
+---
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+
+---
+
+
+# References
