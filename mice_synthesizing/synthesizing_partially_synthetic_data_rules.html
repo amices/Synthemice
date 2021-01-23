@@ -1620,7 +1620,7 @@ div.tocify {
 <h1 class="title toc-ignore">Synthesizing by means of mice with partially synthetic data rules</h1>
 <h4 class="author">Thom Volker</h4>
 <h4 class="author">Utrecht University</h4>
-<h4 class="date">22-01-2021</h4>
+<h4 class="date">23-01-2021</h4>
 
 </div>
 
@@ -1648,6 +1648,7 @@ T_p = \bar{u}_m + \frac{b_m}{m},
 \end{aligned}
 \]</span></p>
 <p>When we use the default <code>cart</code> approach in mice, this yields the following results. Note that we used the results of the simulations as specified in the file <code>simulations/1.a Synthesize_Mice_Replace_All.R</code>, cached from evaluating this R-file in the R Markdown document <code>Mice_Synthesizing.Rmd</code>.</p>
+<p>To assess the quality of the synthetic data, we look at the results and the confidence interval coverage of the regression coefficients of the regression model <code>wgt ~ age + hgt</code> of 500 synthetic versions of the <code>boys</code> data.</p>
 <hr />
 </div>
 <div id="default-cart" class="section level1">
@@ -1835,7 +1836,7 @@ hgt
 </tr>
 </tbody>
 </table>
-<p>Note the fact that the confidence interval coverage of the bootstrapped datasets is somewhat below the nomimal <span class="math inline">\(95\%\)</span> level, due to the fact that the bootstrap variance is somewhat larger than the estimated variances.</p>
+<p>Note the fact that the confidence interval coverage of the bootstrapped datasets is somewhat below the nominal <span class="math inline">\(95\%\)</span> level, due to the fact that the bootstrap variance is somewhat larger than the estimated variances.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>synthetic_results</span></code></pre></div>
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>
@@ -2364,25 +2365,25 @@ hgt
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] kableExtra_1.1.0 knitr_1.29       forcats_0.5.0    stringr_1.4.0   
+##  [1] kableExtra_1.1.0 knitr_1.30       forcats_0.5.0    stringr_1.4.0   
 ##  [5] dplyr_1.0.0      purrr_0.3.4      readr_1.3.1      tidyr_1.1.0     
-##  [9] tibble_3.0.3     ggplot2_3.3.0    tidyverse_1.3.0  magrittr_1.5    
+##  [9] tibble_3.0.3     ggplot2_3.3.0    tidyverse_1.3.0  magrittr_2.0.1  
 ## [13] mice_3.8.0      
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyselect_1.1.0   xfun_0.16          haven_2.3.1        lattice_0.20-41   
+##  [1] tidyselect_1.1.0   xfun_0.20          haven_2.3.1        lattice_0.20-41   
 ##  [5] colorspace_1.4-1   vctrs_0.3.2        generics_0.0.2     viridisLite_0.3.0 
-##  [9] htmltools_0.5.0    yaml_2.2.1         rlang_0.4.7        pillar_1.4.6      
-## [13] glue_1.4.1         withr_2.2.0        DBI_1.1.0          RColorBrewer_1.1-2
+##  [9] htmltools_0.5.1.1  yaml_2.2.1         rlang_0.4.10       pillar_1.4.6      
+## [13] glue_1.4.2         withr_2.2.0        DBI_1.1.0          RColorBrewer_1.1-2
 ## [17] dbplyr_1.4.3       modelr_0.1.7       readxl_1.3.1       lifecycle_0.2.0   
 ## [21] munsell_0.5.0      gtable_0.3.0       cellranger_1.1.0   rvest_0.3.5       
-## [25] evaluate_0.14      labeling_0.3       fansi_0.4.1        highr_0.8         
+## [25] evaluate_0.14      labeling_0.3       fansi_0.4.2        highr_0.8         
 ## [29] broom_0.5.6        Rcpp_1.0.4.6       scales_1.1.0       backports_1.1.7   
-## [33] webshot_0.5.2      jsonlite_1.7.0     farver_2.0.3       fs_1.5.0          
-## [37] hms_0.5.3          digest_0.6.25      stringi_1.4.6      grid_4.0.2        
-## [41] cli_2.0.2          tools_4.0.2        crayon_1.3.4       pkgconfig_2.0.3   
+## [33] webshot_0.5.2      jsonlite_1.7.2     farver_2.0.3       fs_1.5.0          
+## [37] hms_0.5.3          digest_0.6.27      stringi_1.5.3      grid_4.0.2        
+## [41] cli_2.2.0          tools_4.0.2        crayon_1.3.4       pkgconfig_2.0.3   
 ## [45] ellipsis_0.3.1     xml2_1.3.2         reprex_0.3.0       lubridate_1.7.9   
-## [49] assertthat_0.2.1   rmarkdown_2.3      httr_1.4.1         rstudioapi_0.11   
+## [49] assertthat_0.2.1   rmarkdown_2.3      httr_1.4.1         rstudioapi_0.13   
 ## [53] R6_2.4.1           nlme_3.1-148       compiler_4.0.2</code></pre>
 <hr />
 </div>

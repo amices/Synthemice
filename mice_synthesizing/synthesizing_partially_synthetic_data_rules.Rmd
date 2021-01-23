@@ -53,6 +53,8 @@ $$
 
 When we use the default `cart` approach in mice, this yields the following results. Note that we used the results of the simulations as specified in the file `simulations/1.a Synthesize_Mice_Replace_All.R`, cached from evaluating this R-file in the R Markdown document `Mice_Synthesizing.Rmd`. 
 
+To assess the quality of the synthetic data, we look at the results and the confidence interval coverage of the regression coefficients of the regression model `wgt ~ age + hgt` of 500 synthetic versions of the `boys` data.
+
 ---
 
 # Default CART
@@ -97,7 +99,7 @@ synthetic_results <- boot_cart %>%
 true_results
 ```
 
-Note the fact that the confidence interval coverage of the bootstrapped datasets is somewhat below the nomimal $95\%$ level, due to the fact that the bootstrap variance is somewhat larger than the estimated variances. 
+Note the fact that the confidence interval coverage of the bootstrapped datasets is somewhat below the nominal $95\%$ level, due to the fact that the bootstrap variance is somewhat larger than the estimated variances. 
 
 ```{r}
 synthetic_results
