@@ -1304,6 +1304,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
 
 
 
@@ -1333,6 +1342,7 @@ h6 {
   text-align: left;
 }
 </style>
+
 
 
 
@@ -1518,7 +1528,7 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker, Gerko Vink &amp; Stef van Buuren</h4>
-<h4 class="date">14-01-2021</h4>
+<h4 class="date">11-02-2021</h4>
 
 </div>
 
@@ -1603,7 +1613,8 @@ Revisit the simplicity and the readily available solution within the <code>mice<
 <h1><span class="header-section-number">3</span> Generating synthetic data with <code>mice</code></h1>
 <p>The <code>mice</code> package has been developed for multiple imputation of missing data. In this context, the aim is to replace missing values due to nonresponse by plausible values from the posterior predictive distribution of the variable containing the missings. Doing so, <code>mice</code> makes use of fully conditional specification <span class="citation">(FCS; Van Buuren, Brand, Groothuis-Oudshoorn, &amp; Rubin, 2006)</span>, which breaks down the multivariate distribution of the data <span class="math inline">\(\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})\)</span> into <span class="math inline">\(j = 1, 2, \dots, k\)</span> univariate conditional densities, with <span class="math inline">\(k\)</span> the number of variables in the data. Using FCS, for every variable containing missing values a model is constructed, to impute the missing values <span class="math inline">\(Y_{j, mis}\)</span> with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> on a variable by variable basis. Note that the predictor matrix <span class="math inline">\(Y_{-j}\)</span> may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied <span class="math inline">\(m\)</span> times, resulting in <span class="math inline">\(m\)</span> completed datasets <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>, with <span class="math inline">\(\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})\)</span>. <strong>MAYBE ADD AN EXAMPLE OF HOW TO DO IT IN <code>mice</code></strong></p>
 <p>This approach can be straightforwardly extended to a synthetic data framework. However, rather than imputing missing data, we overimpute actually observed data, that is, we replace observed values by multiple imputations. For simplicity, assume that the data is completely observed (i.e., <span class="math inline">\(\textbf{Y} = \textbf{Y}_{obs}\)</span>). Following the notation of <span class="citation">Reiter &amp; Raghunathan (2007)</span>, let <span class="math inline">\(Z_j = 1\)</span> if any of the values of unit <span class="math inline">\(j\)</span> are to be replaced by imputations, and <span class="math inline">\(Z_j = 0\)</span> otherwise, with <span class="math inline">\(\textbf{Z} = (Z_1, Z_2, \dots, Z_n)\)</span>. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., <span class="math inline">\(\textbf{Y}^{(l)} = (\textbf{Y}^{(l)}_{rep}, \textbf{Y}_{nrep})\)</span>. Note the superscript <span class="math inline">\(^{(l)}\)</span> indicating the <span class="math inline">\(l\)</span>th synthetic data set, with <span class="math inline">\(l = 1, 2, \dots, m\)</span>. Now, instead of imputing <span class="math inline">\(\textbf{Y}^{(l)}_{mis}\)</span> with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> as in the missing data case, we impute <span class="math inline">\(\textbf{Y}^{(l)}_{rep}\)</span> from the posterior distribution of <span class="math inline">\((Y_{rep} | \textbf{Y}, \textbf{Z}, \theta)\)</span>. This process results in the synthetic data <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>.</p>
-<p>By default, <code>mice</code> imputes all values that are coded as missing in the dataset. However, using the <code>where</code> parameter within the <code>mice</code>-function, one can choose to impute any value in the dataset. As input, the <code>where</code> parameter requires a matrix of the same dimensions as the data, (i.e., a <span class="math inline">\(n \times k\)</span> matrix, with <span class="math inline">\(n\)</span> the number of observations in the collected data) containing logicals <span class="math inline">\(z_{jk}\)</span> that indicate which cells are selected to have their values replaced. This approach allows to overimpute a subset of the observed data, or the observed data as a whole, resulting in a dataset that partly or completely consists of synthetic values.</p>
+<p>By default, <code>mice</code> imputes all values that are coded as missing in the dataset. However, using the <code>where</code> parameter within the <code>mice</code>-function, one can choose to impute any value in the dataset. As input, the <code>where</code> parameter requires a matrix of the same dimensions as the data, (i.e., a <span class="math inline">\(n \times k\)</span> matrix, with <span class="math inline">\(n\)</span> the number of observations in the collected data) containing logicals <span class="math inline">\(z_{jk}\)</span> that indicate which cells are selected to have their values replaced. This approach allows to <em>overimpute</em> a subset of the observed data, or the observed data as a whole, resulting in a dataset that partly or completely consists of synthetic values. Other parameters that are required to be specified are the number of imputations <span class="math inline">\(m\)</span> (<code>m</code>), the imputation method (<code>method</code>), and the predictor matrix, specifying the predictor variables that are used in the imputation model for every variable <span class="math inline">\(j\)</span> that has some of its values replaced (<code>predictorMatrix</code>).</p>
+<p>Discuss CART (read Reiter) Add text about additional CART parameters cp and minbucket</p>
 <!--
 
 Now, we aim to generate the replacement values for the actually observed data $Y_{syn}$, instead of values that replace missing values $Y_{imp}$. 
@@ -1790,7 +1801,7 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 <p>Van Buuren, S., Brand, J. P. L., Groothuis-Oudshoorn, C. G. M., &amp; Rubin, D. B. (2006). Fully conditional specification in multivariate imputation. <em>Journal of Statistical Computation and Simulation</em>, <em>76</em>(12), 1049–1064.</p>
 </div>
 <div id="ref-mice">
-<p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in r. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
+<p>Van Buuren, S., &amp; Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in R. <em>Journal of Statistical Software</em>, <em>45</em>(3), 1–67. Retrieved from <a href="https://www.jstatsoft.org/v45/i03/">https://www.jstatsoft.org/v45/i03/</a></p>
 </div>
 <div id="ref-walport_brest_sharing_2011">
 <p>Walport, M., &amp; Brest, P. (2011). Sharing research data to improve public health. <em>The Lancet</em>, <em>377</em>, 537–539.</p>
@@ -1810,7 +1821,7 @@ Since `mice` is currently only capable of imputing the data at hand, the approac
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
