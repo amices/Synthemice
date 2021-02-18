@@ -1,0 +1,22 @@
+---
+title: "Proposal ADS"
+author: "Thom Volker"
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: html_document
+bibliography: mice_synthesizing/federated_imp.bib
+csl: "mice_synthesizing/apa-6th-edition.csl"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Imputation is no prediction: The importance of the bias/variance trade-off in multiple imputation
+
+The bias-variance trade-off is one of the key concepts in predictive modeling, and the best methods simultaneously achieve low bias and low variance. In this sense, bias refers to model misspecifications that lead to predictions that systematically deviate from the actual data-generating model. Typically, the bias can be reduced at the cost of a small increase in variance. However, one should be careful that the reduce in bias does not inflate the variance, as the consequence hereof would be to model dataset-specific noise (i.e., unpredictable, random deviations) which would deteriorate the quality of out-of-sample predictions.
+
+However, imputation is no prediction, and when the goal is to create sound imputations, the use of an overly flexible method (i.e., one with high variance) might not be problematic [@murray_multiple_2018]. Specifically, flexible methods like predictive mean matching and classification and regression trees (CART) have been proposed in the multiple imputation literature [@reiter_cart_2005; @doove_buuren_recursive_2014]. However, the performance of these methods in the imputation setting is never thoroughly compared to models that generally achieve lower variance (i.e., random forests and/or generalized additive models). 
+
+
+In this thesis project, you will compare the performance of various modeling techniques in terms of confidence validity in the imputation setting. Hereby, we hope to provide guidelines for applied researchers regarding the imputation models that are most suitable in realistic scenarios.
+
