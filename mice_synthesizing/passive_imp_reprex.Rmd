@@ -1,0 +1,73 @@
+---
+title: "Passive imputation reprex"
+author: "Thom Volker"
+date: "4/9/2021"
+output: html_document
+---
+
+Load the required packages.
+
+```{r}
+library(reprex)
+library(mice)
+library(tidyverse)
+```
+
+Create a complete dataset.
+
+```{r}
+df <- boys %>% mice(m=1, printFlag = FALSE) %>% complete()
+str(df)
+```
+
+Specify an imputation method.
+
+```{r}
+mtd <- make.method(df, 
+                   where = matrix(1, nrow(df), ncol(df)),
+                   defaultMethod = c("cart", "cart", "cart", "cart"))
+mtd["bmi"] <- "~ I(wgt / (hgt/100)^2)"
+```
+
+Create synthetic data.
+
+```{r}
+imp <- df %>% mice(m = 5, 
+                   method = mtd, 
+                   where = matrix(1, nrow(df), ncol(df)),
+                   printFlag = FALSE)
+```
+
+Create the datasets containing the synthetic data. Now, the values for bmi are actually calculated from the "real" dataset, rather than from the synthetic height and weight values.
+
+```{r}
+comp <- complete(imp, action = "all", include = T)
+
+map_dfc(comp, function(x) {
+  d <- head(x)
+  c(d$bmi,d$wgt / (d$hgt/100)^2)
+}) %>% bind_cols(imp = rep(c("imputed", "calculated"), each = 6), .)
+```
+
+Now, you see that the actually imputed values are just calculated from the actually observed data every time, while the calculated values can be created from the synthetic height and weight values (i.e., the values that are ought to be imputed), but are imputed as the bmi values. 
+
+```{r}
+df_mis <- df
+df_mis[1:2, c("hgt", "wgt", "bmi")] <- NA
+
+imp_mis <- df_mis %>% mice(m = 5, 
+                           method = mtd, 
+                           where = matrix(1, nrow(df), ncol(df)),
+                           printFlag = FALSE)
+
+comp_mis <- complete(imp_mis, action = "all", include = TRUE)
+
+map_dfc(comp_mis, function(x) {
+  d <- head(x)
+  c(d$bmi,d$wgt / (d$hgt/100)^2)
+}) %>% bind_cols(imp = rep(c("imputed", "calculated"), each = 6), .)
+```
+
+If the values are missing, the function does work accordingly. So apparently, passive imputation uses the actual data if present, and ignores the where matrix.
+
+
