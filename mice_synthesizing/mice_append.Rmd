@@ -1,0 +1,227 @@
+---
+title: "Mice - append empty data.frame"
+author: "Thom Volker"
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+# Load required packages
+
+```{r}
+library(mice) # imputations
+library(tidyverse) # tidy data
+library(modelr) # bootstrap
+library(magrittr) # pipe
+library(furrr) # parallel mapping
+```
+
+# Set seed
+
+```{r}
+set.seed(123) # seed for reproducibility
+```
+
+# Create a single completely observed dataset
+
+```{r}
+comp_meth <- make.method(boys)
+comp_meth['bmi'] <- "~I(wgt/(hgt/100)^2)"
+
+comp_pred <- make.predictorMatrix(boys)
+comp_pred[c("wgt", "hgt"), "bmi"] <- 0
+
+truth <- boys %>% 
+  mice(seed = 123, 
+       comp_meth, 
+       m = 1, 
+       print = FALSE) %>% 
+  complete()
+```
+
+# Create the true model
+
+```{r}
+model <- function(data) lm(wgt ~ age + hgt, data)
+
+truemodel <- truth %>% model
+
+coefs <- coef(truemodel)
+
+```
+
+# Initialize parallel processing
+
+```{r}
+plan(multisession)
+```
+
+# Specify number of simulations - 100 for now
+
+```{r}
+nsim <- 100
+```
+
+# CART method and predictor matrix for synthesizing
+
+```{r}
+# cart method, all variables are imputed by means of cart
+cart <- rep("cart", ncol(truth))
+names(cart) <- colnames(truth)
+cart['bmi'] <- "~I(wgt / (hgt/100)^2)"
+
+# alter the predictor matrix such that imputations for bmi do not flow
+# back into the predictions for wgt and hgt
+pred <- make.predictorMatrix(truth)
+pred[c("wgt", "hgt"), "bmi"] <- 0
+```
+
+# Bootstrap set of the boys data
+
+```{r}
+bootstrap_boys <- bootstrap(truth, nsim) %$% strap %>% map(as.data.frame)
+```
+
+# Simulate
+
+```{r, results = F, cache = TRUE, cache.lazy = FALSE}
+# 1 iteration, m = 5
+boot_cart_append_maxit1_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% 
+      bind_rows(data.frame(matrix(NA, nrow(.), ncol(.), dimnames = list(NULL, colnames(.))))) %>%
+      mice(m = 5,
+           maxit = 1,
+           method = cart,
+           minbucket = 3, 
+           cp = 1e-08,
+           predictorMatrix = pred,
+           print = F)
+  }, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+
+# 50 iterations, m = 5
+boot_cart_append_maxit50_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% 
+      bind_rows(data.frame(matrix(NA, nrow(.), ncol(.), dimnames = list(NULL, colnames(.))))) %>%
+      mice(m = 5,
+           maxit = 50,
+           method = cart,
+           minbucket = 3, 
+           cp = 1e-08,
+           predictorMatrix = pred,
+           print = F)
+  }, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+```
+
+# Pooling rules and coverage function
+
+```{r}
+# FULLY SYNTHETIC POOL FUNCTION
+pool.syn <- function(mira) {
+  
+  if(class(mira)[1] == "mira") { # if the input object is of class mira
+    fitlist <- mira %$% analyses # extract the analyses from the mira object
+  }
+  else {                         # and otherwise, just take the input list
+    fitlist <- mira
+    }
+  
+  m <- length(fitlist)           # number of imputations
+  
+  pooled <- fitlist %>% 
+    map_dfr(broom::tidy) %>%     # tidy estimates
+    group_by(term) %>%           # group per variable
+    summarise(est     = mean(estimate),
+              bm      = sum((estimate - est)^2) / (m - 1),
+              ubar    = mean(std.error^2),
+              var_u   = (1 + 1/m) * bm - ubar,
+              var     = if_else(var_u > 0, var_u, ubar), # restrict variance to be positive
+              df      = max(1, (m - 1) * (1 - ubar / (bm + bm/m))^2), # restrict df > 1
+              lower   = est - qt(.975, df) * sqrt(var),
+              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
+  pooled
+}
+
+ci_cov <- function(pooled, true_fit = NULL, coefs = NULL, vars = NULL) {
+  
+  if (!is.null(true_fit)) {
+    coefs <- coef(true_fit)
+    vars   <- diag(vcov(true_fit))
+  }
+  
+  nsim <- nrow(pooled) / length(coefs)
+  
+  pooled %>% mutate(true_coef = rep(coefs, nsim),
+                    true_var  = rep(vars, nsim),
+                    cover     = lower < true_coef & true_coef < upper) %>%
+    group_by(term) %>%
+    summarise("True Est" = unique(true_coef),
+              "Syn Est"  = mean(est),
+              "Bias"     = mean(est - true_coef),
+              "True SE"  = unique(sqrt(true_var)),
+              "Syn SE"   = mean(sqrt(var)),
+              "df"       = mean(df),
+              "Lower"    = mean(lower),
+              "Upper"    = mean(upper),
+              "CIW"      = mean(upper - lower),
+              "Coverage" = mean(cover), .groups = "drop")
+}
+```
+
+# Results of simulation
+
+```{r}
+library(kableExtra)
+
+boot_cart_append_maxit1_cp_min3 %>%
+  map_dfr(function(x) {
+    x %>%
+      complete(action = "all") %>%
+      map(~model(.x[749:1496,])) %>%
+      pool.syn
+  }) %>%
+  ci_cov(., truemodel)   %>%
+  kable(digits = 3,
+        caption = "Synthesizing by appending an empty dataframe under the bootstrap samples with 1 iteration") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+boot_cart_append_maxit50_cp_min3 %>%
+  map_dfr(function(x) {
+    x %>%
+      complete(action = "all") %>%
+      map(~model(.x[749:1496,])) %>%
+      pool.syn
+  }) %>%
+  ci_cov(., truemodel) %>%
+  kable(digits = 3,
+        caption = "Synthesizing by appending an empty dataframe under the bootstrap samples with 50 iteration") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+
+# What happens when running mice for 500 iterations
+
+```{r, cache = TRUE, cache.lazy = FALSE}
+iter500 <- boys %>%
+  bind_rows(data.frame(matrix(NA, nrow(.), ncol(.), dimnames = list(NULL, colnames(.))))) %>%
+  mice(m = 5,
+       maxit = 500,
+       method = cart,
+       minbucket = 3, 
+       cp = 1e-08,
+       predictorMatrix = pred,
+       print = F)
+
+plot(iter500)
+```
+
+
+
