@@ -39,7 +39,7 @@ def['reg'] <- "polyreg"
 # cart method, all variables are imputed by means of cart
 cart <- rep("cart", ncol(truth))
 names(cart) <- colnames(truth)
-cart['bmi'] <- def['bmi']
+cart['bmi'] <- "~I(wgt / (hgt/100)^2)"
 
 # alter the predictor matrix such that imputations for bmi do not flow
 # back into the predictions for wgt and hgt
@@ -114,6 +114,32 @@ boot_cart_maxit_cp_min3 <- bootstrap_boys %>%
                where = matrix(TRUE, nrow(truth), ncol(truth)),
                print = F)
 }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
+
+boot_cart_append_maxit1_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% 
+      bind_rows(data.frame(matrix(NA, nrow(.), ncol(.), dimnames = list(NULL, colnames(.))))) %>%
+      mice(m = 5,
+           maxit = 1,
+           method = cart,
+           minbucket = 3, 
+           cp = 1e-08,
+           predictorMatrix = pred,
+           print = F)
+  }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
+
+boot_cart_append_maxit50_cp_min3 <- bootstrap_boys %>%
+  future_map(function(x) {
+    x %>% 
+      bind_rows(data.frame(matrix(NA, nrow(.), ncol(.), dimnames = list(NULL, colnames(.))))) %>%
+      mice(m = 5,
+           maxit = 50,
+           method = cart,
+           minbucket = 3, 
+           cp = 1e-08,
+           predictorMatrix = pred,
+           print = F)
+  }, .options = future_options(seed = as.integer(123)), .progress = TRUE)
 
 # Impute the bootstrapped boys datasets similarly to the previous simulations
 # but with 5 iterations instead of 1
