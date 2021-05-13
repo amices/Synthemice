@@ -13,7 +13,9 @@ pool.syn <- function(mira) {
   }
   else {                         # and otherwise, just take the input list
     fitlist <- mira
-    }
+  }
+  
+  vars <- fitlist[[1]] %>% coef() %>% names()
   
   m <- length(fitlist)           # number of imputations
   
@@ -27,7 +29,8 @@ pool.syn <- function(mira) {
               var     = if_else(var_u > 0, var_u, ubar), # restrict variance to be positive
               df      = max(1, (m - 1) * (1 - ubar / (bm + bm/m))^2), # restrict df > 1
               lower   = est - qt(.975, df) * sqrt(var),
-              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
+              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop') %>%
+    arrange(factor(term, levels = vars))
   pooled
 }
 
@@ -41,6 +44,8 @@ pool2.syn <- function(mira) {
     fitlist <- mira              # and otherwise, just take the input list
   }
   
+  vars <- fitlist[[1]] %>% coef() %>% names()
+  
   m <- length(fitlist)           # number of imputations
   
   pooled <- fitlist %>% 
@@ -53,7 +58,9 @@ pool2.syn <- function(mira) {
               var     = if_else(var_u > 0, var_u, ubar), # restrict variance > 0
               df      = max(m - 1, (m - 1) * (1 - ubar / (bm + bm/m))^2), # restrict df > m-1
               lower   = est - qt(.975, df) * sqrt(var),
-              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
+              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop') %>%
+    arrange(factor(term, levels = vars))
+  
   pooled
 }
 
@@ -67,6 +74,8 @@ pool3.syn <- function(mira) {
     fitlist <- mira              # and otherwise, just take the input list
   }
   
+  vars <- fitlist[[1]] %>% coef() %>% names()
+  
   m <- length(fitlist)           # number of imputations
   
   pooled <- fitlist %>% 
@@ -78,7 +87,8 @@ pool3.syn <- function(mira) {
               var     = ubar + bm/m, # new variance estimate
               df      = (m - 1) * (1 + (ubar * m)/bm), # and new df estimate
               lower   = est - qt(.975, df) * sqrt(var),
-              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop')
+              upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop') %>%
+    arrange(factor(term, levels = vars))
   pooled
 }
 
@@ -89,10 +99,10 @@ ci_cov <- function(pooled, true_fit = NULL, coefs = NULL, vars = NULL) {
     vars   <- diag(vcov(true_fit))
   }
   
-  nsim <- nrow(pooled) / length(coefs)
+  nsim <- nrow(pooled) / length(unique(pooled$term))
   
-  pooled %>% mutate(true_coef = rep(coefs, nsim),
-                    true_var  = rep(vars, nsim),
+  pooled %>% mutate(true_coef = rep(coefs, times = nsim),
+                    true_var  = rep(vars, times = nsim),
                     cover     = lower < true_coef & true_coef < upper) %>%
     group_by(term) %>%
     summarise("True Est" = unique(true_coef),
