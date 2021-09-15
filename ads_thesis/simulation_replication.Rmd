@@ -297,3 +297,24 @@ syn2.cp.boot.imp %>%
 ```
 
 
+```{r}
+syn2_cp_boot %>%
+   map(function(x) {
+    x %$% 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
+          family = binomial(link = "logit"))
+    }) %>%
+  map_dfr(pool3.syn) %>%
+  select(term, est) %>%
+  bind_rows(Syn = ., 
+            True = true_fits %>% 
+              map_dfr(~coef(.x)) %>%
+              pivot_longer(cols = everything(), 
+                           names_to = "term", 
+                           values_to = "est"), .id = "Model") %>%
+  ggplot(aes(x = est, fill = Model)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~term, scales = "free")
+```
+
