@@ -39,15 +39,13 @@ data <- read_csv(url(data_url),
                                   SkinThickness = col_integer(), 
                                   Insulin = col_integer(), 
                                   Age = col_integer(), 
-                                  Outcome = col_factor(levels = c("1", "0"))))
-
-data <- data[!data$BMI == 0,]
+                                  Outcome = col_factor(levels = c("0", "1"))))
 ```
 
 # True model
 
 ```{r}
-fit <- glm(Outcome ~ Pregnancies + Glucose + BMI, 
+fit <- glm(Outcome ~ BMI + Glucose + Pregnancies, 
            family = binomial(link = "logit"), 
            data = data)
 
@@ -85,39 +83,11 @@ pred <- make.predictorMatrix(data)
 # Simulate
 
 ```{r, cache = TRUE, cache.lazy = FALSE}
-nsim <- 100
+nsim <- 500
 plan(multisession)
-
-syn1 <- future_map(1:nsim, function(x) {
-  data %>%
-    mice(m = 5,
-         method = mod1,
-         predictorMatrix = pred,
-         where = matrix(TRUE, nrow(.), ncol(.)),
-         print = FALSE)
-}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
-
-syn1_maxit1 <- future_map(1:nsim, function(x) {
-  data %>%
-    mice(m = 5, 
-         maxit = 1,
-         method = mod1,
-         predictorMatrix = pred,
-         where = matrix(TRUE, nrow(.), ncol(.)),
-         print = FALSE)
-}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
 ```
 
 ```{r, cache = TRUE, cache.lazy = FALSE}
-syn2 <- future_map(1:nsim, function(x) {
-  data %>%
-    mice(m = 5,
-         method = mod2,
-         predictorMatrix = pred,
-         where = matrix(TRUE, nrow(.), ncol(.)),
-         print = FALSE)
-}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
-
 syn2_maxit1 <- future_map(1:nsim, function(x) {
   data %>%
     mice(m = 5, 
@@ -130,17 +100,6 @@ syn2_maxit1 <- future_map(1:nsim, function(x) {
 ```
 
 ```{r, cache = TRUE, cache.lazy = FALSE}
-syn2_cp <- future_map(1:nsim, function(x) {
-  data %>%
-    mice(m = 5,
-         method = mod2,
-         predictorMatrix = pred,
-         where = matrix(TRUE, nrow(.), ncol(.)),
-         cp = 1e-32,
-         minbucket = 3,
-         print = FALSE)
-}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
-
 syn2_cp_maxit1 <- future_map(1:nsim, function(x) {
   data %>%
     mice(m = 5, 
@@ -168,45 +127,10 @@ library(kableExtra)
 
 
 ```{r}
-syn1 %>%
-  map(function(x) {
-    x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
-          family = binomial(link = "logit"))
-    }) %>%
-  map_dfr(pool3.syn) %>%
-  ci_cov(., fit) %>%
-  kable(digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
-syn1_maxit1 %>%
-  map(function(x) {
-    x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
-          family = binomial(link = "logit"))
-    }) %>%
-  map_dfr(pool3.syn) %>%
-  ci_cov(., fit) %>%
-  kable(digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-```
-
-```{r}
-syn2 %>%
-  map(function(x) {
-    x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
-          family = binomial(link = "logit"))
-    }) %>%
-  map_dfr(pool3.syn) %>%
-  ci_cov(., fit) %>%
-  kable(digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
 syn2_maxit1 %>%
   map(function(x) {
     x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
           family = binomial(link = "logit"))
     }) %>%
   map_dfr(pool3.syn) %>%
@@ -216,10 +140,61 @@ syn2_maxit1 %>%
 ```
 
 ```{r}
-syn2_cp %>%
+syn2_cp_maxit1 %>%
   map(function(x) {
     x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
+          family = binomial(link = "logit"))
+    }) %>%
+  map_dfr(pool3.syn) %>%
+  ci_cov(., fit) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```{r, cache = TRUE, cache.lazy = FALSE}
+syn2_boot <- future_map(1:nsim, function(x) {
+  data[sample(1:nrow(data), replace = TRUE), ] %>%
+    mice(m = 10, 
+         maxit = 1,
+         method = mod2,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(.), ncol(.)),
+         cp = 0.0001,
+         minbucket = 3,
+         print = FALSE)
+}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+
+syn2_cp_boot <- future_map(1:nsim, function(x) {
+  data[sample(1:nrow(data), replace = TRUE), ] %>%
+    mice(m = 5, 
+         maxit = 1,
+         method = mod2,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(.), ncol(.)),
+         cp = 1e-32,
+         minbucket = 3,
+         print = FALSE)
+}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+
+true_fits <- map(1:nsim, ~glm(Outcome ~ BMI + Glucose + Pregnancies,
+                 family = binomial(link = "logit"), data = data[sample(1:nrow(data), replace = TRUE),]))
+
+map_dfr(true_fits, function(x) {
+  x %>% broom::tidy(conf.int = TRUE) %>% mutate(cov = conf.low < coef(fit) & coef(fit) < conf.high)
+}) %>% 
+  group_by(term) %>%
+  summarise(est = mean(estimate),
+                 se  = mean(std.error),
+                 ciw = mean(conf.high - conf.low),
+                 cov = mean(cov)) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+syn2_boot %>%
+     map(function(x) {
+    x %$% 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
           family = binomial(link = "logit"))
     }) %>%
   map_dfr(pool3.syn) %>%
@@ -227,15 +202,119 @@ syn2_cp %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
-syn2_cp_maxit1 %>%
-  map(function(x) {
+syn2_cp_boot %>%
+   map(function(x) {
     x %$% 
-      glm(Outcome ~ Pregnancies + Glucose + BMI, 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
           family = binomial(link = "logit"))
     }) %>%
   map_dfr(pool3.syn) %>%
   ci_cov(., fit) %>%
   kable(digits = 3) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+# Zero's replaced by imputation
+
+```{r, cache=TRUE, cache.lazy=FALSE}
+data.imp <- 
+  data %>%
+  lapply(FUN = function(x) {
+  ifelse(is.numeric(x) & x == 0, NA, x)
+  }) %>%
+  as.data.frame() %>%
+  mutate(Outcome = factor(Outcome, labels = c("0", "1"))) %>%
+  mice(m = 1, maxit = 50, method = "pmm") %>%
+  complete()
+
+fit.imp <- glm(Outcome ~ BMI + Glucose + Pregnancies,
+               family = binomial(link = "logit"),
+               data = data.imp)
+
+syn2.boot.imp <- future_map(1:nsim, function(x) {
+  data.imp[sample(1:nrow(data.imp), replace = TRUE), ] %>%
+    mice(m = 10, 
+         maxit = 1,
+         method = mod2,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(.), ncol(.)),
+         cp = 0.0001,
+         minbucket = 3,
+         print = FALSE)
+}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+
+syn2.cp.boot.imp <- future_map(1:nsim, function(x) {
+  data.imp[sample(1:nrow(data.imp), replace = TRUE), ] %>%
+    mice(m = 10, 
+         maxit = 1,
+         method = mod2,
+         predictorMatrix = pred,
+         where = matrix(TRUE, nrow(.), ncol(.)),
+         cp = 1e-32,
+         minbucket = 3,
+         print = FALSE)
+}, .options = future_options(seed = as.integer(123)), .progress = FALSE)
+
+true.fits.imp <- map(1:nsim, ~glm(Outcome ~ BMI + Glucose + Pregnancies,
+                                  family = binomial(link = "logit"), 
+                                  data = data.imp[sample(1:nrow(data.imp), replace = TRUE),]))
+
+true.fits.imp %>%
+  map_dfr(function(x) {
+    x %>% 
+    broom::tidy(conf.int = TRUE) %>% 
+    mutate(cov = conf.low < coef(fit.imp) & coef(fit.imp) < conf.high)
+  }) %>% 
+  group_by(term) %>%
+  summarise(est = mean(estimate),
+                 se  = mean(std.error),
+                 ciw = mean(conf.high - conf.low),
+                 cov = mean(cov)) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+syn2.boot.imp %>%
+  map(function(x) {
+    x %$% 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
+          family = binomial(link = "logit"))
+    }) %>%
+  map_dfr(pool3.syn) %>%
+  ci_cov(., fit.imp) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+syn2.cp.boot.imp %>%
+  map(function(x) {
+    x %$% 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
+          family = binomial(link = "logit"))
+    }) %>%
+  map_dfr(pool3.syn) %>%
+  ci_cov(., fit.imp) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+```{r}
+syn2_cp_boot %>%
+   map(function(x) {
+    x %$% 
+      glm(Outcome ~ BMI + Glucose + Pregnancies, 
+          family = binomial(link = "logit"))
+    }) %>%
+  map_dfr(pool3.syn) %>%
+  select(term, est) %>%
+  bind_rows(Syn = ., 
+            True = true_fits %>% 
+              map_dfr(~coef(.x)) %>%
+              pivot_longer(cols = everything(), 
+                           names_to = "term", 
+                           values_to = "est"), .id = "Model") %>%
+  ggplot(aes(x = est, fill = Model)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_brewer(palette = "Set1") +
+  facet_wrap(~term, scales = "free")
 ```
 

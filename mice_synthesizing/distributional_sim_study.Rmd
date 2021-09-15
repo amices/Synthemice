@@ -1,0 +1,57 @@
+---
+title: "Untitled"
+author: 
+- Thom Volker
+- Utrecht University
+date: "`r format(Sys.time(), '%d-%m-%Y')`"
+output: 
+  html_document:
+    highlight: pygments
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Simulation study -- creating synthetic data with `mice`
+
+
+# Load packages 
+
+```{r}
+library(mice)
+library(tidyverse)
+library(furrr)
+library(magrittr)
+library(knitr)
+```
+
+# Read in the data
+
+```{r}
+data_url <- "https://raw.githubusercontent.com/gerkovink/Synthetic_ADS/main/Data/diabetes.csv"
+data <- read_csv(url(data_url), 
+                 col_types = cols(Pregnancies = col_integer(), 
+                                  Glucose = col_integer(), 
+                                  BloodPressure = col_integer(), 
+                                  SkinThickness = col_integer(), 
+                                  Insulin = col_integer(), 
+                                  Age = col_integer(), 
+                                  Outcome = col_factor(levels = c("0", "1"))))
+```
+
+# True model
+
+```{r}
+fit <- glm(Outcome ~ BMI + Glucose + Pregnancies, 
+           family = binomial(link = "logit"), 
+           data = data)
+
+coef(fit)
+sqrt(diag(vcov(fit)))
+broom::tidy(fit)
+```
