@@ -85,7 +85,7 @@ pool3.syn <- function(mira) {
               bm      = sum((estimate - est)^2) / (m - 1),
               ubar    = mean(std.error^2),
               var     = ubar + bm/m, # new variance estimate
-              df      = (m - 1) * (1 + (ubar * m)/bm), # and new df estimate
+              df      = (m - 1) * (1 + (ubar * m)/bm)^2, # and new df estimate
               lower   = est - qt(.975, df) * sqrt(var),
               upper   = est + qt(.975, df) * sqrt(var), .groups = 'drop') %>%
     arrange(factor(term, levels = vars))
@@ -116,4 +116,27 @@ ci_cov <- function(pooled, true_fit = NULL, coefs = NULL, vars = NULL) {
               "Upper"    = mean(upper),
               "CIW"      = mean(upper - lower),
               "Coverage" = mean(cover), .groups = "drop")
+}
+
+make.coefficients <- function(r2, ratio, rho, model = c("normal", "logit", "probit")) {
+  if (model == "normal") {
+    var_y <- r2
+  }
+  else if (model == "logit") {
+    var_y <- (r2 * pi^2 / 3) / (1 - r2)
+  }
+  sqrt(var_y / sum(ratio %*% t(ratio) * rho)) * ratio
+}
+
+generate.data <- function(r2, betas, rho, n, model = c("normal", "logit", "probit")) {
+  
+  X <- mvrnormArma(n, mu = rep(0, length(betas)), sigma = rho)
+  
+  if (model == "normal") {
+    Y <- X %*% betas + rnorm(n = n, mean = 0, sd = sqrt(1 - r2))
+  }
+  if (model == "logit") {
+    Y <- rbinom(n, 1, 1 / (1 + exp(-(X %*% betas))))
+  }
+  bind_cols(X = as.data.frame(X), Y = Y)
 }
