@@ -157,7 +157,7 @@ syn2_cp_maxit1 <- future_map(1:nsim, function(x) {
 # Source functions file for pooling
 
 ```{r}
-source("~/Documents/Federated_imputation/mice_synthesizing/simulations/functions.R")
+source("../mice_synthesizing/simulations/functions.R")
 ```
 
 # Synthetic data estimates

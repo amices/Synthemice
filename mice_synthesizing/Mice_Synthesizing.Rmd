@@ -4,6 +4,10 @@ author:
 - Thom Volker
 - Utrecht University
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
+reveal_options:
+      width: 100%
+      height: 100%
+      margin: 0.1
 output: 
   html_document:
     theme: spacelab
@@ -33,8 +37,8 @@ library(ggplot2)
 
 
 ```{r, include = F, cache = thomcache, cache.lazy=thomlazy}
-source("1.a Synthesize_Mice_Replace_All.R")
-source("functions.R")
+source("simulations/1.a Synthesize_Mice_Replace_All.R")
+source("simulations/functions.R")
 ```
 
 

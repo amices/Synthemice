@@ -92,6 +92,7 @@ pool3.syn <- function(mira) {
   pooled
 }
 
+
 ci_cov <- function(pooled, true_fit = NULL, coefs = NULL, vars = NULL) {
   
   if (!is.null(true_fit)) {
