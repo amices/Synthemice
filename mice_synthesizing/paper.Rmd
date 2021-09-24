@@ -66,7 +66,7 @@ Open science, including open data, has been marked as the future of science [@ge
 
 Anonymizing the data might seem a quick and appealing approach to limit the unique identification of participants. However, this approach is not sufficient to fulfill contemporary privacy and confidentiality requirements [@ohm_broken_2009; @national_putting_2007]. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above an upper bound or adding random noise to the observed values [@drechsler_synthetic_2011]. However, these methods may distort the true data relation between variables, thereby reducing the data quality and the scientific returns for re-using the same data for further research. 
 
-An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. Observed data values are then replaced by multiple draws from the posterior predictive distribution of the observed data, based on some imputation model. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers. <!-- I don't think so, because the synthetic values can only be linked to observed values from other sources if they are exactly equal, or if they are the only value within a certain range. The latter might be possible when the number of values is very small, or when the observed value is so extreme that synthetic versions will still be so extreme. However, if the other values are synthetic as well, it is quite likely that synthetic information does not apply to the real-world observation. I think that the highest risk is in the possibility to extract a range of possible values, which might be uniquely match some other record that is available. -->
+An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. While in practice, one could see this as replacing the observed data values by multiple draws from the posterior predictive distribution of the observed data, based on some imputation model, Rubin would argue that these synthetic data values are merely draws from the same true data generating model. In that sense, the observed data is never replaced, but the population is resampled from the information captured in the (incomplete) sample. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers. <!-- I don't think so, because the synthetic values can only be linked to observed values from other sources if they are exactly equal, or if they are the only value within a certain range. The latter might be possible when the number of values is very small, or when the observed value is so extreme that synthetic versions will still be so extreme. However, if the other values are synthetic as well, it is quite likely that synthetic information does not apply to the real-world observation. I think that the highest risk is in the possibility to extract a range of possible values, which might be uniquely match some other record that is available. -->
 
 Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation of missing data, as proposed by @rubin_multiple_1987. Instead of replacing just the missing values with multiple draws from the posterior predictive distribution, one could easily *overimpute* any observed sensitive values. Similarly to multiple imputation of missing data, the multiple synthetic datasets allow for correct statistical inferences, **regardless of the fact that the "true" value is not included in the analyses**. The analyses over multiple synthetic data sets should be pooled into a single inference, so that the researcher can draw valid conclusions from the pooled results. To that respect, the variance should reflect the added variability that is induced by the imputation procedure. 
 Potentially, this approach could fulfill the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data is highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these high-quality data sets should be kept at a minimum.
@@ -84,7 +84,7 @@ First, the `mice` algorithm for the creation of synthetic data will be shortly e
 
 The `mice` package [@mice] in `R` [@Rproject] has been developed for multiple imputation of missing data. In this context, the aim is to replace missing values due to nonresponse by plausible values from the posterior predictive distribution of the variable containing the missings. Doing so, `mice` makes use of fully conditional specification [FCS; @vanbuuren_fully_2006], which breaks down the multivariate distribution of the data $\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})$ into $j = 1, 2, \dots, k$ univariate conditional densities, where $k$ denotes the number of columns in the data. Using FCS, a model is constructed for every incomplete variable and the missing values $Y_{j, mis}$ are then imputed with draws from the posterior predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ on a variable-by-variable basis. Note that the predictor matrix $Y_{-j}$ may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied $m$ times, resulting in $m$ completed datasets $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$, with $\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})$.
 
-In `mice`, the generation of multiply imputed data sets is straightforward. The following pseudocode details the multiple imputation of the `mice::boys` data set [@fredriks_boys_2000] into the object `imp` with `m = 10` imputated sets and `maxit = 7` iterations for the algorithm to converge, using the default imputations methods for each column data class. 
+In `mice`, the generation of multiply imputed data sets to solve for unobserved values is straightforward. The following pseudocode details the multiple imputation of the `mice::boys` data set [@fredriks_boys_2000] into the object `imp` with `m = 10` imputated sets and `maxit = 7` iterations for the algorithm to converge, using the default imputations methods for each column data class. 
 
 ```{r eval = FALSE}
 library(mice)
@@ -95,7 +95,7 @@ imp <- mice(boys,
 
 It is straightforward to extended the imputation approach to generate synthetic values. Rather than imputing missing data, the observed values are then replaced by synthetic draws from the posterior predictive distribution. For simplicity, assume that the data is completely observed (i.e., $\textbf{Y} = \textbf{Y}_{obs}$). Following the notation of @reiter_raghunathan_multiple_2007, let for $n$ units denote $Z_i = 1$ if any of the values of unit $i = 1, 2, \dots, n$ are to be replaced by imputations, and $Z_i = 0$ otherwise, with $\textbf{Z} = (Z_1, Z_2, \dots, Z_n)$. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., $\textbf{Y} = (\textbf{Y}_{rep}, \textbf{Y}_{nrep})$. Now, instead of imputing $\textbf{Y}_{mis}$ with draws from the posterior predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ as in the missing data case, $\textbf{Y}_{rep}$ is imputed from the posterior distribution of $P(Y^{(l)}_{j, rep} | \textbf{Y}^{(l)}_{-j}, \textbf{Z}, \theta)$, where $l$ is an indicator for the synthetic dataset ($l = 1, 2, \dots, m$). Note that synthetic values that are imputed at an earlier step can be used for imputing variable $j$. This process results in the synthetic data $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$. 
 
-For example, overimputing the observed and missing values in the `mice::boys` data set into the object `syn`, given the same imputation parameters as before, can be realized by the following code execution
+For example, overimputing synthetic values for both the observed and missing cells in the `mice::boys` data set into the object `syn`, given the same imputation parameters as before, can be realized by the following code execution
 
 ```{r eval = FALSE}
 syn <- mice(boys, 
@@ -120,10 +120,36 @@ syn <- mice(boys,
                            ncol = ncol(boys)))
 ```
 
+# Simulation setup
+- boys data met bootstrap om sampling variance er in te brengen
+- wat evalueren we: bias | standard error | coverage
+- welke pooling: T = Ubar + B/m
 
-# psych::describe
-# correlation matrix
-# wgt ~ age + bmi | hgt ~ age + wgt | gen ~ age + 
+# psych::describe - univariate ok
+map --> psych::describe() --> Reduce("+", .) in de pipe
+
+# correlation matrix - relations preserved
+map --> cor --> logit --> pool --> inv.logit --> correct diagonal
+
+# wgt ~ age + bmi | hgt ~ age + wgt | gen ~ age + bmi - multivariate ok
+3 sets modellen
+
+complete(imp, "all") 
+--> lm1
+--> lm2
+--> polr
+
+pooling cf. T = Ubar + B/m
+
+# Conclusie
+- We hebben laten zien dat het belangrijk is om meerdere synthetische versies te creeren. Dit is ook geen probleem, dat doen we immers al decennia lang met imputeren. 
+- Waarom geen synthpop --> Ibrahim 2000
+- werkt wel goed.
+- Beperkingen
+- Wat verder nog te doen: aanvullende functies voor complexere combinaties van synthetiseren en imputeren
+
+
+ 
 
 ```{r}
 library(mice)

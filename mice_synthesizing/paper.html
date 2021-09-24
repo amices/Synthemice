@@ -427,7 +427,7 @@ WHY WE NEED SYNTHETIC DATA - PARAGRAPHS FROM Lazer, D., Pentland, A. S., Adamic,
 There are also enormous institutional obsta-cles to advancing a computational social sci-ence.  In  terms  of  approach,  the  subjects  ofinquiry in physics and biology present differentchallenges  to  observation  and  intervention.Quarks and cells neither mind when we dis-cover their secrets nor protest if we alter theirenvironments during the discovery process. Asfor infrastructure, the leap from social scienceto a computational social science is larger thanfrom  biology  to  a  computational  biology,largely due to the requirements of distributedmonitoring, permission seeking, and encryp-tion. There are fewer resources available in thesocial  sciences,  and  even  the  physical  (andadministrative) distance between social sciencedepartments and engineering or computer sci-ence departments tends to be greater than forthe other sciences. Perhaps the thorniest challenges exist on thedata side, with respect to access and privacy.Much of these data are proprietary (e.g., mobilephone and financial transactional information).The debacle following AOL’s public release of“anonymized” search records of many of itscustomers highlights the potential risk to indi-viduals and corporations in the sharing of per-sonal data by private companies (14). Robustmodels  of  collaboration  and  data  sharingbetween industry and academia are needed tofacilitate research and safeguard consumer pri-vacy and provide liability protection for corpo-rations. More generally, properly managing pri-vacy  issues  is  essential.  As  the  recent  U.S.National  Research  Council’s  report  on  geo-graphical information system data highlights, itis often possible to pull individual profiles outof even carefully anonymized data (15). Lastyear, the U.S. National Institutes of Health andthe Wellcome Trust abruptly removed a num-ber of genetic databases from online access(16). These databases were seemingly anony-mized,  simply  reporting  the  aggregate  fre-quency of particular genetic markers. How-ever, research revealed the potential for de-anonymization, based on the statistical powerof the sheer quantity of data collected fromeach individual in the database (17).Because a single dramatic incident involv-ing a breach of privacy could produce rulesand statutes that stifle the nascent field of com-putational  social  science,  a  self-regulatoryregime of procedures, technologies, and rulesis needed that reduces this risk but preservesresearch potential. As a cornerstone of such aself-regulatory regime, U.S. Institutional Re-view Boards (IRBs) must increase their techni-cal knowledge to understand the potential forintrusion and individual harm because newpossibilities do not fit their current paradigmsfor harm. Many IRBs would be poorly equip-ped to evaluate the possibility that complexdata could be de-anonymized. Further, it maybe necessary for IRBs to oversee the creationof  a  secure,  centralized  data  infrastructure.Currently,  existing  data  sets  are  scatteredamong many groups, with uneven skills andunderstanding  of  data  security  and  widelyvarying  protocols.  Researchers  themselvesmust develop technologies that protect privacywhile preserving data essential for research.These systems, in turn, may prove useful forindustry in managing customer privacy anddata security (18). -->
 <p>Open science, including open data, has been marked as the future of science <span class="citation">(Gewin, 2016)</span>, and the advantages of publicly available research data are numerous <span class="citation">(Molloy, 2011; Walport &amp; Brest, 2011)</span>. Collecting research data requires an enormous investment both in terms of time and monetary resources. Openly accessible research data bears the potential of increasing the scientific returns for the same data collection effort. Additionally, the fact that public funds are used for data collection results in increasing demand for the collected data. Nevertheless, the possibilities to distribute research data directly are often very limited due to restrictions on data privacy and data confidentiality. Although these regulations are much needed, privacy constraints are also ranked among the toughest challenges to overcome in the advancement of computational social science <span class="citation">(Lazer et al., 2009)</span>.</p>
 <p>Anonymizing the data might seem a quick and appealing approach to limit the unique identification of participants. However, this approach is not sufficient to fulfill contemporary privacy and confidentiality requirements <span class="citation">(Council, 2007; Ohm, 2009)</span>. Over the years, several other techniques have been used to increase the confidentiality of the data, such as categorizing continuous variables, top coding values above an upper bound or adding random noise to the observed values <span class="citation">(Drechsler, 2011)</span>. However, these methods may distort the true data relation between variables, thereby reducing the data quality and the scientific returns for re-using the same data for further research.</p>
-<p>An alternative solution has been proposed separately by <span class="citation">Rubin (1993)</span> and <span class="citation">Little (1993)</span>. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. Observed data values are then replaced by multiple draws from the posterior predictive distribution of the observed data, based on some imputation model. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers. <!-- I don't think so, because the synthetic values can only be linked to observed values from other sources if they are exactly equal, or if they are the only value within a certain range. The latter might be possible when the number of values is very small, or when the observed value is so extreme that synthetic versions will still be so extreme. However, if the other values are synthetic as well, it is quite likely that synthetic information does not apply to the real-world observation. I think that the highest risk is in the possibility to extract a range of possible values, which might be uniquely match some other record that is available. --></p>
+<p>An alternative solution has been proposed separately by <span class="citation">Rubin (1993)</span> and <span class="citation">Little (1993)</span>. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. While in practice, one could see this as replacing the observed data values by multiple draws from the posterior predictive distribution of the observed data, based on some imputation model, Rubin would argue that these synthetic data values are merely draws from the same true data generating model. In that sense, the observed data is never replaced, but the population is resampled from the information captured in the (incomplete) sample. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers. <!-- I don't think so, because the synthetic values can only be linked to observed values from other sources if they are exactly equal, or if they are the only value within a certain range. The latter might be possible when the number of values is very small, or when the observed value is so extreme that synthetic versions will still be so extreme. However, if the other values are synthetic as well, it is quite likely that synthetic information does not apply to the real-world observation. I think that the highest risk is in the possibility to extract a range of possible values, which might be uniquely match some other record that is available. --></p>
 <p>Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation of missing data, as proposed by <span class="citation">Rubin (1987)</span>. Instead of replacing just the missing values with multiple draws from the posterior predictive distribution, one could easily <em>overimpute</em> any observed sensitive values. Similarly to multiple imputation of missing data, the multiple synthetic datasets allow for correct statistical inferences, <strong>regardless of the fact that the “true” value is not included in the analyses</strong>. The analyses over multiple synthetic data sets should be pooled into a single inference, so that the researcher can draw valid conclusions from the pooled results. To that respect, the variance should reflect the added variability that is induced by the imputation procedure. Potentially, this approach could fulfill the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. Also, the quality of the synthetic data is highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, the effort to actually create these high-quality data sets should be kept at a minimum.</p>
 <p>To mitigate additional effort of creating synthetic data sets on behalf of the researcher, software aimed at multiple imputation of missing data can be employed. Especially if researchers used this software at an earlier stage in the research process, or acquired familiarity with it during earlier projects, the additional burden of creating synthetic data sets is relatively small. The R-package <code>mice</code> <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> implements multiple imputation of missing data in a straightforward and user-friendly manner. However, the functionality of <code>mice</code> is not restricted to the imputation of missing data, but allows to impute any value in the data: even observed values. Consequently, <code>mice</code> can be utilized for the creation of multiply imputed synthetic data sets.</p>
 <p>After creating the multiply imputed synthetic data sets, the goal is to obtain valid statistical inferences in the spirit of <span class="citation">Rubin (1987)</span> and <span class="citation">Neyman (1934)</span>. In the missing data framework, this is done by performing statistical analyses on all imputed datasets, and pooling the results of the analyses according to Rubin’s rules <span class="citation">(Rubin, 1987, p. 76)</span>. In the synthetic data framework, the same procedure is followed, but with a slight twist: there are no values that remain constant over the synthetic data sets. The procedure of drawing valid inferences from multiple synthetic data sets is therefore slightly different.</p>
@@ -437,13 +437,13 @@ There are also enormous institutional obsta-cles to advancing a computational so
 <h1 number="3"><span class="header-section-number">3</span> Generating synthetic data with <code>mice</code></h1>
 <p><strong>NEXT TWO PARAGRAPHS ARE PROBABLY NOT CORRECT YET; NOTE TO SELF: UPDATE THIS</strong></p>
 <p>The <code>mice</code> package <span class="citation">(Van Buuren &amp; Groothuis-Oudshoorn, 2011)</span> in <code>R</code> <span class="citation">(R Core Team, 2021)</span> has been developed for multiple imputation of missing data. In this context, the aim is to replace missing values due to nonresponse by plausible values from the posterior predictive distribution of the variable containing the missings. Doing so, <code>mice</code> makes use of fully conditional specification [FCS; <span class="citation">Van Buuren, Brand, Groothuis-Oudshoorn, &amp; Rubin (2006)</span>], which breaks down the multivariate distribution of the data <span class="math inline">\(\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})\)</span> into <span class="math inline">\(j = 1, 2, \dots, k\)</span> univariate conditional densities, where <span class="math inline">\(k\)</span> denotes the number of columns in the data. Using FCS, a model is constructed for every incomplete variable and the missing values <span class="math inline">\(Y_{j, mis}\)</span> are then imputed with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> on a variable-by-variable basis. Note that the predictor matrix <span class="math inline">\(Y_{-j}\)</span> may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied <span class="math inline">\(m\)</span> times, resulting in <span class="math inline">\(m\)</span> completed datasets <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>, with <span class="math inline">\(\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})\)</span>.</p>
-<p>In <code>mice</code>, the generation of multiply imputed data sets is straightforward. The following pseudocode details the multiple imputation of the <code>mice::boys</code> data set <span class="citation">(Fredriks et al., 2000)</span> into the object <code>imp</code> with <code>m = 10</code> imputated sets and <code>maxit = 7</code> iterations for the algorithm to converge, using the default imputations methods for each column data class.</p>
+<p>In <code>mice</code>, the generation of multiply imputed data sets to solve for unobserved values is straightforward. The following pseudocode details the multiple imputation of the <code>mice::boys</code> data set <span class="citation">(Fredriks et al., 2000)</span> into the object <code>imp</code> with <code>m = 10</code> imputated sets and <code>maxit = 7</code> iterations for the algorithm to converge, using the default imputations methods for each column data class.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mice)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>imp <span class="ot">&lt;-</span> <span class="fu">mice</span>(boys, </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="dv">10</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">maxit =</span> <span class="dv">7</span>)</span></code></pre></div>
 <p>It is straightforward to extended the imputation approach to generate synthetic values. Rather than imputing missing data, the observed values are then replaced by synthetic draws from the posterior predictive distribution. For simplicity, assume that the data is completely observed (i.e., <span class="math inline">\(\textbf{Y} = \textbf{Y}_{obs}\)</span>). Following the notation of <span class="citation">Reiter &amp; Raghunathan (2007)</span>, let for <span class="math inline">\(n\)</span> units denote <span class="math inline">\(Z_i = 1\)</span> if any of the values of unit <span class="math inline">\(i = 1, 2, \dots, n\)</span> are to be replaced by imputations, and <span class="math inline">\(Z_i = 0\)</span> otherwise, with <span class="math inline">\(\textbf{Z} = (Z_1, Z_2, \dots, Z_n)\)</span>. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., <span class="math inline">\(\textbf{Y} = (\textbf{Y}_{rep}, \textbf{Y}_{nrep})\)</span>. Now, instead of imputing <span class="math inline">\(\textbf{Y}_{mis}\)</span> with draws from the posterior predictive distribution of <span class="math inline">\(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\)</span> as in the missing data case, <span class="math inline">\(\textbf{Y}_{rep}\)</span> is imputed from the posterior distribution of <span class="math inline">\(P(Y^{(l)}_{j, rep} | \textbf{Y}^{(l)}_{-j}, \textbf{Z}, \theta)\)</span>, where <span class="math inline">\(l\)</span> is an indicator for the synthetic dataset (<span class="math inline">\(l = 1, 2, \dots, m\)</span>). Note that synthetic values that are imputed at an earlier step can be used for imputing variable <span class="math inline">\(j\)</span>. This process results in the synthetic data <span class="math inline">\(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\)</span>.</p>
-<p>For example, overimputing the observed and missing values in the <code>mice::boys</code> data set into the object <code>syn</code>, given the same imputation parameters as before, can be realized by the following code execution</p>
+<p>For example, overimputing synthetic values for both the observed and missing cells in the <code>mice::boys</code> data set into the object <code>syn</code>, given the same imputation parameters as before, can be realized by the following code execution</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>syn <span class="ot">&lt;-</span> <span class="fu">mice</span>(boys, </span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="dv">10</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">maxit =</span> <span class="dv">7</span>, </span>
@@ -460,14 +460,37 @@ There are also enormous institutional obsta-cles to advancing a computational so
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">nrow =</span> <span class="fu">nrow</span>(boys),</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ncol =</span> <span class="fu">ncol</span>(boys)))</span></code></pre></div>
 </div>
-<div id="psychdescribe" class="section level1" number="4">
-<h1 number="4"><span class="header-section-number">4</span> psych::describe</h1>
+<div id="simulation-setup" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Simulation setup</h1>
+<ul>
+<li>boys data met bootstrap om sampling variance er in te brengen</li>
+<li>wat evalueren we: bias | standard error | coverage</li>
+<li>welke pooling: T = Ubar + B/m</li>
+</ul>
 </div>
-<div id="correlation-matrix" class="section level1" number="5">
-<h1 number="5"><span class="header-section-number">5</span> correlation matrix</h1>
+<div id="psychdescribe---univariate-ok" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> psych::describe - univariate ok</h1>
+<p>map –&gt; psych::describe() –&gt; Reduce(“+,” .) in de pipe</p>
 </div>
-<div id="wgt-age-bmi-hgt-age-wgt-gen-age" class="section level1" number="6">
-<h1 number="6"><span class="header-section-number">6</span> wgt ~ age + bmi | hgt ~ age + wgt | gen ~ age +</h1>
+<div id="correlation-matrix---relations-preserved" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> correlation matrix - relations preserved</h1>
+<p>map –&gt; cor –&gt; logit –&gt; pool –&gt; inv.logit –&gt; correct diagonal</p>
+</div>
+<div id="wgt-age-bmi-hgt-age-wgt-gen-age-bmi---multivariate-ok" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> wgt ~ age + bmi | hgt ~ age + wgt | gen ~ age + bmi - multivariate ok</h1>
+<p>3 sets modellen</p>
+<p>complete(imp, “all”) –&gt; lm1 –&gt; lm2 –&gt; polr</p>
+<p>pooling cf. T = Ubar + B/m</p>
+</div>
+<div id="conclusie" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> Conclusie</h1>
+<ul>
+<li>We hebben laten zien dat het belangrijk is om meerdere synthetische versies te creeren. Dit is ook geen probleem, dat doen we immers al decennia lang met imputeren.</li>
+<li>Waarom geen synthpop –&gt; Ibrahim 2000</li>
+<li>werkt wel goed.</li>
+<li>Beperkingen</li>
+<li>Wat verder nog te doen: aanvullende functies voor complexere combinaties van synthetiseren en imputeren</li>
+</ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mice)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;mice&#39;</code></pre>
@@ -497,16 +520,16 @@ There are also enormous institutional obsta-cles to advancing a computational so
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(imp, <span class="fu">lm</span>(wgt <span class="sc">~</span> age <span class="sc">+</span> bmi))<span class="sc">%&gt;%</span> <span class="fu">pool</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
 <pre><code>##          term   estimate  std.error statistic       df p.value
-## 1 (Intercept) -38.251579 1.27266344 -30.05632 166.1535       0
-## 2         age   2.829689 0.03451078  81.99434 245.1308       0
-## 3         bmi   2.741947 0.08064840  33.99878 128.7966       0</code></pre>
+## 1 (Intercept) -38.038521 1.26109839 -30.16301 200.9161       0
+## 2         age   2.836902 0.03610124  78.58186 105.8616       0
+## 3         bmi   2.726724 0.08085416  33.72398 121.9218       0</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(imp, <span class="fu">lm</span>(bmi <span class="sc">~</span> <span class="fu">I</span>((wgt <span class="sc">/</span> (hgt<span class="sc">/</span><span class="dv">100</span>)<span class="sc">^</span><span class="dv">2</span>))))<span class="sc">%&gt;%</span> <span class="fu">pool</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
 <pre><code>##                   term     estimate    std.error    statistic       df
-## 1          (Intercept) -0.005136158 6.475047e-04    -7.932232 730.4675
-## 2 I((wgt/(hgt/100)^2))  1.000018735 3.538574e-05 28260.499481 729.9525
-##        p.value
-## 1 7.993606e-15
-## 2 0.000000e+00</code></pre>
+## 1          (Intercept) -0.005191925 6.577699e-04    -7.893223 544.5148
+## 2 I((wgt/(hgt/100)^2))  1.000021815 3.594705e-05 27819.304710 538.3496
+##       p.value
+## 1 1.64313e-14
+## 2 0.00000e+00</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;MASS&#39;</code></pre>
@@ -514,22 +537,22 @@ There are also enormous institutional obsta-cles to advancing a computational so
 ## 
 ##     select</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(imp, <span class="fu">polr</span>(gen <span class="sc">~</span> age <span class="sc">+</span> bmi, <span class="at">Hess =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="fu">pool</span>() <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
-<pre><code>##    term  estimate  std.error statistic       df      p.value
-## 1   age 0.2803774 0.02765268 10.139249 10.33101 1.077395e-06
-## 2   bmi 0.1133587 0.04201603  2.697986 22.26048 1.305674e-02
-## 3 G1|G2 3.7033389 0.67402067  5.494400 24.14149 1.172146e-05
-## 4 G2|G3 5.3708198 0.78469633  6.844456 14.41619 6.858662e-06
-## 5 G3|G4 6.0012219 0.82552966  7.269541 13.20632 5.735277e-06
-## 6 G4|G5 7.1253232 0.86808622  8.208082 12.88867 1.787619e-06</code></pre>
+<pre><code>##    term   estimate  std.error statistic        df      p.value
+## 1   age 0.28120675 0.02389691 11.767493  16.45635 1.977824e-09
+## 2   bmi 0.09668014 0.03261011  2.964729 405.45699 3.208393e-03
+## 3 G1|G2 3.45276263 0.52120649  6.624558 615.56363 7.605072e-11
+## 4 G2|G3 5.07666337 0.59077124  8.593281  99.26751 1.243450e-13
+## 5 G3|G4 5.68121968 0.60030679  9.463861 111.33775 4.440892e-16
+## 6 G4|G5 6.81541423 0.66198026 10.295495  54.31888 2.264855e-14</code></pre>
 </div>
-<div id="log-reg-prediction-of-rows" class="section level1" number="7">
-<h1 number="7"><span class="header-section-number">7</span> log reg prediction of rows</h1>
+<div id="log-reg-prediction-of-rows" class="section level1" number="9">
+<h1 number="9"><span class="header-section-number">9</span> log reg prediction of rows</h1>
 <p>[[[MOVE UPCOMING TWO PARAGRAPHS TO SIMULATION SECTION]]]</p>
 <p>Additional parameters that come with the use of <code>mice.impute.cart()</code> are the complexity parameter <code>cp</code> and the minimum number of observations in any terminal node <code>minbucket</code>, that both restrain the flexibility of the imputation model. Appropriate values for these parameters, as well as the input for the <code>predictorMatrix</code>, depend on the data at hand. Hence, the specification of these parameters will be illustrated using an actual dataset. The <code>boys</code> data <span class="citation">(Fredriks et al., 2000)</span> that is in-built within the <code>mice</code> package is used to illustrate the specification of these parameters accordingly. <strong>DETERMINE WHETHER THIS DATASET SUFFICES; BECAUSE IMPUTATION MIGHT MAKE THE DATA ARTIFICIALLY SIMILAR BEFORE SYNTHESIZING, MAKING SYNTHESIZING TOO EASY</strong> Unfortunately, this dataset does not differ from the vast majority of collected datasets, in the sense that it suffers from missing data. For simplicity, the data is completed using the default <code>mice</code> imputation model to create a single, fully observed dataset. The data consists of the values of <span class="math inline">\(748\)</span> Dutch boys on the following <span class="math inline">\(9\)</span> variables: age (in years), height (in cm), weight (in kg), body mass index (BMI), head circumference (in cm), Genital Tanner stage (G1-G5), testicular volume (in ml) and region.</p>
 <p>The values of the parameters <code>cp</code> and <code>minbucket</code> ought to adhere to the call for imputation models that are as flexible as possible. Accordingly, the complexity parameter is fixed at <code>cp = 1e-16 [[[CHECK THIS]]]</code> rather than the default value <code>1e-04</code> and the minimum number of observations in each terminal node is set at <code>minbucket</code> <span class="math inline">\(= 3\)</span> rather than the default value <span class="math inline">\(5\)</span>. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. The predictor matrix was specified so that BMI was not imputed from a model, but calculated from the imputed height and weight values (<span class="math inline">\(BMI = kg / m^2\)</span>), an approach called passive imputation. Additionally, BMI is excluded as a predictor for weight and height, because BMI values are directly dependent on the values of weight and height. All other variables <span class="math inline">\(Y_{-j}\)</span> are used as predictors for variable <span class="math inline">\(Y_j\)</span>. Additionally, the number of imputations is set to <span class="math inline">\(m = 5\)</span>.</p>
 </div>
-<div id="synthesizing-data-with-mice" class="section level1" number="8">
-<h1 number="8"><span class="header-section-number">8</span> Synthesizing data with <code>mice</code></h1>
+<div id="synthesizing-data-with-mice" class="section level1" number="10">
+<h1 number="10"><span class="header-section-number">10</span> Synthesizing data with <code>mice</code></h1>
 <p>To display the applicability of <code>mice</code> for generating synthetic data, we will display three distinct simulation set-ups that build up in complexity. The first case considers a multivariable regression model, in which the normally distributed outcome variable <span class="math inline">\(y\)</span> is regressed on three normally distributed predictor variables <span class="math inline">\(\{x_1, x_2, x_3\}\)</span>, which are bivariately correlated with <span class="math inline">\(\rho_{x_i, x_j} = 0.3\)</span>. The regression coefficients are specified in such a way that <span class="math inline">\(\beta_2\)</span> equals <span class="math inline">\(2\beta_1\)</span> and <span class="math inline">\(\beta_3\)</span> equals <span class="math inline">\(3\beta_1\)</span>. Additionally, the proportion explained variance in <span class="math inline">\(y\)</span> equals <span class="math inline">\(R^2=0.25\)</span>. Hence, the population regression weights equal <span class="math inline">\(\beta_1 = 0.11\)</span>, <span class="math inline">\(\beta_2 = 0.22\)</span> and <span class="math inline">\(\beta_3 = 0.33\)</span>.</p>
 <p>The second simulation involves a logistic regression model, in which <span class="math inline">\(y\)</span> follows a Bernoulli distribution with probability <span class="math display">\[
 \frac{1}{1 + \text{exp}\{-X\beta\}},
@@ -594,8 +617,8 @@ To select the values that are to be replaced, one can utilize the `where` parame
 <li>All fun and game, but statistical properties should be intact</li>
 <li>In this paper we demonstrate a straigthforward workflow for generating synthetic data sets and we investigate how to obtain valid inferences from synthesized data.</li>
 </ul>
-<div id="generating-synthetic-data-with-mice-2" class="section level2" number="8.1">
-<h2 number="8.1"><span class="header-section-number">8.1</span> Generating synthetic data with mice</h2>
+<div id="generating-synthetic-data-with-mice-2" class="section level2" number="10.1">
+<h2 number="10.1"><span class="header-section-number">10.1</span> Generating synthetic data with mice</h2>
 <ul>
 <li>Explain FCS in short</li>
 <li>Demonstrate procedure with where matrix and explain rationale</li>
@@ -603,14 +626,14 @@ To select the values that are to be replaced, one can utilize the `where` parame
 <li>Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.</li>
 </ul>
 </div>
-<div id="drawing-inferences-from-mice-synthesized-data-1" class="section level2" number="8.2">
-<h2 number="8.2"><span class="header-section-number">8.2</span> Drawing inferences from mice synthesized data</h2>
+<div id="drawing-inferences-from-mice-synthesized-data-1" class="section level2" number="10.2">
+<h2 number="10.2"><span class="header-section-number">10.2</span> Drawing inferences from mice synthesized data</h2>
 <ul>
 <li>What ways are there (with minimal - if any - escapes to partial/fully synthesized)</li>
 <li>If based on your earlier work, cite the online reference for your simulations and give URL. No need to go into detail about it here.</li>
 </ul>
-<div id="simulation-1" class="section level3" number="8.2.1">
-<h3 number="8.2.1"><span class="header-section-number">8.2.1</span> Simulation</h3>
+<div id="simulation-1" class="section level3" number="10.2.1">
+<h3 number="10.2.1"><span class="header-section-number">10.2.1</span> Simulation</h3>
 <ul>
 <li>Simulation set-up</li>
 <li>Evaluation criteria explained: the bias cov ciw triangle</li>
@@ -618,8 +641,8 @@ To select the values that are to be replaced, one can utilize the `where` parame
 </ul>
 </div>
 </div>
-<div id="discussion-1" class="section level2" number="8.3">
-<h2 number="8.3"><span class="header-section-number">8.3</span> Discussion</h2>
+<div id="discussion-1" class="section level2" number="10.3">
+<h2 number="10.3"><span class="header-section-number">10.3</span> Discussion</h2>
 <ul>
 <li>Summarize findings</li>
 <li>Stress that only holds for sampled data. Explain that for fully observed populations, one would need no sampling variance.</li>
@@ -627,31 +650,31 @@ To select the values that are to be replaced, one can utilize the `where` parame
 </ul>
 </div>
 </div>
-<div id="fullypartially-synthetic-data" class="section level1" number="9">
-<h1 number="9"><span class="header-section-number">9</span> FULLY/PARTIALLY synthetic data</h1>
-<div id="fully-synthetic-data" class="section level2" number="9.1">
-<h2 number="9.1"><span class="header-section-number">9.1</span> Fully synthetic data</h2>
+<div id="fullypartially-synthetic-data" class="section level1" number="11">
+<h1 number="11"><span class="header-section-number">11</span> FULLY/PARTIALLY synthetic data</h1>
+<div id="fully-synthetic-data" class="section level2" number="11.1">
+<h2 number="11.1"><span class="header-section-number">11.1</span> Fully synthetic data</h2>
 <p>DISCUSS APPROACH IN MORE DEPTH</p>
 <p>Explain pooling rules (variance estimates + adjusted variance estimates + simple estimator proposed by synthpop authors)</p>
 </div>
-<div id="partially-synthetic-data" class="section level2" number="9.2">
-<h2 number="9.2"><span class="header-section-number">9.2</span> Partially synthetic data</h2>
+<div id="partially-synthetic-data" class="section level2" number="11.2">
+<h2 number="11.2"><span class="header-section-number">11.2</span> Partially synthetic data</h2>
 <p>DISCUSS APPROACH IN MORE DEPTH</p>
 <p>Explain pooling rules (variance estimates)</p>
 </div>
 </div>
-<div id="mice" class="section level1" number="10">
-<h1 number="10"><span class="header-section-number">10</span> Mice</h1>
+<div id="mice" class="section level1" number="12">
+<h1 number="12"><span class="header-section-number">12</span> Mice</h1>
 <ul>
 <li>Discuss the FCS algorithm in more detail.</li>
 <li>Discuss mice, predominantly the imputation algorithm in greater depth</li>
 <li>Procedure: observed values can be regarded as starting values, so that all variables can be used for the synthesis of all other variables.</li>
 </ul>
 </div>
-<div id="simulations" class="section level1" number="11">
-<h1 number="11"><span class="header-section-number">11</span> Simulations</h1>
-<div id="methods" class="section level2" number="11.1">
-<h2 number="11.1"><span class="header-section-number">11.1</span> Methods</h2>
+<div id="simulations" class="section level1" number="13">
+<h1 number="13"><span class="header-section-number">13</span> Simulations</h1>
+<div id="methods" class="section level2" number="13.1">
+<h2 number="13.1"><span class="header-section-number">13.1</span> Methods</h2>
 <ul>
 <li>Boys data - bootstrapped to obtain a population.</li>
 <li>explain simple synthetic data procedure</li>
@@ -659,8 +682,8 @@ To select the values that are to be replaced, one can utilize the `where` parame
 <li>CART has been proposed by Reiter</li>
 </ul>
 </div>
-<div id="results" class="section level2" number="11.2">
-<h2 number="11.2"><span class="header-section-number">11.2</span> Results</h2>
+<div id="results" class="section level2" number="13.2">
+<h2 number="13.2"><span class="header-section-number">13.2</span> Results</h2>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
