@@ -31,7 +31,7 @@ csl: "apa-6th-edition.csl"
 ## Generating synthetic data with `mice`
 
 - [x] Explain FCS in short.
-- [ ] Demonstrate procedure with `where-matrix` and explain rationale.
+- [x] Demonstrate procedure with `where-matrix` and explain rationale.
 - [ ] Demonstrate that this is a reasonable approach, based on a figure that shows the observed and synthetic relationships side-by-side (e.g. `wgt ~ age + gen`).
 - [ ] Observed values can be regarded as starting values for the imputation model. Since the observed data is used for creating the imputation models, no iterations are required. That is, the model is fixed, and not dependent on the imputed values.
 
@@ -120,6 +120,30 @@ syn <- mice(boys,
                            ncol = ncol(boys)))
 ```
 
+
+# psych::describe
+# correlation matrix
+# wgt ~ age + bmi | hgt ~ age + wgt | gen ~ age + 
+
+```{r}
+library(mice)
+library(dplyr)
+library(magrittr)
+meth <- make.method(boys)
+meth["bmi"] <- "~ I(wgt / (hgt / 100)^2)"
+pred <- make.predictorMatrix(boys)
+pred[c("hgt", "wgt"), "bmi"] <- 0
+imp <-mice(boys, 
+           meth = meth, 
+           pred = pred, 
+           print = FALSE)
+with(imp, lm(wgt ~ age + bmi))%>% pool() %>% summary()
+with(imp, lm(bmi ~ I((wgt / (hgt/100)^2))))%>% pool() %>% summary()
+library(MASS)
+with(imp, polr(gen ~ age + bmi, Hess = TRUE)) %>% pool() %>% summary()
+```
+
+# log reg prediction of rows
 
 [[[MOVE UPCOMING TWO PARAGRAPHS TO SIMULATION SECTION]]]
 
