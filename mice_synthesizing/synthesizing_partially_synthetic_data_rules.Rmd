@@ -46,8 +46,8 @@ with corresponding degrees of freedom
 
 $$
 \begin{aligned}
-\nu_p &= (m - 1)(1 + \frac{\bar{u}_m}{\frac{b_m}{m}}) \\
-&= (m - 1)(1 + \frac{m \cdot \bar{u}_m}{b_m}).
+\nu_p &= (m - 1)(1 + \frac{\bar{u}_m}{\frac{b_m}{m}})^2 \\
+&= (m - 1)(1 + \frac{m \cdot \bar{u}_m}{b_m})^2.
 \end{aligned}
 $$
 
@@ -126,6 +126,44 @@ boot_cart_cp_min3 %>%
   map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
   map_dfr(pool3.syn) %>%
   ci_cov(., truemodel) %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping, 
+        synthesizing (with adjusted mice CART settings) and analysing
+        the boys dataset 500 times") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```{r}
+boot_cart_maxit_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(~mice:::pool.syn(.x) %>% summary(conf.int = TRUE) %>% as.data.frame) %>%
+  mutate(true_coef = rep(coef(truemodel), nrow(.) / length(coef(truemodel))),
+         covered = `2.5 %` < true_coef & true_coef < `97.5 %`) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - true_coef),
+            var = mean(std.error^2),
+            lower = mean(`2.5 %`),
+            upper = mean(`97.5 %`),
+            coverage = mean(covered), .groups = "drop") %>%
+    kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping, 
+        synthesizing (with adjusted mice CART settings) and analysing
+        the boys dataset 500 times") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+boot_cart_cp_min3 %>%
+  map(function(x) x %$% lm(wgt ~ age + hgt)) %>%
+  map_dfr(~mice:::pool.syn(.x) %>% summary(conf.int = TRUE) %>% as.data.frame) %>%
+  mutate(true_coef = rep(coef(truemodel), nrow(.) / length(coef(truemodel))),
+         covered = `2.5 %` < true_coef & true_coef < `97.5 %`) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - true_coef),
+            var = mean(std.error^2),
+            lower = mean(`2.5 %`),
+            upper = mean(`97.5 %`),
+            coverage = mean(covered), .groups = "drop") %>%
   kable(digits = 3,
         caption = "Synthetic regression estimates after bootstrapping, 
         synthesizing (with adjusted mice CART settings) and analysing
