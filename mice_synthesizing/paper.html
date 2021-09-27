@@ -347,7 +347,7 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker &amp; Gerko Vink</h4>
-<h4 class="date">26-09-2021</h4>
+<h4 class="date">27-09-2021</h4>
 
 </div>
 
@@ -480,7 +480,16 @@ There are also enormous institutional obsta-cles to advancing a computational so
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">predictorMatrix =</span> pred)</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">complete</span>(imp)</span></code></pre></div>
-<p>To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the <code>boys</code> data will be synthesized with <span class="math inline">\(m = 5\)</span> imputations. The data will be synthesized using the <code>CART</code> imputation method. Additional parameters that come with the use of <code>mice.impute.cart()</code> are the complexity parameter <code>cp</code> and the minimum number of observations in any terminal node <code>minbucket</code>, that both constrain the flexibility of the imputation model. The values of the parameters <code>cp</code> and <code>minbucket</code> ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the <code>predictorMatrix</code>, depend on the data at hand. In the current example, the complexity parameter is specified at <code>cp = 1e-08</code> rather than the default value <code>1e-04</code>, and the minimum number of observations in each terminal node is set at <code>minbucket</code> <span class="math inline">\(= 3\)</span> rather than the default value <span class="math inline">\(5\)</span>. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to <code>maxit = 1</code>.</p>
+<p>To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the <code>boys</code> data will be synthesized with <span class="math inline">\(m = 5\)</span> imputations. The data will be synthesized using the <code>CART</code> imputation method for all predictors except BMI, which will be synthesized using passive imputation according to the model <code>~I(wgt / (hgt / 100)^2)</code>. Additional parameters that come with the use of <code>mice.impute.cart()</code> are the complexity parameter <code>cp</code> and the minimum number of observations in any terminal node <code>minbucket</code>, that both constrain the flexibility of the imputation model. The values of the parameters <code>cp</code> and <code>minbucket</code> ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the <code>predictorMatrix</code>, depend on the data at hand. In the current example, the complexity parameter is specified at <code>cp = 1e-08</code> rather than the default value <code>1e-04</code>, and the minimum number of observations in each terminal node is set at <code>minbucket</code> <span class="math inline">\(= 3\)</span> rather than the default value <span class="math inline">\(5\)</span>. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to <code>maxit = 1</code>.</p>
+<p>To assess the performance of <code>mice</code> for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the <span class="math inline">\(95\%\)</span> confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, <span class="math inline">\(95\%\)</span> confidence intervals must be calculated using an adjusted variance estimator that accounts for the increase in variance due to imputation <span class="citation">(Drechsler, 2011; Reiter, 2003)</span>. However, these variance estimators are not the same. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic datasets only suffers from the fact that a finite number of <span class="math inline">\(m\)</span> synthetic datasets are used to resemble the observed data. Hence, the according pooling rules for synthetic data as developed by <span class="citation">Reiter (2003)</span> are</p>
+<span class="math display">\[\begin{aligned}
+
+\bar{q}_m &amp;= \sum_{l = 1}^m \frac{q^{(l)}}{m}, \\
+
+b_m       &amp;= \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
+
+\bar{u}_m &amp;= \sum_{l = 1} \frac{u^{(l)}}{m}.
+\end{aligned}\]</span>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>syn <span class="ot">&lt;-</span> <span class="fu">mice</span>(boys,</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="dv">10</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">maxit =</span> <span class="dv">7</span>,</span>
@@ -741,6 +750,9 @@ Ohm, P. (2009). Broken <span>Promises</span> of <span>Privacy</span>: <span>Resp
 </div>
 <div id="ref-Rproject" class="csl-entry">
 R Core Team. (2021). <em>R: A language and environment for statistical computing</em>. Retrieved from <a href="https://www.R-project.org/">https://www.R-project.org/</a>
+</div>
+<div id="ref-reiter_partially_inference_2003" class="csl-entry">
+Reiter, J. P. (2003). Inference for partially synthetic, public use microdata sets. <em>Survey Methodology</em>, <em>29</em>(2), 181–188.
 </div>
 <div id="ref-reiter_cart_2005" class="csl-entry">
 Reiter, J. P. (2005). Using CART to generate partially synthetic public use microdata. <em>Journal of Official Statistics</em>, <em>21</em>(3), 441.
