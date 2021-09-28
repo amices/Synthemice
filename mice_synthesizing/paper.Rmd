@@ -155,7 +155,192 @@ imp <- mice(boys,
 data <- complete(imp)
 ```
 
-To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the `boys` data will be synthesized with $m = 5$ imputations. The data will be synthesized using the `CART` imputation method. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to `maxit = 1`.
+To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the `boys` data will be synthesized with $m = 5$ imputations. The data will be synthesized using the `CART` imputation method for all predictors except BMI, which will be synthesized using passive imputation according to the model `~I(wgt / (hgt / 100)^2)`. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to `maxit = 1`.
+
+To assess the performance of `mice` for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the $95\%$ confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, $95\%$ confidence intervals must be calculated using an adjusted variance estimator that accounts for the increase in variance due to imputation [@reiter_partially_inference_2003; @drechsler_synthetic_2011]. However, these variance estimators are not the same. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic datasets only suffers from the fact that a finite number of $m$ synthetic datasets are used to resemble the observed data. Hence, the according pooling rules for synthetic data as developed by @reiter_partially_inference_2003 are
+
+\begin{aligned}
+
+\bar{q}_m &= \sum_{l = 1}^m \frac{q^{(l)}}{m}, \\
+
+b_m       &= \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
+
+\bar{u}_m &= \sum_{l = 1} \frac{u^{(l)}}{m}.
+
+\end{aligned}
+
+```{r, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE}
+plan(multisession) # increase speed through futures
+
+true_model_age <- lm(age ~ wgt + hgt, data) # model 1
+true_model_wgt <- lm(wgt ~ age + hgt, data) # model 2
+true_model_gen <- MASS::polr(gen ~ age + hc + reg, data, Hess = TRUE) # model 3
+
+coefs_age <- broom::tidy(true_model_age)$estimate # extract coefficients of model 1
+coefs_wgt <- broom::tidy(true_model_wgt)$estimate # extract coefficients of model 2
+coefs_gen <- broom::tidy(true_model_gen)$estimate # extract coefficients of model 3
+
+nsim <- 1000 # use 1000 iterations
+
+bootstrap_samples <- 
+  modelr::bootstrap(data = data, n = nsim) %$% 
+  strap %>% 
+  map(as_tibble)
+
+post <- make.post(data)
+post["bmi"] <- "imp[[j]][, i] <- imp[['wgt']][, i] / (imp[['hgt']][, i] / 100)^2"
+
+synthetic_samples <- 
+  bootstrap_samples %>%
+  future_map(function(x) {
+    x %>% mice(m = 5, 
+               maxit = 1,
+               method = "cart",
+               minbucket = 3,
+               cp = 1e-08,
+               predictorMatrix = pred,
+               post = post,
+               where = matrix(TRUE, nrow(data), ncol(data)),
+               print = F)
+}, .options = furrr_options(seed = as.integer(123)))
+
+true_age <- 
+  bootstrap_samples %>%
+  map_dfr(~lm(age ~ wgt + hgt, .x) %>%
+            broom::tidy(conf.int = TRUE))
+
+true_wgt <-
+  bootstrap_samples %>%
+  map_dfr(~lm(wgt ~ age + hgt, .x) %>% 
+            broom::tidy(conf.int = TRUE))
+
+true_gen <- 
+  bootstrap_samples %>%
+  map_dfr(~MASS::polr(gen ~ age + hc + reg, .x, Hess = TRUE) %>%
+            broom::tidy(conf.int = TRUE))
+
+synthetic_age <- 
+  synthetic_samples %>%
+  map_dfr(function(x) {
+    x %$% 
+      lm(age ~ wgt + hgt) %>%
+      mice:::pool.syn() %>%
+      summary(conf.int = TRUE)
+    })
+
+synthetic_wgt <- 
+  synthetic_samples %>%
+  map_dfr(function(x) {
+    x %$%
+      lm(wgt ~ age + hgt) %>%
+      mice:::pool.syn() %>%
+      summary(conf.int = TRUE)
+  })
+
+synthetic_gen <- 
+  synthetic_samples %>%
+  map_dfr(function(x) {
+    x %$%
+      MASS::polr(gen ~ age + hc + reg, Hess = TRUE) %>%
+      mice:::pool.syn() %>%
+      summary(conf.int = TRUE)
+  })
+```
+
+```{r}
+true_age %>%
+  mutate(truth = rep(coefs_age, nrow(.) / length(coefs_age)),
+         covered = conf.low < truth & truth < conf.high) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(conf.low),
+            upper = mean(conf.high),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Bootstrapped regression estimates (1000 times) for age 
+        regressed on weight and height.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+synthetic_age %>%
+  mutate(truth = rep(coefs_age, nrow(.) / length(coefs_age)),
+         covered = `2.5 %` < truth & truth < `97.5 %`) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(`2.5 %`),
+            upper = mean(`97.5 %`),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping (1000 
+        times) and synthesizing for age regressed on weight and height.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+true_wgt %>%
+  mutate(truth = rep(coefs_wgt, nrow(.) / length(coefs_wgt)),
+         covered = conf.low < truth & truth < conf.high) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(conf.low),
+            upper = mean(conf.high),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Bootstrapped regression estimates (1000 times) for weight 
+        regressed on age and height.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+synthetic_wgt %>%
+  mutate(truth = rep(coefs_wgt, nrow(.) / length(coefs_wgt)),
+         covered = `2.5 %` < truth & truth < `97.5 %`) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(`2.5 %`),
+            upper = mean(`97.5 %`),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping (1000 
+        times) and synthesizing for weight regressed on age and height.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+true_gen %>%
+  mutate(truth = rep(coefs_gen, nrow(.) / length(coefs_gen)),
+         covered = conf.low < truth & truth < conf.high) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(conf.low),
+            upper = mean(conf.high),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Bootstrapped regression estimates (1000 times) for 
+        genital Tanner stage regressed on age, head circumference and 
+        region. ") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+synthetic_gen %>%
+  mutate(truth = rep(coefs_gen, nrow(.) / length(coefs_gen)),
+         covered = `2.5 %` < truth & truth < `97.5 %`) %>%
+  group_by(term) %>%
+  summarize(estimate = mean(estimate),
+            bias = mean(estimate - truth),
+            var = mean(std.error^2),
+            lower = mean(`2.5 %`),
+            upper = mean(`97.5 %`),
+            coverage = mean(covered), .groups = "drop") %>%
+  kable(digits = 3,
+        caption = "Synthetic regression estimates after bootstrapping (1000
+        times) and synthesizing for genital Tanner stage regressed on age,
+        head circumference and region.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
 
 ```{r eval = FALSE}
 syn <- mice(boys,
