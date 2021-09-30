@@ -349,7 +349,7 @@ div.tocify {
 <h1 class="title toc-ignore">Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with <em>mice</em></h1>
 <h3 class="subtitle">Anony<em>mice</em>d shareable data: Using <em>mice</em> to create multiply imputed synthetic datasets</h3>
 <h4 class="author">Thom Volker &amp; Gerko Vink</h4>
-<h4 class="date">28-09-2021</h4>
+<h4 class="date">30-09-2021</h4>
 
 </div>
 
@@ -482,17 +482,23 @@ There are also enormous institutional obsta-cles to advancing a computational so
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">predictorMatrix =</span> pred)</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">complete</span>(imp)</span></code></pre></div>
+<div id="simulation-methods" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> Simulation methods</h2>
 <p>To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the <code>boys</code> data will be synthesized with <span class="math inline">\(m = 5\)</span> imputations. The data will be synthesized using the <code>CART</code> imputation method for all predictors except BMI, which will be synthesized using passive imputation according to the model <code>~I(wgt / (hgt / 100)^2)</code>. Additional parameters that come with the use of <code>mice.impute.cart()</code> are the complexity parameter <code>cp</code> and the minimum number of observations in any terminal node <code>minbucket</code>, that both constrain the flexibility of the imputation model. The values of the parameters <code>cp</code> and <code>minbucket</code> ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the <code>predictorMatrix</code>, depend on the data at hand. In the current example, the complexity parameter is specified at <code>cp = 1e-08</code> rather than the default value <code>1e-04</code>, and the minimum number of observations in each terminal node is set at <code>minbucket</code> <span class="math inline">\(= 3\)</span> rather than the default value <span class="math inline">\(5\)</span>. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic dataset is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to <code>maxit = 1</code>.</p>
-<p>To assess the performance of <code>mice</code> for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the <span class="math inline">\(95\%\)</span> confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, <span class="math inline">\(95\%\)</span> confidence intervals must be calculated using an adjusted variance estimator that accounts for the increase in variance due to imputation <span class="citation">(Drechsler, 2011; Reiter, 2003)</span>. However, these variance estimators are not the same. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic datasets only suffers from the fact that a finite number of <span class="math inline">\(m\)</span> synthetic datasets are used to resemble the observed data. Hence, the according pooling rules for synthetic data as developed by <span class="citation">Reiter (2003)</span> are</p>
-<span class="math display">\[\begin{aligned}
-
-\bar{q}_m &amp;= \sum_{l = 1}^m \frac{q^{(l)}}{m}, \\
-
-b_m       &amp;= \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
-
-\bar{u}_m &amp;= \sum_{l = 1} \frac{u^{(l)}}{m}.
-
-\end{aligned}\]</span>
+<p>To assess the performance of <code>mice</code> for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the <span class="math inline">\(95\%\)</span> confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, correct inferences from synthetic data requires correct pooling over the multiply imputed datasets.</p>
+<p>Obtaining a final point estimate of the parameter of interest <span class="math inline">\(Q\)</span> after imputation is fairly easy and no different from pooling in the case of missing data <span class="citation">(Rubin, 1987)</span>. One can calculate the average of the <span class="math inline">\(m\)</span> point estimates <span class="math inline">\(q^{(l)}\)</span> <span class="math display">\[
+\bar{q}_m = \sum_{l = 1}^m \frac{q^{(l)}}{m}.
+\]</span> Also similarly to the missing data case, variances, and subsequently confidence intervals, should incorporate the increase in variance that is due to imputation <span class="citation">(Drechsler, 2011; Reiter, 2003)</span>. Yet, the increase in variance due to imputation differs according to whether missing values are imputed or observed data is overimputed with missing values. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic datasets only suffers from the fact that a finite number of <span class="math inline">\(m\)</span> synthetic datasets are used to resemble the observed data. Hence, the according variance estimate for synthetic data as developed by <span class="citation">Reiter (2003)</span> yields <span class="math display">\[
+T = \bar{u}_m + \frac{b_m}{m},
+\]</span> with “between-imputation” variance</p>
+<p><span class="math display">\[
+b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
+\]</span> and “within-imputation” variance <span class="math display">\[
+\bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
+\]</span> with <span class="math inline">\(u^{(l)}\)</span> reflecting the variance estimate in every imputed dataset.</p>
+</div>
+<div id="simulation-results" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Simulation results</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession) <span class="co"># increase speed through futures</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>true_model_age <span class="ot">&lt;-</span> <span class="fu">lm</span>(age <span class="sc">~</span> wgt <span class="sc">+</span> hgt, data) <span class="co"># model 1</span></span>
@@ -1591,6 +1597,7 @@ G4|G5
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ncol =</span> <span class="fu">ncol</span>(boys)),</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">cp =</span> <span class="fl">1e-08</span>,</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">minbucket =</span> <span class="dv">3</span>)</span></code></pre></div>
+</div>
 </div>
 <div id="simulation-setup" class="section level1" number="5">
 <h1 number="5"><span class="header-section-number">5</span> Simulation setup</h1>
