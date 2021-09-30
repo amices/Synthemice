@@ -354,6 +354,114 @@ synthetic_gen %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
+# Variable plots
+
+```{r}
+## Merely illustrative, single dataset, plot of age
+synthetic_samples[[1]] %>% 
+  complete(action = "long", include = TRUE) %>%
+  mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
+  ggplot(mapping = aes(x = age, y = ..density.., fill = Synthetic)) +
+  geom_histogram(position = "dodge") +
+  scale_fill_brewer(palette = "Paired") +
+  theme_classic()
+
+## Merely illustrative, single dataset, plot of gen
+
+synthetic_samples[[234]] %>%
+  complete(action = "long", include = TRUE) %>% 
+  mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
+  ggplot(mapping = aes(x = gen, fill = Synthetic, group = Synthetic)) +
+  geom_bar(aes(y = ..prop..), position = "dodge2") +
+  scale_fill_brewer(palette = "Paired") +
+  theme_classic()
+
+## Merely illustrative, single dataset, plot of bmi by region
+synthetic_samples[[678]] %>%
+  complete(action = "long", include = TRUE) %>%
+  mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
+  ggplot(mapping = aes(x = reg, y = bmi, fill = Synthetic)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Paired") +
+  theme_classic()
+```
+
+
+# Parameter plots
+
+```{r}
+# Univariate -- sampling distribution of the mean of age
+synthetic_samples %>%
+  map_dfr(function(x) {
+    x %>%
+      complete(action = "long", include = TRUE) %>%
+      mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
+      group_by(Synthetic) %>%
+      dplyr::summarize(`Mean age` = mean(age))
+}) %>%
+  ggplot(mapping = aes(x = `Mean age`, y = ..density.., fill = Synthetic)) +
+  geom_histogram(position = "dodge") +
+  scale_fill_brewer(palette = "Paired") +
+  theme_classic()
+
+# Univariate -- sampling distribution of the proportion of cases in 
+# every gen category
+synthetic_samples %>%
+  map_dfr(function(x) {
+    x %>%
+      complete(action = "long", include = TRUE) %>% 
+      mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
+      group_by(Synthetic, gen) %>%
+      dplyr::summarize(number = n(), .groups = "drop") %>%
+      group_by(Synthetic) %>%
+      mutate(prop = number / sum(number))
+  }) %>%
+  ggplot(aes(x = gen, y = prop, fill = Synthetic)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Paired") +
+  theme_classic()
+
+bind_rows(`Real data`      = select(true_age, 
+                                    Variable = term, 
+                                    Estimate = estimate),
+          `Synthetic data` = select(synthetic_age, 
+                                    Variable = term, 
+                                    Estimate = estimate),
+          .id = "Synthetic") %>%
+  ggplot(aes(x = Estimate, fill = Synthetic)) +
+  geom_density(alpha = 0.8) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_classic() +
+  facet_wrap(~Variable, scales = "free")
+
+bind_rows(`Real data`      = select(true_wgt, 
+                                    Variable = term, 
+                                    Estimate = estimate),
+          `Synthetic data` = select(synthetic_wgt, 
+                                    Variable = term, 
+                                    Estimate = estimate),
+          .id = "Synthetic") %>%
+  ggplot(aes(x = Estimate, fill = Synthetic)) +
+  geom_density(alpha = 0.8) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_classic() +
+  facet_wrap(~Variable, scales = "free")
+
+bind_rows(`Real data`      = select(true_gen,
+                                    Variable = term, 
+                                    Estimate = estimate),
+          `Synthetic data` = select(synthetic_gen,
+                                    Variable = term,
+                                    Estimate = estimate),
+          .id = "Synthetic") %>%
+  ggplot(aes(x = Estimate, fill = Synthetic)) +
+  geom_density(alpha = 0.8) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_classic() +
+  facet_wrap(~Variable, nrow = 4, scales = "free") +
+  theme(legend.position = "right")
+```
+
 
 ```{r eval = FALSE}
 syn <- mice(boys,
