@@ -36,3 +36,6 @@ vignettes/*.pdf
 *.knit.md
 .DS_Store
 ads_thesis/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData
+
+# Do not ignore paper cache
+!*/mice_synthesizing/paper_cache

@@ -2,7 +2,7 @@
 title: "Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic datasets with *mice*"
 subtitle: "Anony*mice*d shareable data: Using *mice* to create multiply imputed synthetic datasets" 
 author:
-- Thom Volker & Gerko Vink
+- Thom Volker^[Helpful and stimulating discussions with Stef van Buuren, Hanne Oberman, Paulina von Stackelberg, Mirthe Hendriks and Stijn Overbeek are gratefully acknowledged.] & Gerko Vink
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
   html_document:
