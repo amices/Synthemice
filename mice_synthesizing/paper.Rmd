@@ -582,9 +582,13 @@ We demonstrated that generating synthetic data sets with `mice` in `R` is a stra
 
 To non-statisticians, the procedure of generating multiple synthetic sets may seem overly complicated. We would like to emphasize that analyzing a single synthesized set, while perhaps unbiased, would underestimate the variance properties that are so important in drawing statistical inferences from finite data sets. After all, we are often not interested in the sample at hand, but in the underlying data generating mechanism, such as the population. Properly capturing the uncertainty of synthetic data sets, just like with incomplete data sets, is therefore paramount. 
 
+Iets over meerdere data sets en disclosure risk. een cel can in theorie eigenschappen krijgen toegewezen die niet wenselijk zijn. dat is één van de mogelijkheden van what could have been. 
+
 That said, while the field of data synthetisation originated decades ago, it is more relevant today than ever. In our study we outline a standard research workflow where the goal is to synthesize a complete data set. To simplify the simulation we adopted a bootstrapping scheme to induce sampling variance in order to conform to the combination procedure defined by @reiter_partially_inference_2003. Ideally, one would like to omit the bootstrap from the synthetization to adopt a scheme where the sampled data itself serves as a reference: much like the procedure outlined in @vink2014pooling for incomplete data simulation. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
 
 There are other developments that can generate synthetic data sets. For example, the `synthpop` [REF] package in `R` would yield valid synthetic data sets if and only if the *true* data is completely observed. When the data is not completely observed, the single-iteration monotone set-up of the algorithm will bias estimates [REF IBRAHIM]. To avoid this, one could adopt a two-step approach wherein the incomplete values are multiply imputed before synthetization. Given $m$ multiple imputations and synthetizations, at least $m^2$ synthetic data sets are then in order. The flexibility with `mice` is that both unobserved and observed data values can be synthesized at once, without the need for a two-step approach. With `mice` $m$ synthetic sets are sufficient.
+
+itereren. als missingness en synth, dan moet je itereren. 
 
 The ease of use when synthesizing data with `mice` in `R`, together with the validity of inferences obtained through this procedure opens up a wealth of possibilities for data dissemination and further research of initially private data. 
 
