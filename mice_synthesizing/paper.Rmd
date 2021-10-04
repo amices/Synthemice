@@ -139,13 +139,19 @@ We demonstrate the suitability of using `mice` for synthesization using a simula
 | tv     | testicular volume (ml)     |
 | reg    | region                     |
 
-Unfortunately, this data set does not differ from the vast majority of collected data sets, in the sense that it suffers from missing data. For simplicity, the data is completed using the default `mice` imputation model for all predictors except `bmi`, which is imputed using a passive imputation model due to the deterministic relation with weight and height ($\text{BMI} = \frac{\text{weight}}{\text{height (in meters)}^2}$) to create a single, fully observed data set:
+Unfortunately, this data set does not differ from the vast majority of collected data sets, in the sense that it suffers from missing data. For simplicity, the data is completed using the default `mice` imputation model for all predictors except `bmi`, which is passively imputed using its deterministic relation with weight and height.
 
 ```{r, include = FALSE}
 library(mice)
+library(tibble)
 library(magrittr)
 library(tidyverse)
 library(furrr)
+library(knitr)
+library(kableExtra)
+library(psych)
+library(purrr)
+library(dplyr)
 library(knitr)
 library(kableExtra)
 ```
@@ -171,7 +177,7 @@ data <- complete(imp)
 
 ## Simulation methods
 
-To induce an appropriate amount of sampling variance, 1000 bootstrap samples of the `boys` data will be synthesized with $m = 5$ imputations. The data will be synthesized using the `CART` imputation method for all predictors except BMI, which will be synthesized using passive imputation according to the model `~I(wgt / (hgt / 100)^2)`. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to `maxit = 1`.
+To induce sampling variance, 1000 bootstrap samples of the `boys` data will be synthesized with $m = 5$ imputations. Synthetic values are generated using the `CART` imputation method for all columns, except for `bmi`. The deterministic relation `bmi` which will be synthesized passively based on the synthetic values for `hgt` and `wgt` to preserve the relation in the synthetic data. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to `maxit = 1`.
 
 To assess the performance of `mice` for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the $95\%$ confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, correct inferences from synthetic data requires correct pooling over the multiply imputed data sets. 
 
@@ -179,22 +185,27 @@ Obtaining a final point estimate of the parameter of interest $Q$ after imputati
 $$
 \bar{q}_m = \sum_{l = 1}^m \frac{q^{(l)}}{m}.
 $$
-Also similarly to the missing data case, variances, and subsequently confidence intervals, should incorporate the increase in variance that is due to imputation [@reiter_partially_inference_2003; @drechsler_synthetic_2011]. Yet, the increase in variance due to imputation differs according to whether missing values are imputed or observed data is overimputed with missing values. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic data sets only suffers from the fact that a finite number of $m$ synthetic data sets are used to resemble the observed data. Hence, the according variance estimate for synthetic data as developed by @reiter_partially_inference_2003 yields
+with $l = 1, \dots, m$. 
+
+Similarly to the missing data case, variances, and subsequently confidence intervals, should incorporate the increase in variance that is due to imputation [@reiter_partially_inference_2003; @drechsler_synthetic_2011]. Yet, the increase in variance due to imputation differs according to whether missing values are imputed or observed data is overimputed with missing values. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic data sets only suffers from the fact that a finite number of $m$ synthetic data sets are used to resemble the observed data. Hence, the according variance estimate for synthetic data as developed by @reiter_partially_inference_2003 yields
 $$
 T = \bar{u}_m + \frac{b_m}{m},
 $$
+
 with between-imputation variance
 
 $$
 b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 $$
-and within-imputation variance
+and sampling variance
+
 $$
 \bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
 $$
-with $u^{(l)}$ reflecting the variance estimate in every imputed data set.
+with $u^{(l)}$ reflecting the variance estimate in the $l$th synthetic data set.
 
-## Simulation results
+
+# Simulation results
 
 ```{r, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE}
 plan(multisession) # increase speed through futures
@@ -368,6 +379,57 @@ synthetic_gen %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
+## Univariate estimates
+The univariate descriptives for the original data and the synthetic data can be found in the folowing table. [TABLE REF]
+```{r}
+true <- psych::describe(data)
+
+synth <- synthetic_samples %>% 
+  map(~.x %>% complete("all") %>% 
+        map(~.x %>% describe()) %>% Reduce("+", .) / synthetic_samples[[1]]$m) %>% 
+  Reduce("+", .) / length(synthetic_samples)
+rownames(true) <- paste("original", rownames(true), sep = " ")
+rownames(synth) <- paste("synthetic", rownames(synth), sep = " ")
+
+bind_rows(true, setNames(synth, names(true))) %>% 
+           arrange(vars) %>% .[, c(2:5, 8:9, 11:12)] %>% round(3)
+```
+
+$$
+% latex table generated in R 4.1.0 by xtable 1.8-4 package
+% Sun Oct  3 23:20:37 2021
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrrrrr}
+  \hline
+ & n & mean & sd & median & min & max & skew & kurtosis \\ 
+  \hline
+age & 748.00 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\ 
+  age\_synth & 748.00 & 9.23 & 6.91 & 10.51 & 0.04 & 20.93 & -0.05 & -1.56 \\ 
+  hgt & 748.00 & 131.10 & 46.52 & 145.75 & 50.00 & 198.00 & -0.30 & -1.47 \\ 
+  hgt\_synth & 748.00 & 131.59 & 46.72 & 146.09 & 50.71 & 197.47 & -0.30 & -1.47 \\ 
+  wgt & 748.00 & 37.12 & 26.03 & 34.55 & 3.14 & 117.40 & 0.38 & -1.03 \\ 
+  wgt\_synth & 748.00 & 37.44 & 26.23 & 34.87 & 3.36 & 113.04 & 0.36 & -1.05 \\ 
+  bmi & 748.00 & 18.04 & 3.04 & 17.45 & 11.73 & 31.74 & 1.14 & 1.79 \\ 
+  bmi\_synth & 748.00 & 18.04 & 3.10 & 17.44 & 11.41 & 32.09 & 1.09 & 1.70 \\ 
+  hc & 748.00 & 51.62 & 5.86 & 53.10 & 33.70 & 65.00 & -0.91 & 0.12 \\ 
+  hc\_synth & 748.00 & 51.65 & 5.88 & 53.19 & 34.30 & 62.12 & -0.93 & 0.16 \\ 
+  gen* & 748.00 & 2.53 & 1.59 & 2.00 & 1.00 & 5.00 & 0.52 & -1.36 \\ 
+  gen*\_synth & 748.00 & 2.58 & 1.59 & 2.00 & 1.00 & 5.00 & 0.47 & -1.40 \\ 
+  phb* & 748.00 & 2.75 & 1.86 & 2.00 & 1.00 & 6.00 & 0.56 & -1.25 \\ 
+  phb*\_synth & 748.00 & 2.80 & 1.88 & 2.00 & 1.00 & 6.00 & 0.52 & -1.30 \\ 
+  tv & 748.00 & 8.43 & 8.12 & 3.00 & 1.00 & 25.00 & 0.85 & -0.78 \\ 
+  tv\_synth & 748.00 & 8.65 & 8.23 & 3.39 & 1.00 & 25.00 & 0.80 & -0.88 \\ 
+  reg* & 748.00 & 3.02 & 1.14 & 3.00 & 1.00 & 5.00 & -0.08 & -0.77 \\ 
+  reg*\_synth & 748.00 & 3.03 & 1.13 & 3.00 & 1.00 & 5.00 & -0.07 & -0.73 \\ 
+   \hline
+\end{tabular}
+\end{table}
+$$
+
+We see that the synthetic data estimates resemble the true data estimates very well. 
+
+
 # Variable plots
 
 ```{r}
@@ -382,7 +444,7 @@ synthetic_samples[[1]] %>%
 
 ## Merely illustrative, single data set, plot of gen
 
-synthetic_samples[[234]] %>%
+synthetic_samples[[2]] %>%
   complete(action = "long", include = TRUE) %>% 
   mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
   ggplot(mapping = aes(x = gen, fill = Synthetic, group = Synthetic)) +
@@ -391,7 +453,7 @@ synthetic_samples[[234]] %>%
   theme_classic()
 
 ## Merely illustrative, single data set, plot of bmi by region
-synthetic_samples[[678]] %>%
+synthetic_samples[[3]] %>%
   complete(action = "long", include = TRUE) %>%
   mutate(Synthetic = ifelse(.imp == 0, "Real data", "Synthetic data")) %>%
   ggplot(mapping = aes(x = reg, y = bmi, fill = Synthetic)) +
@@ -524,7 +586,7 @@ We demonstrated that generating synthetic data sets with `mice` in `R` is a stra
 
 To non-statisticians, the procedure of generating multiple synthetic sets may seem overly complicated. We would like to emphasize that analyzing a single synthesized set, while perhaps unbiased, would underestimate the variance properties that are so important in drawing statistical inferences from finite data sets. After all, we are often not interested in the sample at hand, but in the underlying data generating mechanism, such as the population. Properly capturing the uncertainty of synthetic data sets, just like with incomplete data sets, is therefore paramount. 
 
-That said, while the field of data synthetisation originated decades ago, it is more relevant today than ever. In our study we outline a standard research workflow where the goal is to synthesize a complete data set. To simplify the simulation we adopted a bootstrapping scheme to induce sampling variance in order to conform to the combination procedure defined by @reiter_partially_inference_2003. Ideally, one would like to omit the bootstrap from the synthetization to adopt a scheme where the sampled data itself serves as a reference: much like the procedure outlined in @vink2014poolingadopt for incomplete data simulation. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
+That said, while the field of data synthetisation originated decades ago, it is more relevant today than ever. In our study we outline a standard research workflow where the goal is to synthesize a complete data set. To simplify the simulation we adopted a bootstrapping scheme to induce sampling variance in order to conform to the combination procedure defined by @reiter_partially_inference_2003. Ideally, one would like to omit the bootstrap from the synthetization to adopt a scheme where the sampled data itself serves as a reference: much like the procedure outlined in @vink2014pooling for incomplete data simulation. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
 
 There are other developments that can generate synthetic data sets. For example, the `synthpop` [REF] package in `R` would yield valid synthetic data sets if and only if the *true* data is completely observed. When the data is not completely observed, the single-iteration monotone set-up of the algorithm will bias estimates [REF IBRAHIM]. To avoid this, one could adopt a two-step approach wherein the incomplete values are multiply imputed before synthetization. Given $m$ multiple imputations and synthetizations, at least $m^2$ synthetic data sets are then in order. The flexibility with `mice` is that both unobserved and observed data values can be synthesized at once, without the need for a two-step approach. With `mice` $m$ synthetic sets are sufficient.
 
