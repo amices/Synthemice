@@ -517,14 +517,14 @@ height.
 \subsection{Simulation methods}\label{simulation-methods}}
 
 To induce sampling variance, 1000 bootstrap samples of the \texttt{boys}
-data will be synthesized with \(m = 5\) imputations. Synthetic values
-are generated using the \texttt{CART} imputation method for all columns,
-except for \texttt{bmi}. The deterministic relation \texttt{bmi} which
-will be synthesized passively based on the synthetic values for
-\texttt{hgt} and \texttt{wgt} to preserve the relation in the synthetic
-data. Additional parameters that come with the use of
-\texttt{mice.impute.cart()} are the complexity parameter \texttt{cp} and
-the minimum number of observations in any terminal node
+data have been synthesized with \(m = 5\) imputations for every data
+cell. Synthetic values are generated using the \texttt{CART} imputation
+method for all columns, except for \texttt{bmi}. The deterministic
+relation \texttt{bmi} which will be synthesized passively based on the
+synthetic values for \texttt{hgt} and \texttt{wgt} to preserve the
+relation in the synthetic data. Additional parameters that come with the
+use of \texttt{mice.impute.cart()} are the complexity parameter
+\texttt{cp} and the minimum number of observations in any terminal node
 \texttt{minbucket}, that both constrain the flexibility of the
 imputation model. The values of the parameters \texttt{cp} and
 \texttt{minbucket} ought to adhere to the call for imputation models
@@ -581,11 +581,49 @@ b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 
 \[
 \bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
-\] with \(u^{(l)}\) reflecting the variance estimate in the \(l\)th
+\] where \(u^{(l)}\) denotes the variance estimate in the \(l\)th
 synthetic data set.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plan}\NormalTok{(multisession) }\CommentTok{\# increase speed through futures}
+
+\NormalTok{true\_model\_age }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(age }\SpecialCharTok{\textasciitilde{}}\NormalTok{ wgt }\SpecialCharTok{+}\NormalTok{ hgt, data) }\CommentTok{\# model 1}
+\NormalTok{true\_model\_wgt }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(wgt }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hgt, data) }\CommentTok{\# model 2}
+\NormalTok{true\_model\_gen }\OtherTok{\textless{}{-}}\NormalTok{ MASS}\SpecialCharTok{::}\FunctionTok{polr}\NormalTok{(gen }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hc }\SpecialCharTok{+}\NormalTok{ reg, data, }\AttributeTok{Hess =} \ConstantTok{TRUE}\NormalTok{) }\CommentTok{\# model 3}
+
+\NormalTok{coefs\_age }\OtherTok{\textless{}{-}}\NormalTok{ broom}\SpecialCharTok{::}\FunctionTok{tidy}\NormalTok{(true\_model\_age)}\SpecialCharTok{$}\NormalTok{estimate }\CommentTok{\# extract coefficients of model 1}
+\NormalTok{coefs\_wgt }\OtherTok{\textless{}{-}}\NormalTok{ broom}\SpecialCharTok{::}\FunctionTok{tidy}\NormalTok{(true\_model\_wgt)}\SpecialCharTok{$}\NormalTok{estimate }\CommentTok{\# extract coefficients of model 2}
+\NormalTok{coefs\_gen }\OtherTok{\textless{}{-}}\NormalTok{ broom}\SpecialCharTok{::}\FunctionTok{tidy}\NormalTok{(true\_model\_gen)}\SpecialCharTok{$}\NormalTok{estimate }\CommentTok{\# extract coefficients of model 3}
+
+\NormalTok{nsim }\OtherTok{\textless{}{-}} \DecValTok{1000} \CommentTok{\# use 1000 iterations}
+
+\NormalTok{bootstrap\_samples }\OtherTok{\textless{}{-}} 
+\NormalTok{  modelr}\SpecialCharTok{::}\FunctionTok{bootstrap}\NormalTok{(}\AttributeTok{data =}\NormalTok{ data, }\AttributeTok{n =}\NormalTok{ nsim) }\SpecialCharTok{\%$\%} 
+\NormalTok{  strap }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{map}\NormalTok{(as\_tibble)}
+
+\NormalTok{post }\OtherTok{\textless{}{-}} \FunctionTok{make.post}\NormalTok{(data)}
+\NormalTok{post[}\StringTok{"bmi"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"imp[[j]][, i] \textless{}{-} imp[[\textquotesingle{}wgt\textquotesingle{}]][, i] / (imp[[\textquotesingle{}hgt\textquotesingle{}]][, i] / 100)\^{}2"}
+
+\NormalTok{synthetic\_samples }\OtherTok{\textless{}{-}} 
+\NormalTok{  bootstrap\_samples }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{future\_map}\NormalTok{(}\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{    x }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mice}\NormalTok{(}\AttributeTok{m =} \DecValTok{5}\NormalTok{, }
+               \AttributeTok{maxit =} \DecValTok{1}\NormalTok{,}
+               \AttributeTok{method =} \StringTok{"cart"}\NormalTok{,}
+               \AttributeTok{minbucket =} \DecValTok{3}\NormalTok{,}
+               \AttributeTok{cp =} \FloatTok{1e{-}08}\NormalTok{,}
+               \AttributeTok{predictorMatrix =}\NormalTok{ pred,}
+               \AttributeTok{post =}\NormalTok{ post,}
+               \AttributeTok{where =} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(data), }\FunctionTok{ncol}\NormalTok{(data)),}
+               \AttributeTok{print =}\NormalTok{ F)}
+\NormalTok{\}, }\AttributeTok{.options =} \FunctionTok{furrr\_options}\NormalTok{(}\AttributeTok{seed =} \FunctionTok{as.integer}\NormalTok{(}\DecValTok{123}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
 
 This section may be divided by subheadings. It should provide a concise
 and precise description of the experimental results, their
