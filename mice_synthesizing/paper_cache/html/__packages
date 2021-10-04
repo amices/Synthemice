@@ -1,0 +1,16 @@
+base
+mice
+magrittr
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+future
+furrr
+knitr
+kableExtra

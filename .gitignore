@@ -38,4 +38,6 @@ vignettes/*.pdf
 ads_thesis/unnamed-chunk-1_3934488913d24a2b94b74c88c35323d4.RData
 
 # Do not ignore paper cache
-!*/mice_synthesizing/paper_cache
+!/mice_synthesizing/paper_cache
+!/mice_synthesizing/paper_cache/html
+!/Federated_imputation/mice_synthesizing/paper_cache/html/unnamed-chunk-6_f126a5f5bce2e63f6be4db0a5d7e1928.RData'
