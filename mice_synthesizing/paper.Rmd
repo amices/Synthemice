@@ -2,7 +2,7 @@
 title: "Outline paper - Multiple imputation for statistical disclosure control: Creating synthetic data sets with *mice*"
 subtitle: "Anony*mice*d shareable data: Using *mice* to create multiply imputed synthetic data sets" 
 author:
-- Thom Volker & Gerko Vink
+- Thom Volker^[Helpful and stimulating discussions with Stef van Buuren, Hanne Oberman, Paulina von Stackelberg, Mirthe Hendriks and Stijn Overbeek are gratefully acknowledged.] & Gerko Vink
 date: "`r format(Sys.time(), '%d-%m-%Y')`"
 output: 
   html_document:
@@ -191,18 +191,22 @@ Similarly to the missing data case, variances, and subsequently confidence inter
 $$
 T = \bar{u}_m + \frac{b_m}{m},
 $$
-with between variance
+
+with between-imputation variance
 
 $$
 b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 $$
 and sampling variance
+
 $$
 \bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
 $$
 with $u^{(l)}$ reflecting the variance estimate in the $l$th synthetic data set.
 
+
 # Simulation results
+
 ```{r, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE}
 plan(multisession) # increase speed through futures
 
