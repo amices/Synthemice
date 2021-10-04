@@ -1321,7 +1321,9 @@ ITERATE {forward.pass}
 REVERSE {reverse.pass}
 
 FUNCTION {begin.bib}
-{ "\begin{thebibliography}{999}"
+{ "\begin{thebibliography}{-------}"
+  write$ newline$
+  "\providecommand{\natexlab}[1]{#1}"
   write$ newline$
 }
 
