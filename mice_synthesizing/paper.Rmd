@@ -183,18 +183,19 @@ Also similarly to the missing data case, variances, and subsequently confidence 
 $$
 T = \bar{u}_m + \frac{b_m}{m},
 $$
-with "between-imputation" variance
+with between-imputation variance
 
 $$
 b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 $$
-and "within-imputation" variance
+and within-imputation variance
 $$
 \bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
 $$
 with $u^{(l)}$ reflecting the variance estimate in every imputed data set.
 
 ## Simulation results
+
 ```{r, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE}
 plan(multisession) # increase speed through futures
 
@@ -206,7 +207,7 @@ coefs_age <- broom::tidy(true_model_age)$estimate # extract coefficients of mode
 coefs_wgt <- broom::tidy(true_model_wgt)$estimate # extract coefficients of model 2
 coefs_gen <- broom::tidy(true_model_gen)$estimate # extract coefficients of model 3
 
-nsim <- 10 # use 1000 iterations
+nsim <- 1000 # use 1000 iterations
 
 bootstrap_samples <- 
   modelr::bootstrap(data = data, n = nsim) %$% 
