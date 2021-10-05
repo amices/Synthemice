@@ -3,7 +3,7 @@ title: "Anony*mice*d shareable data: Using *mice* to create and analyze multiply
 author:
   - name: Thom Volker
     affil: 1,*
-    orcid: 0000-0003-3293-2315
+    orcid: 0000-0002-2408-7820
   - name: Gerko Vink
     affil: 1, \dagger
     orcid: 0000-0001-9767-1924
@@ -23,47 +23,29 @@ type: article
 status: submit
 bibliography: synth.bib
 appendix: appendix.tex
-simplesummary: |
-  A Simple summary goes here.
 abstract: |
-  A single paragraph of about 200 words maximum. For research articles, 
-  abstracts should give a pertinent overview of the work. We strongly encourage
-  authors to use the following style of structured abstracts, but without 
-  headings: 1) Background: Place the question addressed in a broad context and
-  highlight the purpose of the study; 2) Methods: Describe briefly the main
-  methods or treatments applied; 3) Results: Summarize the article's main 
-  findings; and 4) Conclusion: Indicate the main conclusions or interpretations. 
-  The abstract should be an objective representation of the article, it must not 
-  contain results which are not presented and substantiated in the main text and 
-  should not exaggerate the main conclusions.
+  Synthetic data sets can greatly improve the dissemination of data 
+  and further analysis of private data. Generating and analyzing synthetic data 
+  sets is straightforward, yet adopting a synthetic data analysis pipeline is 
+  often ignored by applied researchers. We outline a simple procedure for 
+  generating and alayzing synthetic data sets with `mice` in `R`. We demonstrate 
+  in simulation that the analysis results obtained on synthetic data 
+  obtained with `mice` yields unbiased and valid inferences, and leads to synthetic 
+  records that cannot be distinguished from the true data records. The ease of use 
+  when synthesizing data with `mice`, together with the validity of inferences 
+  obtained through this procedure opens up a wealth of possibilities for data 
+  dissemination and further research of initially private data. 
 keywords: |
-  keyword 1; keyword 2; keyword 3 (list three to ten pertinent keywords specific 
-  to the article, yet reasonably common within the subject discipline.).
+  mice; imputation; synthetic data.
 acknowledgement: |
-  All sources of funding of the study should be disclosed. Please clearly 
-  indicate grants that you have received in support of your research work. 
-  Clearly state if you received funds for covering the costs to publish in open 
-  access.
+  We are grateful to Mirthe Hendriks and Stijn van den Broek for replicating the 
+  simulation study on an independent data set. 
 authorcontributions: |
-  For research articles with several authors, a short paragraph specifying their 
-  individual contributions must be provided. The following statements should be 
-  used ``X.X. and Y.Y. conceive and designed the experiments; X.X. performed the 
-  experiments; X.X. and Y.Y. analyzed the data; W.W. contributed 
-  reagents/materials/analysis tools; Y.Y. wrote the paper.'' Authorship must be
-  limited to those who have contributed substantially to the work reported.
+  The authors contributed equally to this work.
 conflictsofinterest: |
-  'The authors declare no conflict of interest.' 
+  The authors declare no conflict of interest. 
 sampleavailability: |
-  Samples of the compounds ...... are available from the authors.
-abbreviations:
-  - short: MDPI
-    long: Multidisciplinary Digital Publishing Institute
-  - short: DOAJ
-    long: Directory of open access journals
-  - short: TLA
-    long: Three letter acronym
-  - short: LD 
-    long: linear dichroism
+  A full simulation archive is available from https://github.com/amices/Federated_imputation/tree/master/manuscript.
 output: rticles::mdpi_article
 ---
 
@@ -134,19 +116,27 @@ In a nutshell, the above code shows the simplicity of creating $m = 10$ syntheti
 
 We demonstrate the suitability of using `mice` for synthesization using a simulation study on the `mice::boys` data set. This data set consists of the values of $`r nrow(mice::boys)`$ Dutch boys on the following $`r ncol(mice::boys)`$ variables: 
 
-| column | description                |
-|--------|----------------------------|
-| age    | age in years               |
-| hgt    | height (cm)                |
-| wgt    | weight (kg)                |
-| bmi    | body mass index            |
-| hc     | head circumference (cm)    |
-| gen    | genital Tanner stage G1-G5 |
-| phb    | pubic hair Tanner P1-P6    |
-| tv     | testicular volume (ml)     |
-| reg    | region                     |
+\begin{table}[H]
+\caption{Description of the features in the \texttt{mice::boys} data set.}
+\centering
+\begin{tabular}{rl}
+\hline
+column & description                \\ 
+\hline
+age    & age in years               \\ 
+hgt    & height (cm)                \\ 
+wgt    & weight (kg)                \\ 
+bmi    & body mass index            \\ 
+hc     & head circumference (cm)    \\ 
+gen    & genital Tanner stage G1-G5 \\ 
+phb    & pubic hair Tanner P1-P6    \\ 
+tv     & testicular volume (ml)     \\ 
+reg    & region                     \\ 
+\hline
+\end{tabular}
+\end{table}
 
-Unfortunately, this data set does not differ from the vast majority of collected data sets, in the sense that it suffers from missing data. For simplicity, the data is completed using the default `mice` imputation model for all predictors except `bmi`, which is passively imputed using its deterministic relation with weight and height.
+Unfortunately, this data set does not differ from the vast majority of collected data sets, in the sense that it suffers from missing data. For simplicity, we complete the missing values using the default `mice` imputation model for all predictors except `bmi`, which is passively imputed using its deterministic relation with `wgt` and `hgt`.
 
 ```{r, include = FALSE}
 library(mice)
@@ -164,7 +154,7 @@ library(kableExtra)
 ```
 
 
-```{r, results = FALSE, message = FALSE, warning = FALSE}
+```{r true-data, results = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
 # create a single imputed, completely observed `boys` data set
 set.seed(123)
 
@@ -184,13 +174,13 @@ data <- complete(imp)
 
 ## Simulation methods
 
-To induce sampling variance, 1000 bootstrap samples of the `boys` data have been synthesized with $m = 5$ imputations for every data cell. Synthetic values are generated using the `CART` imputation method for all columns, except for `bmi`. The deterministic relation `bmi` which will be synthesized passively based on the synthetic values for `hgt` and `wgt` to preserve the relation in the synthetic data. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the missingness pattern is monotone, the number of iterations can be set to `maxit = 1`.
+To induce sampling variance, 1000 bootstrap samples of the `boys` data have been synthesized with $m = 5$ imputations for every data cell. Synthetic values are generated using the `CART` imputation method for all columns, except for `bmi`. The deterministic relation `bmi` which will be synthesized passively based on the synthetic values for `hgt` and `wgt` to preserve the relation in the synthetic data. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the synthesis pattern is monotone, the number of iterations can be set to `maxit = 1`.
 
 To assess the performance of `mice` for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the $95\%$ confidence interval coverage of the synthetic data will be examined. Similarly to multiple imputation of missing data, correct inferences from synthetic data requires correct pooling over the multiply imputed data sets. 
 
 Obtaining a final point estimate of the parameter of interest $Q$ after imputation is fairly easy and no different from pooling in the case of missing data [@rubin_multiple_1987]. One can calculate the average of the $m$ point estimates $q^{(l)}$
 $$
-\bar{q}_m = \sum_{l = 1}^m \frac{q^{(l)}}{m}.
+\bar{q}_m = \sum_{l = 1}^m \frac{q^{(l)}}{m},
 $$
 with $l = 1, \dots, m$. 
 
@@ -212,7 +202,7 @@ $$
 where $u^{(l)}$ denotes the variance estimate in the $l$th synthetic data set.
 
 # Results
-```{r, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE}
+```{r simulation, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE, echo = FALSE}
 plan(multisession) # increase speed through futures
 
 true_model_age <- lm(age ~ wgt + hgt, data) # model 1
@@ -247,81 +237,336 @@ synthetic_samples <-
                print = F)
 }, .options = furrr_options(seed = as.integer(123)))
 ```
+We evaluate the synthetic data with respect to the *true* data set on the basis of three aims. We believe that every reliable and valid data synthetisation effort in statistical data analysis should be able to yield 1) unbiased univariate statistical properties, 2) unbiased bivariate properties, 3) unbiased and valid multivariate inferences and 4) synthetic data that cannot be distinguished from real data. We consider the evaluation of the synthetic data simulations in the above order.
 
-This section may be divided by subheadings. It should provide a concise and precise description of the experimental results, their interpretation as well as the experimental conclusions that can be drawn.
+## Univariate estimates
+The univariate descriptives for the original data and the synthetic data can be found in Table 2. 
+```{r univariate-statistics, echo = FALSE, cache = TRUE, results = FALSE}
+library(xtable)
+true <- psych::describe(data)
 
-## Subsection Heading Here
+synth <- synthetic_samples %>% 
+  map(~.x %>% complete("all") %>% 
+        map(~.x %>% describe()) %>% Reduce("+", .) / synthetic_samples[[1]]$m) %>% 
+  Reduce("+", .) / length(synthetic_samples)
+rownames(true) <- paste("original", rownames(true), sep = " ")
+rownames(synth) <- paste("synthetic", rownames(synth), sep = " ")
 
-Subsection text here.
-
-### Subsubsection Heading Here
-
-Bulleted lists look like this:
-
-* First bullet
-* Second bullet
-* Third bullet
-
-Numbered lists can be added as follows:
-
-1. First item
-2. Second item
-3. Third item
-
-The text continues here.
-
-All figures and tables should be cited in the main text as Figure 1, Table 1, etc.
-
-\begin{figure}[H]
+bind_rows(true, setNames(synth, names(true))) %>% 
+           arrange(vars) %>% .[, c(2:5, 8:9, 11:12)] %>% round(3) %>% 
+  xtable
+```
+<!-- % latex table generated in R 4.1.0 by xtable 1.8-4 package -->
+<!-- % Mon Oct  4 16:47:59 2021 -->
+\begin{table}[ht]
+\caption{Univariate descriptives for the true data and $m=5$ pooled univariate descriptives for the synthetic data over 1000 simulations.}
 \centering
-\includegraphics[width=3 cm]{logo-mdpi}
-\caption{This is a figure, Schemes follow the same formatting. If there are multiple panels, they should be listed as: (\textbf{a}) Description of what is contained in the first panel. (\textbf{b}) Description of what is contained in the second panel. Figures should be placed in the main text near to the first time they are cited. A caption on a single line should be centered.}
-\end{figure}
+\begin{tabular}{rrrrrrrrr}
+  \hline
+ & n & mean & sd & median & min & max & skew & kurtosis \\ 
+  \hline
+original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\ 
+  synthetic age & 748 & 9.15 & 6.89 & 10.49 & 0.04 & 20.96 & -0.03 & -1.55 \\ 
+  original hgt & 748 & 131.10 & 46.52 & 145.75 & 50.00 & 198.00 & -0.30 & -1.47 \\ 
+  synthetic hgt & 748 & 131.06 & 46.50 & 145.32 & 50.69 & 197.16 & -0.30 & -1.47 \\ 
+  original wgt & 748 & 37.12 & 26.03 & 34.55 & 3.14 & 117.40 & 0.38 & -1.03 \\ 
+  synthetic wgt & 748 & 37.09 & 26.00 & 34.44 & 3.35 & 112.26 & 0.38 & -1.03 \\ 
+  original bmi & 748 & 18.04 & 3.04 & 17.45 & 11.73 & 31.74 & 1.14 & 1.79 \\ 
+  synthetic bmi & 748 & 18.05 & 3.08 & 17.48 & 11.49 & 32.37 & 1.11 & 1.85 \\ 
+  original hc & 748 & 51.62 & 5.86 & 53.10 & 33.70 & 65.00 & -0.91 & 0.12 \\ 
+  synthetic hc & 748 & 51.61 & 5.86 & 53.18 & 34.38 & 62.85 & -0.91 & 0.12 \\ 
+  original gen* & 748 & 2.53 & 1.59 & 2.00 & 1.00 & 5.00 & 0.52 & -1.36 \\ 
+  synthetic gen* & 748 & 2.53 & 1.59 & 2.00 & 1.00 & 5.00 & 0.52 & -1.35 \\ 
+  original phb* & 748 & 2.75 & 1.86 & 2.00 & 1.00 & 6.00 & 0.56 & -1.25 \\ 
+  synthetic phb* & 748 & 2.75 & 1.86 & 2.00 & 1.00 & 6.00 & 0.56 & -1.24 \\ 
+  original tv & 748 & 8.43 & 8.12 & 3.00 & 1.00 & 25.00 & 0.85 & -0.78 \\ 
+  synthetic tv & 748 & 8.42 & 8.11 & 3.19 & 1.00 & 25.00 & 0.85 & -0.77 \\ 
+  original reg* & 748 & 3.02 & 1.14 & 3.00 & 1.00 & 5.00 & -0.08 & -0.77 \\ 
+  synthetic reg* & 748 & 3.02 & 1.14 & 3.00 & 1.00 & 5.00 & -0.08 & -0.76 \\ 
+   \hline
+\end{tabular}
+\end{table}
+We see from Table 1 that the synthetic data estimates closely resemble the true data estimates.
 
+## Bivariate estimates
+An often used bivariate statistic is Pearson's correlation coefficient. When evaluating this correlation coefficient on the numeric columns in the `boys` data set, we find that biases are very small. The results are displayed in Table 3. 
+```{r bivariate-statistics, echo = FALSE, cache = TRUE, results = FALSE}
+true <- data %>% select(-gen, -phb, -reg) %>% cor
 
+fisher.trans <- function(x) 1/2 * log((1 + x) / (1 - x))
+fisher.backtrans <- function(x) (exp(2 * x) - 1) / (exp(2 * x) + 1)
+retrieve.cor <- function(mids){
+  out <- mids %>%
+  mice::complete("all") %>%
+  map(select, -phb, -gen, -reg) %>%  
+  map(stats::cor) %>%
+  map(fisher.trans) %>% 
+    Reduce("+", .) / mids$m
+  out %<>%   fisher.backtrans()
+  diag(out) <- 1
+  return(out)
+}
+
+synth <- synthetic_samples %>%
+  map(~.x %>% retrieve.cor) %>%
+  Reduce("+", .) / length(synthetic_samples)
+
+corbias <- apply(cbind(round(c(true), 3), round(c(true - synth), 3)), 1, function(x) paste(x[1], " (", x[2], ")", sep = "" )) %>% 
+  matrix(6, 6)
+diag(corbias) <- 1
+dimnames(corbias) <- dimnames(true)
+true - synth
+xtable(corbias)
+```
+<!-- % latex table generated in R 4.1.0 by xtable 1.8-4 package -->
+<!-- % Mon Oct  4 17:57:32 2021 -->
 \begin{table}[H]
-\caption{This is a table caption. Tables should be placed in the main text near to the first time they are cited.}
+\caption{Bivariate correlations of the numerical columns in the true data with in parentheses the corresponding bias of the $m=5$ pooled synthetic correlations over 1000 simulations. All estimates are rounded to 3 decimal places. }
 \centering
-%% \tablesize{} %% You can specify the fontsize here, e.g.  \tablesize{\footnotesize}. If commented out \small will be used.
-\begin{tabular}{ccc}
-\toprule
-\textbf{Title 1}	& \textbf{Title 2}	& \textbf{Title 3}\\
-\midrule
-entry 1		& data			& data\\
-entry 2		& data			& data\\
-\bottomrule
+\begin{tabular}{rcccccc}
+  \hline
+ & age & hgt & wgt & bmi & hc & tv \\ 
+  \hline
+age & 1 & 0.976 (0.001) & 0.950 (0.000) & 0.627 (0.009) & 0.853 (0.000) & 0.810 (0.002) \\ 
+  hgt & 0.976 (0.001) & 1 & 0.944 (0.001) & 0.596 (0.013) & 0.907 (0.000) & 0.754 (0.000) \\ 
+  wgt & 0.950 (0.000) & 0.944 (0.001) & 1 & 0.791 (0.009) & 0.834 (0.000) & 0.817 (0.000) \\ 
+  bmi & 0.627 (0.009) & 0.596 (0.013) & 0.791 (0.009) & 1 & 0.588 (0.009) & 0.610 (0.007) \\ 
+  hc & 0.853 (0.000) & 0.907 (0.000) & 0.834 (0.000) & 0.588 (0.009) & 1 & 0.623 (0.000) \\ 
+  tv & 0.810 (0.002) & 0.754 (0.000) & 0.817 (0.000) & 0.610 (0.007) & 0.623 (0.000) & 1 \\ 
+   \hline
+\end{tabular}
+\end{table}
+We see that the correlations obtained from synthetic data are unbiased with respect to the true data set. 
+
+## Multivariate model inferences
+
+```{r multiv_model1, cache = TRUE, echo = FALSE, results=FALSE}
+# true data estimate
+true <- data %$% lm(hgt ~ age + phb) %>% coef()
+
+# bootstrap coverage
+boot <- bootstrap_samples %>% 
+  map(~.x %$% 
+        lm(hgt ~ age + phb) %>% 
+        broom::tidy(conf.int = TRUE) %>% 
+        mutate(boot.cov = conf.low < true & true < conf.high,
+               true = true, 
+               boot.bias = estimate - true) %>% 
+        column_to_rownames("term")) %>% 
+  Reduce("+", .) / length(bootstrap_samples)
+
+# bootstrap coverage
+synth <- synthetic_samples %>%
+  map(~.x %>% 
+        with(lm(hgt ~ age + phb)) %>% 
+        mice:::pool.syn() %>% 
+        summary(conf.int = TRUE) %>% 
+        mutate(synth.cov = `2.5 %` < true & true < `97.5 %`,
+               true = true, 
+               synth.bias = estimate - true) %>% 
+        column_to_rownames("term")) %>% 
+  Reduce("+", .) / length(synthetic_samples)
+
+cbind(boot %>% select(true, boot.bias, boot.cov),
+      synth %>% select(synth.bias, synth.cov)) %>% xtable(digits = 3)
+```
+First, we evaluate the performance of our synthetic simulation set on a linear model where `hgt` is modeled by a continuous predictor `age` and an ordered categorical predictor `phb`. The results for this simulation can be found in Table 4. 
+
+\begin{table}[ht]
+\caption{Simulation results for a linear regression model with continuous and ordered categorical predictors. The model evaluated is `hgt ~ age + phb`. Depicted are the true data estimate and the bias from the true data estimate and the coverage rate of the 95\% confidence interval for the bootstrap and synthetic data sets.}
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+  & & \multicolumn{2}{c}{Bootstrap} & \multicolumn{2}{c}{Synthetic}\\
+ term & estimate & bias & cov & bias & cov \\ 
+  \hline
+(Intercept) & 63.087 & -0.001 & 0.970 & 0.405 & 0.958 \\ 
+  age & 7.174 & 0.000 & 0.958 & -0.033 & 0.947 \\ 
+  phb.L & -12.250 & 0.008 & 0.950 & 0.582 & 0.927 \\ 
+  phb.Q & -1.376 & -0.022 & 0.926 & 0.112 & 0.934 \\ 
+  phb.C & -3.564 & 0.051 & 0.915 & 0.301 & 0.912 \\ 
+  phb\verb|^|4 & -0.431 & 0.016 & 0.930 & 0.106 & 0.940 \\ 
+  phb\verb|^|5 & 2.064 & 0.060 & 0.941 & 0.077 & 0.943 \\ 
+   \hline
 \end{tabular}
 \end{table}
 
-This is an example of an equation:
+We see that the finite nature of the true data set together with the design-based simulation setup yields slight undercoverage for the polynomial functions. This finding is observed in both the bootstrap coverages (i.e. the fraction of 95% confidence intervals that cover the true data parameters) and the synthetic data coverages, indicating that the undercoverage stems from the simulation setup.
 
-\begin{equation}
-\mathbb{S}
-\end{equation}
-<!-- If the documentclass option "submit" is chosen, please insert a blank line before and after any math environment (equation and eqnarray environments). This ensures correct linenumbering. The blank line should be removed when the documentclass option is changed to "accept" because the text following an equation should not be a new paragraph. -->
+Second, we evaluate a proportional odds logistic regression model wherein ordered categorical column `gen` is modeled by continuous predictors `age` and `hc`, and categorical predictor `reg`. The results for this model evaluation are shown in Table 5.
 
-<!-- Please punctuate equations as regular text. Theorem-type environments (including propositions, lemmas, corollaries etc.) can be formatted as follows: -->
-Example of a theorem:
-\begin{Theorem}
-Example text of a theorem.
-\end{Theorem}
+```{r multiv_model2, cache = TRUE, echo = FALSE, results=FALSE}
+# true data estimate
+true <- data %$% MASS::polr(gen ~ age + hc + reg, Hess = TRUE) %>% broom::tidy(conf.int = TRUE) %>% column_to_rownames("term") %>% select(estimate) 
 
-The text continues here. Proofs must be formatted as follows:
+# bootstrap coverage
+boot <- bootstrap_samples %>% 
+  map(~.x %$% 
+        MASS::polr(gen ~ age + hc + reg, Hess = TRUE) %>% 
+        broom::tidy(conf.int = TRUE) %>% 
+        mutate(true = true$estimate, 
+               boot.cov = conf.low < true & true < conf.high,
+               boot.cov2 = (estimate - 1.96*std.error) < true & true < (estimate + 1.96 * std.error), 
+               boot.bias = estimate - true) %>% 
+        select(-coef.type) %>% 
+        column_to_rownames("term")) %>% 
+  Reduce("+", .) / length(bootstrap_samples)
 
-Example of a proof:
-\begin{proof}[Proof of Theorem 1]
-Text of the proof. Note that the phrase `of Theorem 1' is optional if it is clear which theorem is being referred to.
-\end{proof}
-The text continues here.
+# synthetic coverage
+synth <- synthetic_samples %>%
+  map(~.x %>% 
+        with(MASS::polr(gen ~ age + hc + reg, Hess = TRUE)) %>% 
+        mice:::pool.syn() %>% 
+        summary(conf.int = TRUE) %>% 
+        mutate(true = true$estimate, 
+               synth.cov = `2.5 %` < true & true < `97.5 %`,
+               synth.bias = estimate - true) %>% 
+        column_to_rownames("term")) %>% 
+  Reduce("+", .) / length(synthetic_samples)
+
+cbind(boot %>% select(true, boot.bias, boot.cov),
+      synth %>% select(synth.bias, synth.cov)) %>% xtable(digits = 3)
+```
+```{r echo = FALSE, results=FALSE}
+library(xtable)
+cbind(boot %>% select(true, boot.bias, boot.cov2),
+      synth %>% select(synth.bias, synth.cov)) %>% xtable(digits = 3)
+```
+
+<!-- % latex table generated in R 4.1.0 by xtable 1.8-4 packag -->
+<!-- % Mon Oct  4 23:32:01 2021 -->
+\begin{table}[H]
+\caption{Simulation results for a proportional odds logistic regression model with continuous and ordered categorical predictors. The model evaluated is `gen ~ age + hc + reg`. Depicted are the true data estimate and the bias from the true data estimate and the coverage rate of the 95\% confidence interval for the bootstrap and synthetic data sets.}
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ & & \multicolumn{2}{c}{Bootstrap} & \multicolumn{2}{c}{Synthetic}\\
+ term & estimate & bias & cov & bias & cov \\ 
+  \hline
+  age & 0.461 & 0.004 & 0.942 & 0.002 & 0.939 \\
+  hc & -0.188 & -0.000 & 0.929 & -0.004 & 0.945 \\
+  regeast & -0.339 & 0.012 & 0.960 & 0.092 & 0.957\\
+  regwest & 0.486 & 0.009 & 0.952 & -0.122 & 0.944\\
+  regsouth & 0.646 & 0.012 & 0.966 & -0.152 & 0.943 \\
+  regcity & -0.069 & 0.012 & 0.940 & 0.001 & 0.972 \\
+  G1$|$G2 & -6.322 & 0.032 & 0.934 & -0.254 & 0.946 \\
+  G2$|$G3 & -4.501 & 0.052 & 0.936 & -0.246 & 0.945 \\
+  G3$|$G4 & -3.842 & 0.058 & 0.937 & -0.244 & 0.948 \\
+  G4$|$G5 & -2.639 & 0.064 & 0.936 & -0.253 & 0.947 \\
+   \hline
+\end{tabular}
+\end{table}
+These results demonstrate that the synthetic data analysis yields valid inferences with low bias.
+
+## Data discrimination
+When we combine the original and synthetic data, can we predict which rows come from the synthetic data set? If so, then our synthetic data procedure would be redundant, since the synthetic set differs from the observed set. To evaluate whether we can distinguish between the true data and the synthetic data, we combine the rows from each simulation synthetic data set with the rows from the true data. We then run a logistic regression model to predict group membership: i.e. does a row belong to the true data or synthetic data. As predictors we take all columns in the data. The pooled parameter estimates over all simulations can be found in Table 6. 
+
+
+```{r discriminate, cache = TRUE, results=FALSE, echo = FALSE}
+out <- synthetic_samples %>%
+  map(~.x %>% 
+        complete("all") %>%  
+        map(~.x %>% 
+              rbind(data) %>% 
+              mutate(indic = as.factor(c(rep(0, 748), rep(1, 748)))) %$% 
+              glm(indic ~ wgt + hgt + age + hc + gen + phb + tv + reg + bmi, family=binomial(link = "logit"))) %>% 
+        pool() %>%  
+        summary() %>% 
+        column_to_rownames("term")) %>% 
+  Reduce("+", .) / length(synthetic_samples) 
+
+out %>% xtable
+
+library(caret)
+do_fun <- function(x){
+  dat <- x %>% 
+    rbind(data) %>% 
+    mutate(indic = as.factor(c(rep(0, 748), rep(1, 748))))
+  fit <- dat %$% 
+    glm(indic ~ wgt + hgt + age + hc + gen + phb + tv + reg + bmi, family=binomial(link = "logit")) %>% 
+    predict(type = "response") %>% rbinom(1496, 1, prob = .)
+  CM <- confusionMatrix(factor(fit), factor(dat$indic))
+  c(CM$overall, CM$byClass)
+}
+out2 <- synthetic_samples %>%
+  map(~.x %>% 
+        complete("all") %>%  
+        map(~.x %>% do_fun()) %>% 
+        do.call("rbind", .) %>% colMeans()) %>% 
+  do.call("rbind", .) %>% colMeans() %>% .[c(1, 18, 2,  7, 8, 9, 15)]
+```
+```{r echo = FALSE, results=FALSE}
+library(xtable)
+out2 %>% as.matrix() %>% xtable(digits = 5)
+```
+
+<!-- % latex table generated in R 4.1.0 by xtable 1.8-4 package -->
+<!-- % Tue Oct  5 02:25:08 2021 -->
+\begin{table}[H]
+\caption{Simulation results for a logistic regression model aimed at discriminating between synthetic records and true records.}
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ term & estimate & std.error & statistic & df & p.value \\
+  \hline
+  (Intercept) & 0.22 & 1.15 & 0.19 & 521.93 & 0.60 \\ 
+  wgt & 0.00 & 0.02 & 0.25 & 420.19 & 0.60 \\
+  hgt & -0.00 & 0.01 & -0.18 & 359.73 & 0.60 \\
+  age & -0.00 & 0.05 & -0.00 & 345.73 & 0.62 \\ 
+  hc & 0.00 & 0.03 & 0.11 & 415.44 & 0.61\\
+  gen.L & -0.00 & 0.42 & -0.00 & 164.76 & 0.65 \\
+  gen.Q & -0.01 & 0.21 & -0.04 & 203.38 & 0.63 \\
+  gen.C & -0.00 & 0.16 & -0.02 & 239.63 & 0.64 \\
+  gen\verb|^|4 & 0.01 & 0.21 & 0.01 & 237.41 & 0.63 \\
+  phb.L & -0.02 & 0.44 & -0.04 & 156.54 & 0.64 \\
+  phb.Q & -0.01 & 0.22 & -0.02 & 198.20 & 0.64 \\
+  phb.C & 0.00 & 0.18 & 0.00 & 211.17 & 0.62 \\
+  phb\verb|^|4 & 0.00 & 0.18 & 0.02 & 228.51 & 0.64\\
+  phb\verb|^|5 & 0.00 & 0.20 & 0.02 & 248.57 & 0.63\\
+  tv & 0.00 & 0.02 & 0.01 & 264.26 & 0.63\\
+  regeast & -0.00 & 0.23 & 0.01 & 210.90 & 0.64 \\ 
+  regwest & -0.00 & 0.22 & -0.00 & 221.14 & 0.63 \\ 
+  regsouth & -0.01 & 0.22 & -0.02 & 226.10 & 0.64 \\ 
+  regcity & 0.01 & 0.27 & 0.03 & 204.15 & 0.64 \\ 
+  bmi & -0.02 & 0.06 & -0.26 & 320.18 & 0.61 \\
+   \hline
+\end{tabular}
+\end{table}
+
+From these pooled results we can see that the effects for all predictors are close to zero and non-significant. When we take the predicted values from the simulated models and compare them with the *real* values, we obtain the summary statistics in Table 7.
+
+\begin{table}[H]
+\caption{Confusion statistics for a prediction model aimed at discriminating between synthetic records and true records.}
+\centering
+\begin{tabular}{rr}
+  \hline
+& estimate\\
+  \hline
+ Accuracy & 0.50381 \\
+ Balanced Accuracy & 0.50381 \\
+ Kappa & 0.00762 \\
+ McnemarPValue & 0.63187 \\
+ Sensitivity & 0.50368 \\
+ Specificity & 0.50394 \\
+ Prevalence & 0.50000 \\
+   \hline
+\end{tabular}
+\end{table}
+
+The accuracy of the predictive modeling effort is not better than random selection and the Kappa coefficient indicates that a perfect prediction model is far from realized. The accuracy is quite balanced as there is no skewness over sensitivity and specificity. These findings indicate that the synthetic data is indistinguishable from the true data. 
 
 # Discussion
 
-Authors should discuss the results and how they can be interpreted in perspective of previous studies and of the working hypotheses. The findings and their implications should be discussed in the broadest context possible. Future research directions may also be highlighted.
+We demonstrate that generating synthetic data sets with `mice` in `R` is a straightforward process that fits well in a data analysis pipeline. The multiple synthetic sets yield valid inferences about the true underlying data generating mechanism, thereby capturing the nature of the original data. This makes the multiple synthetisation procedure with `mice` suitable for further dissemination of synthetic data sets.
 
-# Conclusion
+To non-statisticians, the procedure of generating multiple synthetic sets may seem overly complicated. We would like to emphasize that analyzing a single synthesized set, while perhaps unbiased, would underestimate the variance properties that are so important in drawing statistical inferences from finite data sets. After all, we are often not interested in the sample at hand, but in the underlying data generating mechanism, such as the population. Properly capturing the uncertainty of synthetic data sets, just like with incomplete data sets, is therefore paramount. 
 
-This section is not mandatory, but can be added to the manuscript if the discussion is unusually long or complex.
+Analyzing multiple synthetic sets has another clear benefit over analyzing just a single synthesized data set: the risk for data disclosure is much lower. Instead of having just one synthetic realization, a set of multiple synthetic values that could have been are generated from the posterior predictive distribution. This means that both properties that might belong to individual participants, as well as properties that might not belong to those participants can be introduced in the synthetic values. Because we are not interested in the individual data sets, but rather in the inference obtained over the multiple data sets, the likelihood of data properties distributed over participants is aggregated to represent the true data generating model. 
 
-# Patents
+That said, while the fields of data disclosure control and data synthetisation originated decades ago, it is more relevant today than ever. In our study we outline a standard research workflow where the goal is to synthesize a complete data set. To simplify the simulation we adopted a bootstrapping scheme to induce sampling variance in order to conform to the combination procedure defined by @reiter_partially_inference_2003. Ideally, one would like to omit the bootstrap from the synthetization to adopt a scheme where the sampled data itself serves as a reference: much like the procedure outlined in @vink2014pooling for incomplete data simulation. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
 
-This section is not mandatory, but may be added if there are patents resulting from the work reported in this manuscript.
+It is important to note that in our simulations we used a single iteration. A single iteration is sufficient only when the true data is completely observed [IBRAHIM ref needed]. If both observed and unobserved values are to be synthesized, then more iterations and a careful investigation into the convergence of the algorithm are in order. Synthetic data generation with `mice` is therein no different than multiple imputation with `mice`. 
+
+There are other developments that can generate synthetic data sets. For example, the `synthpop` @synthpop package in `R` would yield valid synthetic data sets, but requires the true data to be completely observed. To avoid this, one could adopt a two-step approach wherein the incomplete values are multiply imputed before synthetization.  Given $m$ multiple imputations and synthetizations, at least $m^2$ synthetic data sets are then in order. The flexibility with `mice` is that both unobserved and observed data values can be synthesized at once, without the need for a two-step approach. With `mice` $m$ synthetic sets are sufficient.
+
+The ease of use when synthesizing data with `mice` in `R`, together with the validity of inferences obtained through this procedure opens up a wealth of possibilities for data dissemination and further research of initially private data. 

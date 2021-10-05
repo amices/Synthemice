@@ -241,7 +241,9 @@ synthetic_samples <-
                where = matrix(TRUE, nrow(data), ncol(data)),
                print = F)
 }, .options = furrr_options(seed = as.integer(123)))
+```
 
+```{r cache = TRUE}
 true_age <- 
   bootstrap_samples %>%
   map_dfr(~lm(age ~ wgt + hgt, .x) %>%

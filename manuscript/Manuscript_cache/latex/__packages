@@ -1,10 +1,4 @@
 base
-methods
-datasets
-utils
-grDevices
-graphics
-stats
 mice
 tibble
 magrittr
@@ -21,3 +15,6 @@ furrr
 knitr
 kableExtra
 psych
+xtable
+lattice
+caret
