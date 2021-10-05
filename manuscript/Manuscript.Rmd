@@ -2,7 +2,7 @@
 title: "Anony*mice*d shareable data: Using *mice* to create and analyze multiply imputed synthetic data sets"
 author:
   - name: Thom Volker
-    affil: 1,*
+    affil: 1,*, \dagger
     orcid: 0000-0002-2408-7820
   - name: Gerko Vink
     affil: 1, \dagger
@@ -11,8 +11,8 @@ affiliation:
   - num: 1
     address: |
       Utrecht University - 
-      Department of Methodology and Statistics
-      Padualaan 14, 3584CH Utrecht, the Netherlands
+      Department of Methodology and Statistics. 
+      Padualaan 14. 3584CH Utrecht, the Netherlands
 # firstnote to eighthnote
 firstnote: |
   These authors contributed equally to this work.
