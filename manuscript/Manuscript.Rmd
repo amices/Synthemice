@@ -39,7 +39,7 @@ keywords: |
   mice; imputation; synthetic data.
 acknowledgement: |
   We are grateful to Mirthe Hendriks and Stijn van den Broek for replicating the 
-  simulation study on an independent data set. Additionally, we thank Hanne Oberman, [[NOT ANONYMOUS REVIEWER]] and an anonymous reviewer for their stimulating comments.
+  simulation study on an independent data set. Additionally, we thank Hanne Oberman and two anonymous reviewers for their stimulating comments.
 authorcontributions: |
   The authors contributed equally to this work.
 conflictsofinterest: |
@@ -49,19 +49,17 @@ sampleavailability: |
 output: rticles::mdpi_article
 ---
 
-# ADD REVIEWER NAME
-
 # Introduction
 
 Open science, including open data, has been marked as the future of science [@gewin_data_2016], and the advantages of publicly available research data are numerous [@molloy_open_2011; @walport_brest_sharing_2011]. Collecting research data requires an enormous investment both in terms of time and monetary resources. Disseminating the research data bears the potential of increasing the scientific returns for the same data collection effort tremendously. Additionally, the fact that public funds are used for data collection results in increasing demand for access to the collected data. Nevertheless, the possibilities to distribute research data directly are often very limited due to restrictions on data privacy and data confidentiality. Although these regulations are much needed, privacy constraints are also ranked among the toughest challenges to overcome in the advancement of modern day social science research [@lazer_life_2009].
 
 Anonymizing research data might seem a quick and appealing approach to limit the unique identification of participants. However, this approach is not sufficient to fulfil contemporary privacy and confidentiality requirements [@ohm_broken_2009; @national_putting_2007]. Over the years, several other techniques have been used to increase the confidentiality of research data, such as categorizing continuous variables, top coding values above an upper bound or adding random noise to the observed values [@drechsler_synthetic_2011]. However, these methods may distort the true data relation between variables, thereby reducing the data quality and the scientific returns for re-using the same data for further research. 
 
-An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. While in practice, one could see this as replacing the observed data values by multiple draws from the posterior predictive distribution of the observed data, based on some imputation model, Rubin would argue that these synthetic data values are merely draws from the same true data generating model. In that sense, the observed data is never replaced, but the population is resampled from the information captured in the (incomplete) sample. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers.
+An alternative solution has been proposed separately by @rubin_statistical_disclosure_1993 and @little_statistical_1993. Although their approaches differ to some extent, the overarching procedure is to use bonafide observed data to generate multiply imputed synthetic data sets that can be freely disclosed. While in practice, one could see this as replacing the observed data values by multiple draws from the predictive distribution of the observed data, based on some imputation model, Rubin would argue that these synthetic data values are merely draws from the same true data generating model. In that sense, the observed data is never replaced, but the population is resampled from the information captured in the (incomplete) sample. Using this approach, the researcher could replace the observed data set as a whole with multiple synthetic versions. Alternatively, the researcher could opt to only replace a subset of the observed data. For example, one can choose to only replace dimensions in the data that could be compared with publicly available data sets or registers. Likewise, synthetisation could be limited to those values that are disclosive, such as high incomes or high turnovers.
 
-Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation of missing data, as proposed by @rubin_multiple_1987. Instead of replacing just the missing values with multiple draws from the posterior predictive distribution, one could easily replace any observed sensitive values. Similarly to multiple imputation of missing data, the multiple synthetic data sets allow for correct statistical inferences, despite the fact that the analyses do not use the "true" value. The analyses over multiple synthetic data sets should be pooled into a single inference, so that the researcher can draw valid conclusions from the pooled results. To that respect, the variance should reflect the added variability that is induced by the imputation procedure. 
+Conceptually, the synthetic data framework is based upon the building blocks of multiple imputation of missing data, as proposed by @rubin_multiple_1987. Instead of replacing just the missing values, one could easily replace any observed sensitive values by multiple draws from the posterior predictive distribution - or a non-Bayesian predictive distribution. We will refer to both of these as predictive distributions. Similarly to multiple imputation of missing data, the multiple synthetic data sets allow for correct statistical inferences, despite the fact that the analyses do not use the "true" value. The analyses over multiple synthetic data sets should be pooled into a single inference, so that the researcher can draw valid conclusions from the pooled results. To that respect, the variance should reflect the added variability that is induced by the imputation procedure. 
 
-Potentially, this approach could fulfill the needs for openly accessibly data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. The quality of the synthetic data is highly dependent on the imputation models, and using flawed models to generate synthetic data might bias subsequent analyses [@reiter2004simultaneous; @grund2021using; @jiang2021balancing]. Conversely, if the models used to create the synthetic data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. Thus, to fully exploit the benefits of synthetic data, additional complications to actually create these high-quality data sets should be kept at a minimum.
+Potentially, this approach could fulfil the needs for openly accessible data, without running into barriers with regard to privacy and confidentiality constraints. However, there is no such thing as a free lunch: data collectors have to put effort in creating high-quality synthetic data. The quality of the synthetic data is highly dependent on the imputation models, and using flawed imputation models might bias subsequent analyses [@reiter2004simultaneous; @grund2021using; @jiang2021balancing]. Conversely, if the models used to synthesize the data are able to preserve the relationships between the variables as in the original data, the synthetic data can be nearly as informative as the observed data. To fully exploit the benefits of synthetic data, complicating aspects of creating high-quality synthetic data sets should be kept at a minimum, while keeping the accuracy of the models as high as possible.
 
 To mitigate unnecessary challenges related to creating synthetic data sets on behalf of the researcher, software aimed at multiple imputation of missing data can be employed. Especially if researchers acquired familiarity with this software during earlier projects, or used it earlier during the research process, the additional burden of creating synthetic data sets is relatively small. The R-package `mice` [@mice] implements multiple imputation of missing data in a straightforward and user-friendly manner. However, the functionality of `mice` is not restricted to the imputation of missing data, but allows to impute any value in the data: even observed values. Consequently, `mice` can be used for the creation of multiply imputed synthetic data sets. 
 
@@ -71,48 +69,63 @@ In this manuscript we detail a workflow for synthesizing data with `mice`. First
 
 # Generating synthetic data with `mice`
 
+Generally, there are three ways to impute data: joint modeling, sequential modeling and fully conditional specification [@murray_multiple_2018; @ludtke2020regression; @grund2021using]. With joint modeling, the entire joint distribution of the data is specified as a single multivariate distribution, and the imputations are drawn from this model. This strategy is implemented in, among others, the `R`-package `jomo` [@jomo] to deal with missing data. However, when the structure of the data increases in complexity, specifying a single multivariate distribution can become cumbersome. A more flexible solution has been proposed in sequential regression imputation, in which the multivariate distribution is separated into univariate distributions for every variable. Every single variable is then imputed conditional on a model containing only the variables in the sequence located before the variable to be imputed. This approach has been implemented in the R-packages `mdmb` [@mdmb] for imputation of missing data and `synthpop` [@synthpop] for imputation of synthetic data. 
 
-The `mice` package [@mice] in `R` [@Rproject] has been developed for multiple imputation to overcome problems related to nonresponse. In that context, the aim is to replace missing values with plausible values from the posterior predictive distribution of that variable. In `mice`, this is accomplished using fully conditional specification (FCS) [@vanbuuren_fully_2006], which breaks down the multivariate distribution of the data $\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})$ into $j = 1, 2, \dots, k$ univariate conditional densities, where $k$ denotes the number of columns in the data. Using FCS, a model is constructed for every incomplete variable and the missing values $Y_{j, mis}$ are then imputed with draws from the posterior predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ on a variable-by-variable basis. Note that the predictor matrix $Y_{-j}$ may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied $m$ times, resulting in $m$ completed data sets $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$, with $\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})$.
+The `mice` package [@mice] in `R` [@Rproject] has been developed for multiple imputation to overcome problems related to nonresponse. In that context, the aim is to replace missing values with plausible values from the predictive distribution of that variable. In `mice`, this is accomplished using fully conditional specification (FCS) [@vanbuuren_fully_2006], which breaks down the multivariate distribution of the data $\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})$ into $j = 1, 2, \dots, k$ univariate conditional densities, where $k$ denotes the number of columns in the data. Using FCS, a model is constructed for every incomplete variable and the missing values $Y_{j, mis}$ are then imputed with draws from the predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ on a variable-by-variable basis. Note that the predictor matrix $Y_{-j}$ may contain yet imputed values from an earlier imputation step, and thus will be updated after every iteration. This procedure is applied $m$ times, resulting in $m$ completed data sets $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$, with $\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})$.
 
-In `mice`, the generation of multiply imputed data sets to solve for unobserved values is straightforward. The following pseudocode details the multiple imputation of the `mice::boys` data set [@fredriks_boys_2000] into the object `imp` with `m = 10` imputated sets and `maxit = 7` iterations for the algorithm to converge, using the default imputations methods given each column's data class.
+In `mice`, the generation of multiply imputed data sets to solve for unobserved values is straightforward. The following pseudocode details multiple imputation of any data set that contains missingness into the object `imp` with `m = 10` imputated sets and `maxit = 7` iterations for the algorithm to converge, using the default imputations methods.
 
 ```{r eval = FALSE}
 library(mice)
-imp <- mice(boys, 
+imp <- mice(data.with.missings, 
             m = 10,
             maxit = 7)
 ```
 
-It is straightforward to extend the imputation approach to generate synthetic values. Rather than imputing missing data, the observed values are then replaced by synthetic draws from the posterior predictive distribution. For simplicity, assume that the data is completely observed (i.e., $\textbf{Y} = \textbf{Y}_{obs}$). Following the notation of @reiter_raghunathan_multiple_2007, let, given $n$ observations, $Z_i = 1$ if any of the values of unit $i = 1, 2, \dots, n$, are to be replaced by imputations, and $Z_i = 0$ otherwise, with $\textbf{Z} = (Z_1, Z_2, \dots, Z_n)$. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., $\textbf{Y} = (\textbf{Y}_{rep}, \textbf{Y}_{nrep})$. Now, instead of imputing $\textbf{Y}_{mis}$ with draws from the posterior predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ as in the missing data case, $\textbf{Y}_{rep}$ is imputed from the posterior distribution of $P(Y^{(l)}_{j, rep} | \textbf{Y}^{(l)}_{-j}, \textbf{Z}, \theta)$, where $l$ is an indicator for the synthetic data set ($l = 1, 2, \dots, m$). The synthetic values that are imputed at an earlier step can be used for imputing variable $j$. This process results in the synthetic data $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$. Note that, given a completely observed data set, iterating over the posterior predictive distribution is not required. 
+The imputation approach in `mice` can be easily extended to generate synthetic values. Rather than imputing missing data, observed values are then replaced by synthetic draws from the predictive distribution. For simplicity, assume that the data is completely observed (i.e., $\textbf{Y} = \textbf{Y}_{obs}$). Following the notation of @reiter_raghunathan_multiple_2007, let, given $n$ observations, $Z_i = 1$ if any of the values of unit $i = 1, 2, \dots, n$, are to be replaced by imputations, and $Z_i = 0$ otherwise, with $\textbf{Z} = (Z_1, Z_2, \dots, Z_n)$. Accordingly, the data consists of values that are to be replaced and values that are to be kept (i.e., $\textbf{Y} = (\textbf{Y}_{rep}, \textbf{Y}_{nrep})$. Now, instead of imputing $\textbf{Y}_{mis}$ with draws from the predictive distribution of $P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)$ as in the missing data case, $\textbf{Y}_{rep}$ is imputed from the posterior distribution of $P(Y^{(l)}_{j, rep} | \textbf{Y}^{(l)}_{-j}, \textbf{Z}, \theta)$, where $l$ is an indicator for the synthetic data set ($l = 1, 2, \dots, m$). The synthetic values that are imputed at an earlier step can be used for imputing variable $j$. This process results in the synthetic data $\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})$. Note that, given a completely observed data set, iterating over the predictive distribution is not required. 
 
-If the goal is to create synthetic versions of a data set that suffers from missingness, the imputation procedure becomes more complex. A two-step imputation procedure has been proposed by @reiter2004simultaneous. In the first step, the missing data is imputed according to the principles of multiple imputation for missing data, while in a second step, the synthetic data is imputed conform the corresponding procedure. Intuitively, these steps could be combined using `mice`, conditioning the imputations on both the missingness and the values that are to be synthesized. In practice, replacing observed and missing cells in the `mice::boys` data set by synthetic values into the object `syn`, given the same imputation parameters as before, can be realized by the following code execution.
+Hence, creating synthetic values for a completely observed data set into the object `syn`, given the same imputation parameters as specified above, can be realized as follows:
 
 ```{r eval = FALSE}
-syn <- mice(boys, 
+library(mice)
+imp <- mice(data.to.synthesize, 
+            m = 10,
+            maxit = 1,
+            where = matrix(TRUE,
+                           nrow = nrow(data.to.synthesize),
+                           ncol = ncol(data.to.synthetize)))
+```
+
+Here, the argument `where` requires a matrix of the same dimensions as the data, (i.e., a $n \times k$ matrix) containing logicals $z_{ij}$ that indicate which cells are selected to have their values replaced by draws from the predictive distribution. This approach allows to replace a subset of the observed data (e.g., by only specifying those cells that are to be replaced as `TRUE` in the `where`-matrix, leaving the rest to `FALSE`), or as in the aforementioned example, the observed data as a whole, resulting in a data set that partially or completely consists of synthetic data values. Note that because the data is completely observed, iterating over the predictive distribution is not required. 
+
+If the goal is to create synthetic versions of a data set that suffers from missingness, the imputation procedure becomes more complex. A two-step imputation procedure has been proposed by @reiter2004simultaneous. In the first step, the missing data is imputed according to the principles of multiple imputation for missing data, while in a second step, the synthetic data is imputed conform the corresponding procedure. Ideally, these steps could be combined using `mice`, conditioning the imputations on both the missingness and the values that are to be synthesized. In practice, replacing observed and missing cells in a data set by synthetic values into the object `syn`, given the same imputation parameters as before, can be realized by the following code execution.
+
+```{r eval = FALSE}
+syn <- mice(data.with.missings.to.synthesize, 
             m = 10,
             maxit = 7, 
             where = matrix(TRUE, 
-                           nrow = nrow(boys),
-                           ncol = ncol(boys)))
+                           nrow = nrow(data.with.missings.to.synthesize),
+                           ncol = ncol(data.with.missings.to.synthesize)))
 ```
 
-Here, the argument `where` requires a matrix of the same dimensions as the data, (i.e., a $n \times k$ matrix) containing logicals $z_{ij}$ that indicate which cells are selected to have their values replaced by draws from the posterior predictive distribution. This approach allows to replace a subset of the observed data, or as in the aforementioned example, the observed data as a whole, resulting in a data set that partially or completely consists of synthetic data values. However, because the validity of this approach when the data suffers from missingness has not been investigated yet, we restrict ourselves in the following sections to a completely observed data set.However, because the validity of this approach has not been investigated yet, we restrict ourselves in the followi
+However, because the validity of this approach when the data suffers from missingness has not been investigated yet, we restrict ourselves in the following sections to a completely observed data set. 
 
+Choosing an adequate imputation model to impute the data is paramount, as a flawed imputation model may drastically impact the validity of inferences [@grund2021using; @jiang2021balancing]. Imputation models should be as flexible as possible to capture most of the patterns in the data, and to model possibly unanticipated data characteristics [@murray_multiple_2018; @rubin_18years_1996]. Generally, multiple methods can be feasible, including joint modeling, sequential regression and FCS, all with different parameter specifications, depending on the imputation problem at hand [@ludtke2020regression; @yucel2018sequential; @murray2016multiple]. Various simulations have shown that the most accurate imputation procedure may vary over different imputation problems [@hanne_review_2021]. Hence, a one-size-fits-all solution does probably not exist. 
 
-Choosing an adequate imputation model to impute the data is paramount, as a flawed imputation model may drastically impact the validity of inferences [@grund2021using; @jiang2021balancing]. Imputation models should be as flexible as possible to capture most of the patterns in the data, and to model possibly unanticipated data characteristics [@murray_multiple_2018; @rubin_18years_1996]. Parametric methods, albeit easy to implement in practice, may be too restrictive to capture generally complex patterns in the data, especially in the case of nonlinear relations and interactions between multiple variables. Classification and regression trees [CART\; @breiman_cart_1984] allow to model more complex patterns in the data, and have therefore been suggested as an appropriate imputation method [@reiter_cart_2005; @burgette_reiter_cart_2010; @doove_buuren_recursive_2014]. Loosely speaking, CART sequentially splits the predictor space into non-overlapping regions in such a way that the within-region variance is as small as possible after every split. As such, CART does not impose any parametric distribution on the data, making it a widely applicable method that allows for a large variety of relationships within the data [@islr_2013]. Given these appealing characteristics and the call for the use of flexible methods when multiply imputing data, we will focus our illustrations and evaluations of `mice` to method `mice.impute.cart()`, realized by:
+However, one of the methods that has shown a reasonable performance over multiple simulations uses FCS in combination with classification and regression trees [CART\; @breiman_cart_1984; @reiter_cart_2005; @burgette_reiter_cart_2010; @doove_buuren_recursive_2014; @raab_practical_2016]. Due to its non-parametric nature, CART allows to model more complex patterns (e.g., interactions and non-linear relationships) in the data. Loosely speaking, CART sequentially splits the predictor space into non-overlapping regions in such a way that the within-region variance is as small as possible after every split. As such, CART does not impose any parametric distribution on the data, making it a widely applicable method that allows for a large variety of relationships within the data [@islr_2013]. Given these appealing characteristics and the call for the use of flexible methods when multiply imputing data, we will focus our illustrations and evaluations of `mice` to method `mice.impute.cart()`, realized by:
 
 ```{r eval = FALSE}
-syn <- mice(boys, 
+syn <- mice(data.to.synthesize, 
             m = 10,
-            maxit = 7, 
+            maxit = 1, 
             method = "cart",
             where = matrix(TRUE, 
                            nrow = nrow(boys),
                            ncol = ncol(boys)))
 ```
 
-
-In a nutshell, the above code shows the simplicity of creating $m = 10$ synthetic data sets using `mice`. In practice, however, one should take some additional complicating factors into account. For example, one should account for deterministic relations in the data. Additionally, relations between variables may be described best using a different model than `CART`. Such factors are data dependent and should be considered by the imputer. In the next section, we will describe how the `boys` data can be adequately imputed. Additionally, we will show through simulations that this approach yields valid inferences.
+In a nutshell, the above code shows the simplicity of creating $m = 10$ synthetic data sets using `mice`. In practice, however, one should take some additional complicating factors into account. For example, one should account for deterministic relations in the data. Additionally, relations between variables may be described best using a different model than `CART`. Such factors are data dependent and should be considered by the imputer. In the next section, we will describe how the `mice::boys` data [fredriks_boys_2000] can be adequately synthesized. Additionally, we will show through simulations that this approach yields valid inferences.
 
 
 # Materials and Methods
@@ -177,17 +190,21 @@ data <- complete(imp)
 
 ## Simulation methods
 
-Usually, one would draw samples from a population that can be synthesized to evaluate the performance of the synthesization methods. As we only have access to a single sample, 1000 bootstrap samples of the `boys` data have been synthesized with $m = 5$ imputations for every data cell to induce an appropriate amount of sampling variance. Synthetic values are generated using the `CART` imputation method for all columns, except for `bmi`. The deterministic relation `bmi` which will be synthesized passively based on the synthetic values for `hgt` and `wgt` to preserve the relation in the synthetic data. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the synthesis pattern is monotone, the number of iterations can be set to `maxit = 1` [e.g., @drechsler_synthetic_2011, Ch. 3].
+Usually, one would draw samples from a population that can be synthesized to evaluate the performance of the synthetisation methods. As we only have access to a single sample, 1000 bootstrap samples of the `boys` data have been synthesized with $m = 5$ imputations for every data cell to induce an appropriate amount of sampling variance. This approach precludes us from knowing the *true* data-generating model, and in this sense provides a more stringent test of the applicability of `mice` for real-life synthetisation procedures. Specifically, every bootstrapped sample is treated as an actual sample from a population that is synthesized using `mice`, using a model that is built to approximate the true data-generating mechanisms as closely as possible. As relationships in realistic data are generally more complex than relationships in parametrically simulated data, achieving good performance on a real data set is likely to be more indicative of practical applicability than good performance on a parametrically simulated data set.
+
+In the simulations, synthetic values are generated using the `CART` imputation method for all columns, except for `bmi`. The deterministic relation `bmi` which will be synthesized passively based on the synthetic values for `hgt` and `wgt` to preserve the relation in the synthetic data. Additional parameters that come with the use of `mice.impute.cart()` are the complexity parameter `cp` and the minimum number of observations in any terminal node `minbucket`, that both constrain the flexibility of the imputation model. The values of the parameters `cp` and `minbucket` ought to adhere to the call for imputation models that are as flexible as possible. Appropriate values for these parameters, as well as the input for the `predictorMatrix`, depend on the data at hand. In the current example, the complexity parameter is specified at `cp = 1e-08` rather than the default value `1e-04`, and the minimum number of observations in each terminal node is set at `minbucket` $= 3$ rather than the default value $5$. By allowing for more complexity in the imputation model, bias in the estimates from the synthetic data set is reduced. Additionally, since the synthesis pattern is monotone, the number of iterations can be set to `maxit = 1` [e.g., @drechsler_synthetic_2011, Ch. 3].
 
 To assess the performance of `mice` for synthesizing data, we compare the bootstrapped samples with the synthetic versions of these bootstrapped samples. Specifically, univariate descriptive statistics, the correlation matrix, and two linear regression models as well as one ordered logistic regression model will be considered. Subsequently, the bias in the parameters and the $95\%$ confidence interval coverage of the synthetic data will be examined. Similar to multiple imputation of missing data, correct inferences from synthetic data require correct pooling over the multiply imputed data sets. 
 
 Obtaining a final point estimate of the parameter of interest $Q$ after imputation is fairly easy and no different from pooling in the case of missing data [@rubin_multiple_1987]. One can calculate the average of the $m$ point estimates $q^{(l)}$
+
 $$
 \bar{q}_m = \sum_{l = 1}^m \frac{q^{(l)}}{m},
 $$
 with $l = 1, \dots, m$. 
 
 Also similarly to the missing data case, variances, and subsequently confidence intervals, should incorporate the increase in variance that is due to imputation [@reiter_partially_inference_2003; @drechsler_synthetic_2011]. Yet, the increase in variance due to imputation differs according to whether missing values are imputed or observed data is replaced by synthetic values. Whereas the variance estimate after imputation of missing data needs to account for the fact that a certain amount of information in the data is missing, variance estimation from synthetic data does not suffer from this issue. The adjusted variance estimate that follows from using multiple synthetic data sets only suffers from the fact that a finite number of $m$ synthetic data sets are used to resemble the observed data. Hence, the according variance estimate for synthetic data as developed by @reiter_partially_inference_2003 yields
+
 $$
 T = \bar{u}_m + \frac{b_m}{m},
 $$
@@ -202,7 +219,7 @@ and sampling variance
 $$
 \bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
 $$
-where $u^{(l)}$ denotes the variance estimate in the $l$th synthetic data set.
+where $u^{(l)}$ denotes the variance estimate in the $l$th synthetic data set. These pooling rules are implemented in `mice` as the function `pool.syn`. @reiter_kinney_2012 proved that synthesizing data from the posterior predictive distribution is not required for these pooling rules to hold. In fact, the parameters of an imputation model can be fixed to their maximum likelihood estimates or their posterior modes, and synthetic values can be drawn after plugging these values into the imputation models. This observation as been taken a step further by @raab_practical_2016, who developed pooling rules that do not require multiple synthetic data sets and performed highly similar to the aforementioned pooling rules. However, we adhere to the originally proposed pooling rules by @reiter_partially_inference_2003, who defined the total variance in terms of sampling variance and between-imputation variance. 
 
 # Results
 
@@ -241,11 +258,12 @@ synthetic_samples <-
                print = F)
 }, .options = furrr_options(seed = as.integer(123)))
 ```
+
 We evaluate the synthetic data with respect to the *true* data set on the basis of three aims. We believe that every reliable and valid data synthetisation effort in statistical data analysis should be able to yield 1) unbiased univariate statistical properties, 2) unbiased bivariate properties, 3) unbiased and valid multivariate inferences and 4) synthetic data that cannot be distinguished from real data. We consider the evaluation of the synthetic data simulations in the above order.
 
 ## Univariate estimates
 
-The univariate descriptives for the original data and the synthetic data can be found in Table 2. 
+The sampling distribution of the means of the continuous variables for both the bootstrapped and the synthetic data can be found in Figure 1, while the number of observations per category in the bootstrapped data and the averaged number of observations per category over the synthetic data sets can be found in Figure 2. 
 
 ```{r univariate-statistics, echo = FALSE, cache = TRUE, results = FALSE}
 library(xtable)
@@ -257,6 +275,66 @@ synth <- synthetic_samples %>%
   Reduce("+", .) / length(synthetic_samples)
 rownames(true) <- paste("observed", rownames(true), sep = " ")
 rownames(synth) <- paste("synthetic", rownames(synth), sep = " ")
+
+boot_stats_cont <- bootstrap_samples %>% 
+  map_dfr(~.x %>% 
+            select(where(is.numeric)) %>% 
+            pivot_longer(everything()) %>%
+            group_by(name) %>%
+            summarize(mean = mean(value)))
+
+syn_stats_cont <- synthetic_samples  %>%
+  map_dfr(~.x %>%
+            complete("long") %>%
+            select(c(age, hgt, wgt, bmi, hc, tv)) %>%
+            colMeans) %>%
+  pivot_longer(everything(), values_to = "mean")
+
+bind_rows(Boostrapped = boot_stats_cont, 
+          Synthetic = syn_stats_cont, 
+          .id = "Class") %>%
+  ggplot(aes(x = mean, col = Class, fill = Class)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1") +
+  scale_color_brewer(palette = "Set1") +
+  labs(x = "Mean",
+       title = "Empirical sampling distribution of the mean.")
+```
+
+Both figures show that the marginal distributions of the bootstrapped data and the synthetic data are highly similar. Additionally, the univariate descriptives for the original data and the synthetic data can be found in Table 2. 
+
+```{r univariate-statistics-II, echo = FALSE, cache = TRUE, results = FALSE}
+boot_stats_cat <- bootstrap_samples %>%
+  map_dfr(~.x %>%
+            select(!where(is.numeric)) %>%
+            mutate(across(everything(), as.character)) %>%
+            pivot_longer(everything()) %>% 
+            group_by(name, value) %>%
+            summarize(`Number of observations` = n(), .groups = "drop"))
+
+syn_stats_cat <- synthetic_samples %>%
+  map_dfr(~.x %>%
+            complete("long") %>%
+            select(c(gen, phb, reg)) %>%
+            mutate(across(everything(), as.character)) %>%
+            pivot_longer(everything()) %>%
+            group_by(name, value) %>%
+            summarize(`Number of observations` = n() / 5, .groups = "drop"))
+
+bind_rows(Boostrapped = boot_stats_cat, 
+          Synthetic = syn_stats_cat, 
+          .id = "Class") %>%
+  ggplot(aes(y = value, x = `Number of observations`, col = Class, group = Class)) +
+  geom_point(alpha = 0.1, position = position_jitterdodge(jitter.width = 0.2)) +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  labs(x = "Number of observations per category",
+       title = "Distribution of data over different categories.")
+
+
 
 bind_rows(true, setNames(synth, names(true))) %>% 
            arrange(vars) %>% .[, c(2:5, 8:9, 11:12)] %>% round(3) %>% 
@@ -292,6 +370,7 @@ original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\
    \hline
 \end{tabular}
 \end{table}
+
 We see from Table 1 that the synthetic data estimates closely resemble the true data estimates. All sample statistics of interest show negligible bias over the 1000 synthetic data sets. Hence, univariately the imputation model proves adequate.
 
 ## Bivariate estimates
@@ -569,20 +648,18 @@ The accuracy of the predictive modeling effort is not better than random selecti
 
 # Discussion
 
-We demonstrate that generating synthetic data sets with `mice` in `R` is a straightforward process that fits well in a data analysis pipeline. The approach is hardly different from using multiple imputation to solve problems related to missing data, and hence can be expected to be familiar to applied researchers. The multiple synthetic sets yield valid inferences on the true underlying data generating mechanism, thereby capturing the nature of the original data. This makes the multiple synthetisation procedure with `mice` suitable for further dissemination of synthetic data sets.
+We demonstrate that generating synthetic data sets with `mice` using CART in `R` is a straightforward process that fits well in a data analysis pipeline. The approach is hardly different from using multiple imputation to solve problems related to missing data, and hence can be expected to be familiar to applied researchers. The multiple synthetic sets yield valid inferences on the true underlying data generating mechanism, thereby capturing the nature of the original data. This makes the multiple synthetisation procedure with `mice` suitable for further dissemination of synthetic data sets. It is important to note that in our simulations we used a single iteration and relied on CART as the imputation method. A single iteration is sufficient only when the true data is completely observed, or when the missingness pattern is monotone [@drechsler_synthetic_2011]. If both observed and unobserved values are to be synthesized, then more iterations and a careful investigation into the convergence of the algorithm are in order. Synthetic data generation is therein no different than multiple imputation.
 
-To some, the procedure of generating multiple synthetic sets may seem overly complicated. We would like to emphasize that analyzing a single synthesized set, while perhaps unbiased, would underestimate the variance properties that are so important in drawing statistical inferences from finite data sets. After all, we are often not interested in the sample at hand, but aim to make inferences about the underlying data generating mechanism as reflected in the population. Properly capturing the uncertainty of synthetic data sets, just like with incomplete data sets, is therefore paramount. 
+However, when creating synthetic data with `mice`, close attention should be paid to three distinct aspects of the data: incorporating the additional uncertainty that is due synthesizing (part of) the data, potential disclosure risk that remain after synthesizing the data, and the utility of the synthetic data. First, the procedure of generating multiple synthetic sets may seem overly complicated. We would like to emphasize that analyzing a single synthesized set, while perhaps unbiased, would underestimate the variance properties that are so important in drawing statistical inferences from finite data sets. After all, we are often not interested in the sample at hand, but aim to make inferences about the underlying data generating mechanism as reflected in the population. Properly capturing the uncertainty of synthetic data sets, just like with incomplete data sets, is therefore paramount. To achieve this, we adopted a bootstrap scheme in our simulations, to represent sampling from a superpopulation. However, when a single sample should be the reference, in the sense that the sample reflects the population one wishes to make inferences about, adjusted pooling rules are required that are similar to the procedure outlined in @vink2014pooling. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
 
-Besides capturing uncertainty of synthetic data, it is important that imputers pay close attention to disclosure risks that remain after creating synthetic data sets. Creating synthetic data, unless generated from a completely parametric distribution, does not remove all potential disclosure risks. For example, if the values that ought to be replaced get the exact same value imputed, the synthetisation procedure has no use. 
+Second, it is important that imputers pay close attention to disclosure risks that remain after creating synthetic data sets. Creating synthetic data, unless generated from a completely parametric distribution, does not remove all potential disclosure risks. For example, if the values that ought to be replaced get the exact same value imputed, the synthetisation procedure has no use. Additionally, if not all variables in the data are synthesized, but the variables that are synthesized can be linked to open access data, a disclosure risk may remain [@drechsler2011empirical]. If the open access data allows for identification, and the corresponding observations in the synthetic data can be identified, the variables that are not synthesized may provide information that should not have been disseminated. The associated problems generally decrease when the sensitive variables are synthesized as well. Still, it is important to remain critical regarding the extent to which the synthetic data might be disclosive. The practical development of easy to use software to identify which observations are at risk of disclosure is an area of future work that can improve these issues. Subsequently, the implementation of ways to overcome such problems once detected, for example by record swapping as suggested by @jiang2021balancing, is welcomed. 
 
-Additionally, if not all variables in the data are synthesized, but the variables that are synthesized can be linked to open access data, a disclosure risk may remain [@drechsler2011empirical]. If the open access data allows for identification, and the corresponding observations in the synthetic data can be identified, the variables that are not synthesized may provide information that should not have been disseminated. The associated problems generally decrease when the sensitive variables are synthesized as well. Still, it is important to remain critical regarding the extent to which the synthetic data might be disclosive. The practical development of easy to use software to identify which observations are at risk of disclosure is an area of future work that can improve these issues. Subsequently, the implementation of ways to overcome such problems once detected, for example by record swapping as suggested by @jiang2021balancing, is welcomed. 
+Third, the utility of the synthetic data should receive considerable scrutiny. After all, synthetic data is generated to allow third parties without access to the data to make accurate inference. If the quality of the synthetic data is very poor, such accurate inferences are impossible. We showed that CART proved to be an adequate method for the data at hand. However, it may well be that for some problems, using CART for imputation is not the optimal strategy. We already demonstrated that imputing deterministic relationships should not be based on CART. However, due to the variety in possible imputation methods that have proved to perform well in varying circumstances, providing a single solution to all imputation problems seems impossible. If required, imputers could build up their imputation models in complexity. Nevertheless, similarly to past research [e.g., @burgette_reiter_cart_2010; @doove_buuren_recursive_2014; @raab_practical_2016], we showed that CART provides adequate results in general, and therefore serves as a good starting point. 
 
-That said, while the fields of data disclosure control and data synthetisation originated decades ago, it is more relevant today than ever. In our study we outline a standard research workflow where the goal is to synthesize a complete data set. To simplify the simulation we adopted a bootstrapping scheme to induce sampling variance in order to conform to the combination procedure defined by @reiter_partially_inference_2003. Ideally, one would like to omit the bootstrap from the synthetisation to adopt a scheme where the sampled data itself serves as a reference: much like the procedure outlined in @vink2014pooling for incomplete data simulation. The corresponding pooling rules have not been derived yet and the incorporation in data analysis workflows would require proper attention from developers alike. 
+After imputation, the quality of the synthetic data can be assessed using various utility measures. The simplest way to assess data quality is through visual inspection. However, visualizing more than two dimensions quickly becomes cumbersome, which makes it hard to assess the accuracy of multivariate relations. Trying to predict whether the data is observed or synthetic allows to get an intuition of the quality of the data. This procedure has been advanced by @snoke2018general, who proposed a measure of distributional similarity based on the mean squared error of propensity scores indicating class belonging for both observed and synthetic data. Additionally, if one knows the analyses that will be carried out by the synthetic data users, it is possible to compare the results on the observed and the synthetic data, allowing to assess the accuracy of the synthetisation method. Both of these methods have been implemented in the `R`-package `synthpop` [@synthpop], who pioneered in the field of synthetic data generation in `R`. 
 
-There exist other software that is capable of creating synthetic data. For example, the `synthpop` [@synthpop] package in `R` pioneered in the field of synthetic data generation in `R`, and contains many functionalities to create and evaluate synthetic data sets. However, although `synthpop` is capable to synthesize regardless of missing data, it cannot solve eventual missingness problems. If the data for synthetisation contains missing values, the missingness will be considered as a property of the data, and the corresponding synthetic data sets will contain missing values as well. If the goal is to impute and synthesize a data set, a two-step approach must be used, in which the missing values are imputed using a different package, like `mice`, after which `synthpop` can be used to synthesize the imputed data. Then, given $m$ multiple imputations and $r$ synthetisations, at least $m \times r$ synthetic data sets are in order, after which the data can be analysed and the analyses can be pooled using rules developed by @reiter2004simultaneous. However, such an approach would be computationally inefficient and practically cumbersome, because the architectures of both packages differ.
+However, although `synthpop` is capable to synthesize regardless of missing data, it cannot solve eventual missingness problems. If the data for synthetisation contains missing values, the missingness will be considered as a property of the data, and the corresponding synthetic data sets will contain missing values as well. If the goal is to impute and synthesize a data set, a two-step approach must be used, in which the missing values are imputed using a different package, like `mice`, after which `synthpop` can be used to synthesize the imputed data. Then, given $m$ multiple imputations and $r$ synthetisations, at least $m \times r$ synthetic data sets are in order, after which the data can be analysed and the analyses can be pooled using rules developed by @reiter2004simultaneous. However, such an approach would be computationally inefficient and practically cumbersome, because the architectures of both packages differ.
 
-The appealing nature of `mice` therefore lays in its ability to solve both the missingness problem and create synthetic versions of the data. Eventually, the flexibility with `mice` is that both unobserved and observed data values could be synthesized at once, without the need for a two-step approach. Using `mice`, $m$ synthetic sets would sufficient. However, as of today, no pooling rules for one-step imputation of missingness and synthetisation have been developed. The derivation of those would yield a massive theoretical improve to further reduce the burden of creating synthetic data sets. More practically, the `synthpop` package contains functionality that would be highly beneficial to users in `mice`, while `mice` is likely to contain functionality that would be beneficial to `synthpop`. Although efforts have been made to bridge gaps between the packages [e.g., @miceadds_3.11-6], further improvements could be made in that respect. Specifically, `synthpop` contains a wide variety of functions that can be used to assess the quality of synthetic data [e.g., see ADD SNOKE REFERENCE + ARXIV], while `mice` contains methods to impute multilevel data. Being able to use such functionality interchangeably would greatly benefit the public. 
-
-It is important to note that in our simulations we used a single iteration. A single iteration is sufficient only when the true data is completely observed, or when the missingness pattern is monotone [@drechsler_synthetic_2011]. If both observed and unobserved values are to be synthesized, then more iterations and a careful investigation into the convergence of the algorithm are in order. Synthetic data generation with `mice` is therein no different than multiple imputation.
+The appealing nature of `mice` therefore lays in its ability to solve both the missingness problem and create synthetic versions of the data. Eventually, the flexibility with `mice` is that both unobserved and observed data values could be synthesized at once, without the need for a two-step approach. Using `mice`, $m$ synthetic sets would sufficient. However, as of today, no pooling rules for one-step imputation of missingness and synthetisation have been developed. The derivation of those would yield a massive theoretical improve to further reduce the burden of creating synthetic data sets. More practically, the `synthpop` package contains functionality that would be highly beneficial to users in `mice`, while `mice` is likely to contain functionality that would be beneficial to `synthpop`. Although efforts have been made to bridge gaps between the packages [e.g., @miceadds_3.11-6], further improvements could be made in that respect. Specifically, `synthpop` contains a wide variety of functions that can be used to assess the quality of synthetic data [e.g., @snoke2018general], while `mice` contains methods to impute multilevel data. Being able to use such functionality interchangeably would greatly benefit the public. 
 
 The ease of use when synthesizing data with `mice` in `R`, together with the validity of inferences obtained through this procedure opens up a wealth of possibilities for data dissemination and further research of initially private data. 
