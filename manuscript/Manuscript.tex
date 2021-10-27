@@ -1020,9 +1020,13 @@ is observed or synthetic allows to get an intuition of the quality of
 the data. This procedure has been advanced by \citet{snoke2018general},
 who proposed a measure of distributional similarity based on the mean
 squared error of propensity scores indicating class belonging for both
-observed and synthetic data. This method has been implemented in the
-\texttt{R}-package \texttt{synthpop} \citep{synthpop}, who pioneered in
-the field of synthetic data generation in \texttt{R}.
+observed and synthetic data. Additionally, if one knows the analyses
+that will be carried out by the synthetic data users, it is possible to
+compare the results on the observed and the synthetic data, allowing to
+assess the accuracy of the synthetisation method. Both of these methods
+have been implemented in the \texttt{R}-package \texttt{synthpop}
+\citep{synthpop}, who pioneered in the field of synthetic data
+generation in \texttt{R}.
 
 However, although \texttt{synthpop} is capable to synthesize regardless
 of missing data, it cannot solve eventual missingness problems. If the
