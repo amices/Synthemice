@@ -657,9 +657,7 @@ as developed by \citet{reiter_partially_inference_2003} yields
 
 \[
 T = \bar{u}_m + \frac{b_m}{m},
-\]
-
-with between-imputation variance
+\] with between-imputation variance
 
 \[
 b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
@@ -703,14 +701,25 @@ while the number of observations per category in the bootstrapped data
 and the averaged number of observations per category over the synthetic
 data sets can be found in Figure 2.
 
+\begin{figure}
+\centering
 \includegraphics{Manuscript_files/figure-latex/univariate-statistics-1.pdf}
+\caption{Empirical sampling distribution of the bootstrapped and
+synthetic means of the continuous variables in the boys data.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{Manuscript_files/figure-latex/univariate-statistics-II-1.pdf}
+\caption{Empirical sampling distribution of the number within each
+category of the categorical variables in the bootstrapped and synthetic
+boys data.}
+\end{figure}
 
 Both figures show that the marginal distributions of the bootstrapped
 data and the synthetic data are highly similar. Additionally, the
 univariate descriptives for the original data and the synthetic data can
 be found in Table 2.
-
-\includegraphics{Manuscript_files/figure-latex/univariate-statistics-II-1.pdf}
 
 \begin{table}[ht]
 \caption{Univariate descriptives for the true data and $m=5$ pooled univariate descriptives for the synthetic data over 1000 simulations. Variable names followed by a $^*$ are categorical.}
@@ -869,27 +878,6 @@ logistic regression model to predict group membership: i.e.~does a row
 belong to the true data or synthetic data. As predictors we take all
 columns in the data. The pooled parameter estimates over all simulations
 can be found in Table 6.
-
-\begin{verbatim}
-## Loading required package: lattice
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'caret'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:future':
-## 
-##     cluster
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:purrr':
-## 
-##     lift
-\end{verbatim}
 
 \begin{table}[H]
 \caption{Simulation results for a logistic regression model aimed at discriminating between synthetic records and true records.}
