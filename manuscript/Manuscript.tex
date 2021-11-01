@@ -121,13 +121,13 @@
 analyze multiply imputed synthetic data sets}
 
 % Authors, for the paper (add full first names)
-\Author{Thom Volker$^{1,*,
+\Author{Thom Benjamin Volker$^{1,*,
 \dagger}$\href{https://orcid.org/0000-0002-2408-7820}{\orcidicon}, Gerko
 Vink$^{1,
 \dagger}$\href{https://orcid.org/0000-0001-9767-1924}{\orcidicon}}
 
 % Authors, for metadata in PDF
-\AuthorNames{Thom Volker, Gerko Vink}
+\AuthorNames{Thom Benjamin Volker, Gerko Vink}
 
 % Affiliations / Addresses (Add [1] after \address if there is only one affiliation.)
 \address{%
@@ -151,21 +151,24 @@ Statistics. Padualaan 14. 3584CH Utrecht, the Netherlands; \\
 % Simple summary
 
 % Abstract (Do not insert blank lines, i.e. \\)
-\abstract{Synthetic data sets can greatly improve the dissemination of
-data and further analysis of private data. Generating and analyzing
-synthetic data sets is straightforward, yet a synthetic data analysis
-pipeline is seldom adopted by applied researchers. We outline a simple
-procedure for generating and analyzing synthetic data sets with
-\texttt{mice} in \texttt{R}. We demonstrate using simulations that the
-analysis results obtained on synthetic data yields unbiased and valid
-inferences, and leads to synthetic records that cannot be distinguished
-from the true data records. The ease of use when synthesizing data with
-\texttt{mice}, together with the validity of inferences obtained through
-this procedure opens up a wealth of possibilities for data dissemination
-and further research of initially private data.}
+\abstract{Synthetic data sets simultaneously allow for the dissemination
+of research data while protection the privacy and confidentiality of
+respondents. Generating and analyzing synthetic data sets is
+straightforward, yet a synthetic data analysis pipeline is seldom
+adopted by applied researchers. We outline a simple procedure for
+generating and analyzing synthetic data sets with the multiple
+imputation software \texttt{mice} in \texttt{R}. We demonstrate using
+simulations that the analysis results obtained on synthetic data yield
+unbiased and valid inferences, and leads to synthetic records that
+cannot be distinguished from the true data records. The ease of use when
+synthesizing data with \texttt{mice}, together with the validity of
+inferences obtained through this procedure opens up a wealth of
+possibilities for data dissemination and further research of initially
+private data.}
 
 % Keywords
-\keyword{mice; imputation; synthetic data.}
+\keyword{mice; multiple imputation; synthetic data; statistical
+disclosure control; privacy.}
 
 % The fields PACS, MSC, and JEL may be left empty or commented out if not applicable
 %\PACS{J0101}
@@ -270,15 +273,15 @@ blocks of multiple imputation of missing data, as proposed by
 \citet{rubin_multiple_1987}. Instead of replacing just the missing
 values, one could easily replace any observed sensitive values by
 multiple draws from the posterior predictive distribution - or a
-non-Bayesian predictive distribution. We will refer to both of these as
-predictive distributions. Similarly to multiple imputation of missing
-data, the multiple synthetic data sets allow for correct statistical
-inferences, despite the fact that the analyses do not use the ``true''
-value. The analyses over multiple synthetic data sets should be pooled
-into a single inference, so that the researcher can draw valid
-conclusions from the pooled results. To that respect, the variance
-should reflect the added variability that is induced by the imputation
-procedure.
+non-Bayesian predictive distribution (both of these will be referred to
+as predictive distributions). Similarly to multiple imputation of
+missing data, the multiple synthetic data sets allow for correct
+statistical inferences, despite the fact that the analyses do not use
+the \emph{true} value. The analyses over multiple synthetic data sets
+should be pooled into a single inference, so that the researcher can
+draw valid conclusions from the pooled results. To that respect, the
+variance should reflect the added variability that is induced by the
+imputation procedure.
 
 Potentially, this approach could fulfill the needs for openly accessible
 data, without running into barriers with regard to privacy and
@@ -350,12 +353,12 @@ variable to be imputed. This approach has been implemented in the
 R-packages \texttt{mdmb} \citep{mdmb} for imputation of missing data and
 \texttt{synthpop} \citep{synthpop} for imputation of synthetic data.
 
-The \texttt{mice} package \citep{mice} in \texttt{R} \citep{Rproject}
-has been developed for multiple imputation to overcome problems related
-to nonresponse. In that context, the aim is to replace missing values
-with plausible values from the predictive distribution of that variable.
-In \texttt{mice}, this is accomplished using fully conditional
-specification (FCS) \citep{vanbuuren_fully_2006}, which breaks down the
+Fully conditional specification (FCS) has been implemented in the
+\texttt{mice} package \citep{mice, vanbuuren_fully_2006} in \texttt{R}
+\citep{Rproject}, which has been developed for multiple imputation to
+overcome problems related to nonresponse. In that context, the aim is to
+replace missing values with plausible values from the predictive
+distribution of that variable. This is achieved by breaking down the
 multivariate distribution of the data
 \(\textbf{Y} = (\textbf{Y}_{obs}, \textbf{Y}_{mis})\) into
 \(j = 1, 2, \dots, k\) univariate conditional densities, where \(k\)
@@ -368,7 +371,7 @@ may contain yet imputed values from an earlier imputation step, and thus
 will be updated after every iteration. This procedure is applied \(m\)
 times, resulting in \(m\) completed data sets
 \(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\),
-with \(\textbf{D}^{(l)} = (\textbf{Y}_{obs}, Y^{(l)}_{mis})\).
+with \(\textbf{D}^{(l)} = (\textbf{Y}_{obs}, \textbf{Y}^{(l)}_{mis})\).
 
 In \texttt{mice}, the generation of multiply imputed data sets to solve
 for unobserved values is straightforward. The following pseudocode
@@ -394,22 +397,17 @@ observed (i.e., \(\textbf{Y} = \textbf{Y}_{obs}\)). Following the
 notation of \citet{reiter_raghunathan_multiple_2007}, let, given \(n\)
 observations, \(Z_i = 1\) if any of the values of unit
 \(i = 1, 2, \dots, n\), are to be replaced by imputations, and
-\(Z_i = 0\) otherwise, with \(\textbf{Z} = (Z_1, Z_2, \dots, Z_n)\).
-Accordingly, the data consists of values that are to be replaced and
-values that are to be kept (i.e.,
+\(Z_i = 0\) otherwise, with \(Z = (Z_1, Z_2, \dots, Z_n)\). Accordingly,
+the data consists of values that are to be replaced and values that are
+to be kept (i.e.,
 \(\textbf{Y} = (\textbf{Y}_{rep}, \textbf{Y}_{nrep})\). Now, instead of
 imputing \(\textbf{Y}_{mis}\) with draws from the predictive
 distribution of \(P(Y_{j, mis} | \textbf{Y}_{obs}, \theta)\) as in the
 missing data case, \(\textbf{Y}_{rep}\) is imputed from the posterior
-distribution of
-\(P(Y^{(l)}_{j, rep} | \textbf{Y}^{(l)}_{-j}, \textbf{Z}, \theta)\),
+distribution of \(P(Y^{(l)}_{j, rep} | \textbf{Y}_{-j}, Z, \theta)\),
 where \(l\) is an indicator for the synthetic data set
-(\(l = 1, 2, \dots, m\)). The synthetic values that are imputed at an
-earlier step can be used for imputing variable \(j\). This process
-results in the synthetic data
+(\(l = 1, 2, \dots, m\)). This process results in the synthetic data
 \(\textbf{D} = (\textbf{D}^{(1)}, \textbf{D}^{(2)}, \dots, \textbf{D}^{(m)})\).
-Note that, given a completely observed data set, iterating over the
-predictive distribution is not required.
 
 Hence, creating synthetic values for a completely observed data set into
 the object \texttt{syn}, given the same imputation parameters as
@@ -417,7 +415,6 @@ specified above, can be realized as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(mice)}
 \NormalTok{syn }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(data.to.synthesize, }
             \AttributeTok{m =} \DecValTok{10}\NormalTok{,}
             \AttributeTok{maxit =} \DecValTok{1}\NormalTok{,}
@@ -431,8 +428,8 @@ Here, the argument \texttt{where} requires a matrix of the same
 dimensions as the data, (i.e., a \(n \times k\) matrix) containing
 logicals \(z_{ij}\) that indicate which cells are selected to have their
 values replaced by draws from the predictive distribution. This approach
-allows to replace a subset of the observed data (e.g., by only
-specifying those cells that are to be replaced as \texttt{TRUE} in the
+allows to replace a subset of the observed data (e.g., by specifying
+only those cells that are to be replaced as \texttt{TRUE} in the
 \texttt{where}-matrix, leaving the rest to \texttt{FALSE}), or as in the
 aforementioned example, the observed data as a whole, resulting in a
 data set that partially or completely consists of synthetic data values.
@@ -478,25 +475,26 @@ and FCS, all with different parameter specifications, depending on the
 imputation problem at hand
 \citep{ludtke2020regression, yucel2018sequential, murray2016multiple}.
 Various simulations have shown that the most accurate imputation
-procedure may vary over different imputation problems
-\citep{hanne_review_2021}. Hence, a one-size-fits-all solution does
-probably not exist.
+procedure may vary over different imputation problems \citep[e.g., see][
+for an overview]{hanne_review_2021}. Hence, a one-size-fits-all solution
+does probably not exist.
 
 However, one of the methods that has shown a reasonable and consistent
-performance over multiple simulations using FCS in combination with
-classification and regression trees
-\citep[CART;][]{breiman_cart_1984, reiter_cart_2005, burgette_reiter_cart_2010, doove_buuren_recursive_2014, raab_practical_2016}.
-Due to its non-parametric nature, CART allows to model more complex
-patterns (e.g., interactions and non-linear relationships) in the data.
-Loosely speaking, CART sequentially splits the predictor space into
-non-overlapping regions in such a way that the within-region variance is
-as small as possible after every split. As such, CART does not impose
-any parametric distribution on the data, making it a widely applicable
-method that allows for a large variety of relationships within the data
-\citep{islr_2013}. Given these appealing characteristics and the call
-for the use of flexible methods when multiply imputing data, we will
-focus our illustrations and evaluations of \texttt{mice} to method
-\texttt{mice.impute.cart()}, realized by:
+performance over multiple simulations
+\citep[e.g.,][]{reiter_cart_2005, burgette_reiter_cart_2010, doove_buuren_recursive_2014, raab_practical_2016}
+is FCS in combination with classification and regression trees
+\citep[CART;][]{breiman_cart_1984}. Due to its non-parametric nature,
+CART allows to model complex patterns (e.g., interactions and non-linear
+relationships) in the data. Loosely speaking, CART sequentially splits
+the predictor space into non-overlapping regions in such a way that the
+within-region variance is as small as possible after every split. As
+such, CART does not impose any parametric distribution on the data,
+making it a widely applicable method that allows for a large variety of
+relationships within the data to be modeled \citep{islr_2013}. Given
+these appealing characteristics and the call for the use of flexible
+methods when multiply imputing data, we will focus our illustrations and
+evaluations of \texttt{mice} to method \texttt{mice.impute.cart()},
+realized by:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -517,10 +515,10 @@ account. For example, one should account for deterministic relations in
 the data. Additionally, relations between variables may be described
 best using a different model than \texttt{CART}. Such factors are data
 dependent and should be considered by the imputer. In the next section,
-we will describe how the \texttt{mice::boys} data
-\citep{fredriks_boys_2000} can be adequately synthesized. Additionally,
-we will show through simulations that this approach yields valid
-inferences.
+we will describe how a completely observed version of the
+\texttt{mice::boys} data \citep{fredriks_boys_2000} can be adequately
+synthesized. Additionally, we will show through simulations that this
+approach yields valid inferences.
 
 \hypertarget{materials-and-methods}{%
 \section{Materials and Methods}\label{materials-and-methods}}
@@ -552,12 +550,12 @@ reg    & region                     \\
 
 Unfortunately, this data set does not differ from the vast majority of
 collected data sets, in the sense that it suffers from missing data. For
-simplicity, we complete the missing values using the default
-\texttt{mice} imputation model for all predictors except \texttt{bmi},
-which is passively imputed using its deterministic relation with
-\texttt{wgt} and \texttt{hgt}. Specifically, the imputed values are used
-to calculate the exact \texttt{bmi} values that correspond with
-\texttt{hgt} and \texttt{wgt}.
+simplicity, we solve the missingness problem using a single imputation
+with the default \texttt{mice} imputation model for all predictors
+except \texttt{bmi}, which is passively imputed using its deterministic
+relation with \texttt{wgt} and \texttt{hgt}. Specifically, the imputed
+values are used to calculate the exact \texttt{bmi} values that
+correspond with \texttt{hgt} and \texttt{wgt}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -591,13 +589,14 @@ This approach precludes us from knowing the \emph{true} data-generating
 model, and in this sense provides a more stringent test of the
 applicability of \texttt{mice} for real-life synthetisation procedures.
 Specifically, every bootstrapped sample is treated as an actual sample
-from a population that is synthesized using \texttt{mice}, using a model
-that is built to approximate the true data-generating mechanisms as
-closely as possible. As relationships in realistic data are generally
-more complex than relationships in parametrically simulated data,
-achieving good performance on a real data set is likely to be more
-indicative of practical applicability than good performance on a
-parametrically simulated data set.
+from a population. These bootstrap samples will be synthesized using
+\texttt{mice}, using a model that is built to approximate the true
+data-generating mechanisms as closely as possible. As relationships in
+realistic data are generally more complex than relationships in
+parametrically simulated data, achieving good performance on a real data
+set is likely to be more indicative of practical applicability than good
+performance on samples from a known multivariate probability density
+function.
 
 In the simulations, synthetic values are generated using the
 \texttt{CART} imputation method for all columns, except for
@@ -664,7 +663,7 @@ b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 \] and sampling variance
 
 \[
-\bar{u}_m = \sum_{l = 1} \frac{u^{(l)}}{m},
+\bar{u}_m = \sum_{l = 1}^m \frac{u^{(l)}}{m},
 \] where \(u^{(l)}\) denotes the variance estimate in the \(l\)th
 synthetic data set. These pooling rules are implemented in \texttt{mice}
 as the function \texttt{pool.syn}. \citet{reiter_kinney_2012} proved
@@ -675,15 +674,17 @@ their posterior modes, and synthetic values can be drawn after plugging
 these values into the imputation models. This observation as been taken
 a step further by \citet{raab_practical_2016}, who developed pooling
 rules that do not require multiple synthetic data sets and performed
-highly similar to the aforementioned pooling rules. However, we adhere
-to the originally proposed pooling rules by
-\citet{reiter_partially_inference_2003}, who defined the total variance
-in terms of sampling variance and between-imputation variance.
+highly similar to the aforementioned pooling rules. However, because
+these pooling rules can only be used when the complete data (rather than
+a subset of the data) is synthesized, we adhere to the originally
+proposed pooling rules by \citet{reiter_partially_inference_2003}, who
+defined the total variance in terms of sampling variance and
+between-imputation variance.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-We evaluate the synthetic data with respect to the \emph{true} data set
+The synthetic data is evaluated with respect to the \emph{true} data set
 on the basis of three aims. We believe that every reliable and valid
 data synthetisation effort in statistical data analysis should be able
 to yield 1) unbiased univariate statistical properties, 2) unbiased
@@ -695,11 +696,23 @@ order.
 \hypertarget{univariate-estimates}{%
 \subsection{Univariate estimates}\label{univariate-estimates}}
 
+The univariate descriptives for the original data and the synthetic data
+can be found in Table 2. From this table, it can be seen that the
+synthetic data estimates closely resemble the true data estimates. All
+sample statistics of interest show negligible bias over the 1000
+synthetic data sets.
+
 The sampling distribution of the means of the continuous variables for
 both the bootstrapped and the synthetic data can be found in Figure 1,
 while the number of observations per category in the bootstrapped data
 and the averaged number of observations per category over the synthetic
 data sets can be found in Figure 2.
+
+Both figures show that the marginal distributions of the bootstrapped
+data and the synthetic data are highly similar. The sampling
+distributions of these parameters hardly seem to differ. Hence, both the
+numeric and graphical results show that univariately the synthetisation
+model proves adequate.
 
 \begin{figure}
 \centering
@@ -711,18 +724,13 @@ synthetic means of the continuous variables in the boys data.}
 \begin{figure}
 \centering
 \includegraphics{Manuscript_files/figure-latex/univariate-statistics-II-1.pdf}
-\caption{Empirical sampling distribution of the number within each
-category of the categorical variables in the bootstrapped and synthetic
-boys data.}
+\caption{Empirical sampling distribution of the number of observations
+within each category of the categorical variables in the bootstrapped
+and synthetic boys data.}
 \end{figure}
 
-Both figures show that the marginal distributions of the bootstrapped
-data and the synthetic data are highly similar. Additionally, the
-univariate descriptives for the original data and the synthetic data can
-be found in Table 2.
-
 \begin{table}[ht]
-\caption{Univariate descriptives for the true data and $m=5$ pooled univariate descriptives for the synthetic data over 1000 simulations. Variable names followed by a $^*$ are categorical.}
+\caption{Univariate descriptives for the true data and $m=5$ pooled univariate descriptives for the synthetic data over 1000 simulations. Variable names followed by an asterix ($^*$) are categorical.}
 \centering
 \begin{tabular}{rrrrrrrrr}
   \hline
@@ -750,18 +758,14 @@ original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\
 \end{tabular}
 \end{table}
 
-We see from Table 1 that the synthetic data estimates closely resemble
-the true data estimates. All sample statistics of interest show
-negligible bias over the 1000 synthetic data sets. Hence, univariately
-the synthetisation model proves adequate.
-
 \hypertarget{bivariate-estimates}{%
 \subsection{Bivariate estimates}\label{bivariate-estimates}}
 
 An often used bivariate statistic is Pearson's correlation coefficient.
 When evaluating this correlation coefficient on the numeric columns in
-the \texttt{boys} data set, we find that biases are very small. The
-results are displayed in Table 3.
+the \texttt{boys} data set, the differences between the correlations in
+the synthetic and bootstrapped data are very small. These results are
+displayed in Table 3.
 
 \begin{table}[H]
 \caption{Bivariate correlations of the numerical columns in the true data with in parentheses the corresponding bias of the $m=5$ pooled synthetic correlations over 1000 simulations. All estimates are rounded to 3 decimal places. }
@@ -780,10 +784,10 @@ age & 1 & 0.976 (0.001) & 0.950 (0.000) & 0.627 (0.009) & 0.853 (0.000) & 0.810 
 \end{tabular}
 \end{table}
 
-We see that the correlations obtained from synthetic data are unbiased
-with respect to the true data set. The largest absolute bias over 1000
-simulations equals 0.013, indicating that the imputation model is
-capable of preserving the bivariate relations in the data.
+The correlations obtained from synthetic data are unbiased with respect
+to the true data set. The largest bias over 1000 simulations equals
+0.013, indicating that the imputation model is capable of preserving the
+bivariate relations in the data.
 
 \hypertarget{multivariate-model-inferences}{%
 \subsection{Multivariate model
@@ -960,14 +964,14 @@ iterations and a careful investigation into the convergence of the
 algorithm are in order. Synthetic data generation is therein no
 different than multiple imputation.
 
-However, when creating synthetic data with \texttt{mice}, close
-attention should be paid to three distinct aspects of the data:
-incorporating the additional uncertainty that is due to synthesizing
-(part of) the data, potential disclosure risks that remain after
-synthesizing the data, and the utility of the synthetic data. First, the
-procedure of generating multiple synthetic sets may seem overly
-complicated. We would like to emphasize that analyzing a single
-synthesized set, while perhaps unbiased, would underestimate the
+When creating synthetic data with \texttt{mice}, close attention should
+be paid to three distinct factors: (i) the additional uncertainty that
+is due to synthesizing (part of) the data should be incorporated, (ii)
+potential disclosure risks that remain after synthesizing the data
+should be assessed, and (iii) the utility of the synthetic data should
+be examined. First, the procedure of generating multiple synthetic sets
+may seem overly complicated. We would like to emphasize that analyzing a
+single synthesized set, while perhaps unbiased, would underestimate the
 variance properties that are so important in drawing statistical
 inferences from finite data sets. After all, we are often not interested
 in the sample at hand, but aim to make inferences about the underlying
@@ -1045,7 +1049,7 @@ considered as a property of the data, and the corresponding synthetic
 data sets will contain missing values as well. If the goal is to solve
 for the missingness and synthesize the data set, a two-step approach
 must be used, in which the missing values are imputed using a different
-package, like \texttt{mice}. After this, \texttt{synthpop} can be used
+package, like \texttt{mice}. Subsequently, \texttt{synthpop} can be used
 to synthesize the imputed data. Then, given \(m\) multiple imputations
 and \(r\) synthetisations, at least \(m \times r\) synthetic data sets
 are in order, after which the data can be analysed and the analyses can
@@ -1055,15 +1059,14 @@ practically cumbersome, because the architectures of both packages
 differ.
 
 The appealing nature of \texttt{mice} therefore lays in its ability to
-solve both the missingness problem and create synthetic versions of the
-data. Eventually, the flexibility with \texttt{mice} is that both
-unobserved and observed data values could be synthesized at once,
-without the need for a two-step approach. Using \texttt{mice}, \(m\)
-synthetic sets would be sufficient. However, as of today, no pooling
-rules for one-step imputation of missingness and synthetisation have
-been developed. The derivation of those would yield a massive
-theoretical improvement to further reduce the burden of creating
-synthetic data sets.
+both solve the missingness problem and create synthetic versions of the
+data. Eventually, the flexibility with \texttt{mice} is that unobserved
+and observed data values could be synthesized at once, without the need
+for a two-step approach. Using \texttt{mice}, \(m\) synthetic sets would
+be sufficient. However, as of today, no pooling rules for one-step
+imputation of missingness and synthetisation have been developed. The
+derivation of those would yield a massive theoretical improvement to
+further reduce the burden of creating synthetic data sets.
 
 That said, the fields of synthetic data and multiple imputation are very
 much in development. Although efforts have been made to bridge gaps
@@ -1072,10 +1075,10 @@ between these fields, such as in the \texttt{miceadds} package
 \texttt{synthpop} and \texttt{mice}, further improvements could be made
 in that respect. Specifically, \texttt{synthpop} contains a
 comprehensive suite of functions that can be used to assess the quality
-of synthetic data \citep[e.g.,][]{snoke2018general}, while \texttt{mice}
-contains methodology to allow for flexible synthesis of intricate data
-structures, such as multilevel data. Being able to use such
-functionality interchangeably would greatly benefit data analysist.
+of synthetic data \citep[e.g., see][]{snoke2018general}, while
+\texttt{mice} contains methodology to allow for flexible synthesis of
+intricate data structures, such as multilevel data. Being able to use
+such functionality interchangeably would greatly benefit data analysts.
 
 The added possibility of synthesizing data with \texttt{mice} in
 \texttt{R}, together with the validity of inferences obtained through
@@ -1096,8 +1099,8 @@ users.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \acknowledgments{We are grateful to Mirthe Hendriks and Stijn van den
 Broek for replicating the simulation study on an independent data set.
-Additionally, we thank Hanne Oberman and two anonymous reviewers for
-their helpful and insightful comments.}
+Additionally, we thank Hanne Oberman, two anonymous reviewers and the
+editor for their helpful and insightful comments.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \authorcontributions{The authors contributed equally to this work.}
