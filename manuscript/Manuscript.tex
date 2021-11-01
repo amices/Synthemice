@@ -235,7 +235,7 @@ overcome in the advancement of modern day social science research
 
 Anonymizing research data might seem a quick and appealing approach to
 limit the unique identification of participants. However, this approach
-is not sufficient to fulfil contemporary privacy and confidentiality
+is not sufficient to fulfill contemporary privacy and confidentiality
 requirements \citep{ohm_broken_2009, national_putting_2007}. Over the
 years, several other techniques have been used to increase the
 confidentiality of research data, such as categorizing continuous
@@ -340,15 +340,15 @@ as a single multivariate distribution, and the imputations are drawn
 from this model. This strategy is implemented in, among others, the
 \texttt{R}-package \texttt{jomo} \citep{jomo} to deal with missing data.
 However, when the structure of the data increases in complexity,
-specifying a single multivariate distribution can become cumbersome. A
-more flexible solution has been proposed in sequential regression
-imputation, in which the multivariate distribution is separated into
-univariate distributions for every variable. Every single variable is
-then imputed conditional on a model containing only the variables in the
-sequence located before the variable to be imputed. This approach has
-been implemented in the R-packages \texttt{mdmb} \citep{mdmb} for
-imputation of missing data and \texttt{synthpop} \citep{synthpop} for
-imputation of synthetic data.
+specifying a single multivariate distribution that would fit the
+observed data can become challenging. A more flexible solution has been
+proposed in sequential regression imputation, in which the multivariate
+distribution is separated into univariate conditional distributions.
+Every single variable is then imputed conditionally on a model
+containing only the variables in the sequence located before the
+variable to be imputed. This approach has been implemented in the
+R-packages \texttt{mdmb} \citep{mdmb} for imputation of missing data and
+\texttt{synthpop} \citep{synthpop} for imputation of synthetic data.
 
 The \texttt{mice} package \citep{mice} in \texttt{R} \citep{Rproject}
 has been developed for multiple imputation to overcome problems related
@@ -418,7 +418,7 @@ specified above, can be realized as follows:
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(mice)}
-\NormalTok{imp }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(data.to.synthesize, }
+\NormalTok{syn }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(data.to.synthesize, }
             \AttributeTok{m =} \DecValTok{10}\NormalTok{,}
             \AttributeTok{maxit =} \DecValTok{1}\NormalTok{,}
             \AttributeTok{where =} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{,}
@@ -482,9 +482,9 @@ procedure may vary over different imputation problems
 \citep{hanne_review_2021}. Hence, a one-size-fits-all solution does
 probably not exist.
 
-However, one of the methods that has shown a reasonable performance over
-multiple simulations uses FCS in combination with classification and
-regression trees
+However, one of the methods that has shown a reasonable and consistent
+performance over multiple simulations using FCS in combination with
+classification and regression trees
 \citep[CART;][]{breiman_cart_1984, reiter_cart_2005, burgette_reiter_cart_2010, doove_buuren_recursive_2014, raab_practical_2016}.
 Due to its non-parametric nature, CART allows to model more complex
 patterns (e.g., interactions and non-linear relationships) in the data.
@@ -518,7 +518,7 @@ the data. Additionally, relations between variables may be described
 best using a different model than \texttt{CART}. Such factors are data
 dependent and should be considered by the imputer. In the next section,
 we will describe how the \texttt{mice::boys} data
-{[}fredriks\_boys\_2000{]} can be adequately synthesized. Additionally,
+\citep{fredriks_boys_2000} can be adequately synthesized. Additionally,
 we will show through simulations that this approach yields valid
 inferences.
 
@@ -744,7 +744,7 @@ original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\
 We see from Table 1 that the synthetic data estimates closely resemble
 the true data estimates. All sample statistics of interest show
 negligible bias over the 1000 synthetic data sets. Hence, univariately
-the imputation model proves adequate.
+the synthetisation model proves adequate.
 
 \hypertarget{bivariate-estimates}{%
 \subsection{Bivariate estimates}\label{bivariate-estimates}}
@@ -869,6 +869,27 @@ logistic regression model to predict group membership: i.e.~does a row
 belong to the true data or synthetic data. As predictors we take all
 columns in the data. The pooled parameter estimates over all simulations
 can be found in Table 6.
+
+\begin{verbatim}
+## Loading required package: lattice
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'caret'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:future':
+## 
+##     cluster
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     lift
+\end{verbatim}
 
 \begin{table}[H]
 \caption{Simulation results for a logistic regression model aimed at discriminating between synthetic records and true records.}
@@ -1083,7 +1104,7 @@ research of initially private data.
 \acknowledgments{We are grateful to Mirthe Hendriks and Stijn van den
 Broek for replicating the simulation study on an independent data set.
 Additionally, we thank Hanne Oberman and two anonymous reviewers for
-their stimulating comments.}
+their helpful and insightful comments.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \authorcontributions{The authors contributed equally to this work.}
