@@ -98,15 +98,15 @@ syn <- mice(data.to.synthesize,
 
 Here, the argument `where` requires a matrix of the same dimensions as the data, (i.e., a $n \times k$ matrix) containing logicals $z_{ij}$ that indicate which cells are selected to have their values replaced by draws from the predictive distribution. This approach allows to replace a subset of the observed data (e.g., by specifying only those cells that are to be replaced as `TRUE` in the `where`-matrix, leaving the rest to `FALSE`), or as in the aforementioned example, the observed data as a whole, resulting in a data set that partially or completely consists of synthetic data values. Note that because the data is completely observed, iterating over the predictive distribution is not required. 
 
-If the goal is to create synthetic versions of a data set that suffers from missingness, the imputation procedure becomes more complex. A two-step imputation procedure has been proposed by @reiter2004simultaneous. In the first step, the missing data is imputed according to the principles of multiple imputation for missing data, while in a second step, the synthetic data is imputed conform the corresponding procedure. Ideally, these steps could be combined using `mice`, conditioning the imputations on both the missingness and the values that are to be synthesized. In practice, replacing observed and missing cells in a data set by synthetic values into the object `syn`, given the same imputation parameters as before, can be realized by the following code execution.
+If the goal is to create synthetic versions of a data set that suffers from missingness, the imputation procedure becomes more complex. A two-step imputation procedure has been proposed by @reiter2004simultaneous. In the first step, the missing data is imputed according to the principles of multiple imputation for missing data, while in a second step, the synthetic data is imputed conform the corresponding procedure. Ideally, these steps could be combined using `mice`, conditioning the imputations on both the missingness and the values that are to be synthesized. In practice, replacing observed and missing cells in a data set by synthetic values into the object `syn.mis`, given the same imputation parameters as before, can be realized by the following code execution.
 
 ```{r eval = FALSE}
-syn <- mice(data.with.missings.to.synthesize, 
-            m = 10,
-            maxit = 7, 
-            where = matrix(TRUE, 
-                           nrow = nrow(data.with.missings.to.synthesize),
-                           ncol = ncol(data.with.missings.to.synthesize)))
+syn.mis <- mice(data.with.missings.to.synthesize, 
+                m = 10,
+                maxit = 7, 
+                where = matrix(TRUE, 
+                               nrow = nrow(data.with.missings.to.synthesize),
+                               ncol = ncol(data.with.missings.to.synthesize)))
 ```
 
 However, because the validity of this approach when the data suffers from missingness has not been investigated yet, we restrict ourselves in the following sections to a completely observed data set. 
@@ -218,7 +218,14 @@ and sampling variance
 $$
 \bar{u}_m = \sum_{l = 1}^m \frac{u^{(l)}}{m},
 $$
-where $u^{(l)}$ denotes the variance estimate in the $l$th synthetic data set. These pooling rules are implemented in `mice` as the function `pool.syn`. @reiter_kinney_2012 proved that synthesizing data from the posterior predictive distribution is not required for these pooling rules to hold. In fact, the parameters of an imputation model can be fixed to their maximum likelihood estimates or their posterior modes, and synthetic values can be drawn after plugging these values into the imputation models. This observation as been taken a step further by @raab_practical_2016, who developed pooling rules that do not require multiple synthetic data sets and performed highly similar to the aforementioned pooling rules. However, because these pooling rules can only be used when the complete data (rather than a subset of the data) is synthesized, we adhere to the originally proposed pooling rules by @reiter_partially_inference_2003, who defined the total variance in terms of sampling variance and between-imputation variance. 
+where $u^{(l)}$ denotes the variance estimate in the $l$th synthetic data set. These pooling rules are implemented in `mice` as the function `pool.syn()`. Returning to our previous example, pooling the parameter estimates of a linear model in which the dependent variable `DV` is regressed on predictors `IV1` and `IV2` fitted on each of the synthetic data sets is as straightforward as the following code block.
+
+```{r, eval = FALSE}
+fits <- with(syn, lm(DV ~ IV1 + IV2))
+pool.syn(fits)
+```
+
+@reiter_kinney_2012 proved that synthesizing data from the posterior predictive distribution is not required for these pooling rules to hold. In fact, the parameters of an imputation model can be fixed to their maximum likelihood estimates or their posterior modes, and synthetic values can be drawn after plugging these values into the imputation models. This observation as been taken a step further by @raab_practical_2016, who developed pooling rules that do not require multiple synthetic data sets and performed highly similar to the aforementioned pooling rules. However, because these pooling rules can only be used when the complete data (rather than a subset of the data) is synthesized, we adhere to the originally proposed pooling rules by @reiter_partially_inference_2003, who defined the total variance in terms of sampling variance and between-imputation variance. 
 
 # Results
 
@@ -264,12 +271,8 @@ The synthetic data is evaluated with respect to the *true* data set on the basis
 
 The univariate descriptives for the original data and the synthetic data can be found in Table 2. From this table, it can be seen that the synthetic data estimates closely resemble the true data estimates. All sample statistics of interest show negligible bias over the 1000 synthetic data sets. 
 
-The sampling distribution of the means of the continuous variables for both the bootstrapped and the synthetic data can be found in Figure 1, while the number of observations per category in the bootstrapped data and the averaged number of observations per category over the synthetic data sets can be found in Figure 2. 
 
-Both figures show that the marginal distributions of the bootstrapped data and the synthetic data are highly similar. The sampling distributions of these parameters hardly seem to differ. Hence, both the numeric and graphical results show that univariately the synthetisation model proves adequate.
-
-```{r univariate-statistics, echo = FALSE, cache = TRUE, results = FALSE, fig.cap="Empirical sampling distribution of the bootstrapped and synthetic means of the continuous variables in the boys data."}
-
+```{r univ-stats, include = FALSE, cache = TRUE}
 library(xtable)
 
 true <- psych::describe(data)
@@ -281,74 +284,11 @@ synth <- synthetic_samples %>%
 rownames(true) <- paste("observed", rownames(true), sep = " ")
 rownames(synth) <- paste("synthetic", rownames(synth), sep = " ")
 
-boot_stats_cont <- bootstrap_samples %>% 
-  map_dfr(~.x %>% 
-            select(where(is.numeric)) %>% 
-            pivot_longer(everything()) %>%
-            group_by(name) %>%
-            summarize(mean = mean(value)))
-
-syn_stats_cont <- synthetic_samples  %>%
-  map_dfr(~.x %>%
-            complete("long") %>%
-            select(c(age, hgt, wgt, bmi, hc, tv)) %>%
-            colMeans) %>%
-  pivot_longer(everything(), values_to = "mean")
-
-bind_rows(Boostrapped = boot_stats_cont, 
-          Synthetic = syn_stats_cont, 
-          .id = "Class") %>%
-  ggplot(aes(x = mean, col = Class, fill = Class)) +
-  geom_density(alpha = 0.5) +
-  facet_wrap(~name, scales = "free") +
-  theme_classic() +
-  theme(legend.position = "bottom") +
-  scale_fill_brewer(palette = "Set1") +
-  scale_color_brewer(palette = "Set1") +
-  labs(x = "Mean",
-       y = "Density",
-       title = "")
-```
-
-
-```{r univariate-statistics-II, echo = FALSE, cache = TRUE, results = FALSE, fig.cap = "Empirical sampling distribution of the number of observations within each category of the categorical variables in the bootstrapped and synthetic boys data."}
-boot_stats_cat <- bootstrap_samples %>%
-  map_dfr(~.x %>%
-            select(!where(is.numeric)) %>%
-            mutate(across(everything(), as.character)) %>%
-            pivot_longer(everything()) %>% 
-            group_by(name, value) %>%
-            summarize(`Number of observations` = n(), .groups = "drop"))
-
-syn_stats_cat <- synthetic_samples %>%
-  map_dfr(~.x %>%
-            complete("long") %>%
-            select(c(gen, phb, reg)) %>%
-            mutate(across(everything(), as.character)) %>%
-            pivot_longer(everything()) %>%
-            group_by(name, value) %>%
-            summarize(`Number of observations` = n() / 5, .groups = "drop"))
-
-bind_rows(Boostrapped = boot_stats_cat, 
-          Synthetic = syn_stats_cat, 
-          .id = "Class") %>%
-  ggplot(aes(y = value, x = `Number of observations`, fill = Class)) +
-  geom_boxplot(position = "dodge", width = 0.8) +
-  facet_wrap(~name, scales = "free") +
-  theme_classic() +
-  theme(legend.position = "bottom") +
-  scale_fill_brewer(palette = "Set1") +
-  labs(x = "Number of observations per category",
-       y = "Category",
-       title = "")
-```
-
-```{r, include = FALSE}
-library(xtable)
 bind_rows(true, setNames(synth, names(true))) %>% 
            arrange(vars) %>% .[, c(2:5, 8:9, 11:12)] %>% round(3) %>% 
   xtable
 ```
+
 <!-- % latex table generated in R 4.1.0 by xtable 1.8-4 package -->
 <!-- % Mon Oct  4 16:47:59 2021 -->
 \begin{table}[ht]
@@ -380,6 +320,74 @@ original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\
 \end{tabular}
 \end{table}
 
+
+```{r univariate-statistics, echo = FALSE, cache = TRUE, results = FALSE, fig.cap="Empirical sampling distribution of the bootstrapped and synthetic means of the continuous variables in the boys data."}
+
+boot_stats_cont <- bootstrap_samples %>% 
+  map_dfr(~.x %>% 
+            select(where(is.numeric)) %>% 
+            pivot_longer(everything()) %>%
+            group_by(name) %>%
+            summarize(mean = mean(value)))
+
+syn_stats_cont <- synthetic_samples  %>%
+  map_dfr(~.x %>%
+            complete("long") %>%
+            select(c(age, hgt, wgt, bmi, hc, tv)) %>%
+            colMeans) %>%
+  pivot_longer(everything(), values_to = "mean")
+
+bind_rows(Bootstrapped = boot_stats_cont, 
+          Synthetic = syn_stats_cont, 
+          .id = "Class") %>%
+  ggplot(aes(x = mean, col = Class, fill = Class)) +
+  geom_density(alpha = 0) +
+  facet_wrap(~name, scales = "free") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  scale_fill_brewer(palette = "Set1", direction = -1) +
+  scale_color_brewer(palette = "Set1", direction = -1) +
+  labs(x = "Mean",
+       y = "Density",
+       title = "")
+```
+
+
+```{r univariate-statistics-II, echo = FALSE, cache = TRUE, results = FALSE, fig.cap = "Empirical sampling distribution of the number of observations within each category of the categorical variables in the bootstrapped and synthetic boys data."}
+boot_stats_cat <- bootstrap_samples %>%
+  map_dfr(~.x %>%
+            select(!where(is.numeric)) %>%
+            mutate(across(everything(), as.character)) %>%
+            pivot_longer(everything()) %>% 
+            group_by(name, value) %>%
+            summarize(`Number of observations` = n(), .groups = "drop"))
+
+syn_stats_cat <- synthetic_samples %>%
+  map_dfr(~.x %>%
+            complete("long") %>%
+            select(c(gen, phb, reg)) %>%
+            mutate(across(everything(), as.character)) %>%
+            pivot_longer(everything()) %>%
+            group_by(name, value) %>%
+            summarize(`Number of observations` = n() / 5, .groups = "drop"))
+
+bind_rows(Bootstrapped = boot_stats_cat, 
+          Synthetic = syn_stats_cat, 
+          .id = "Class") %>%
+  ggplot(aes(y = value, x = `Number of observations`, fill = Class)) +
+  geom_boxplot(position = "dodge", width = 0.8) +
+  facet_wrap(~name, scales = "free") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  scale_fill_brewer(palette = "Set1", direction = -1) +
+  labs(x = "Number of observations per category",
+       y = "Category",
+       title = "")
+```
+
+The sampling distribution of the means of the continuous variables for both the bootstrapped and the synthetic data can be found in Figure 1, while the number of observations per category in the bootstrapped data and the averaged number of observations per category over the synthetic data sets can be found in Figure 2. 
+
+Both figures show that the marginal distributions of the bootstrapped data and the synthetic data are highly similar. The sampling distributions of these parameters hardly seem to differ. Hence, both the numeric and graphical results show that univariately the synthetisation model proves adequate.
 
 ## Bivariate estimates
 
