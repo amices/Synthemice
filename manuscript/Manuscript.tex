@@ -557,26 +557,6 @@ relation with \texttt{wgt} and \texttt{hgt}. Specifically, the imputed
 values are used to calculate the exact \texttt{bmi} values that
 correspond with \texttt{hgt} and \texttt{wgt}.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# create a single imputed, completely observed \textasciigrave{}boys\textasciigrave{} data set}
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
-
-\NormalTok{meth }\OtherTok{\textless{}{-}} \FunctionTok{make.method}\NormalTok{(boys)}
-\NormalTok{meth[}\StringTok{"bmi"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"\textasciitilde{} I(wgt / (hgt / 100)\^{}2)"}
-\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{make.predictorMatrix}\NormalTok{(boys)}
-\NormalTok{pred[}\FunctionTok{c}\NormalTok{(}\StringTok{"hgt"}\NormalTok{, }\StringTok{"wgt"}\NormalTok{), }\StringTok{"bmi"}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
-
-\NormalTok{imp }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(boys, }
-            \AttributeTok{m =} \DecValTok{1}\NormalTok{,}
-            \AttributeTok{maxit =} \DecValTok{10}\NormalTok{,}
-            \AttributeTok{method =}\NormalTok{ meth,}
-            \AttributeTok{predictorMatrix =}\NormalTok{ pred)}
-
-\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{complete}\NormalTok{(imp)}
-\end{Highlighting}
-\end{Shaded}
-
 \hypertarget{simulation-methods}{%
 \subsection{Simulation methods}\label{simulation-methods}}
 

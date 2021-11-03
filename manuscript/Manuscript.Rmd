@@ -170,7 +170,7 @@ library(kableExtra)
 ```
 
 
-```{r true-data, results = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+```{r true-data, include = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
 # create a single imputed, completely observed `boys` data set
 set.seed(123)
 
