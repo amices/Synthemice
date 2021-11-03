@@ -446,17 +446,17 @@ corresponding procedure. Ideally, these steps could be combined using
 \texttt{mice}, conditioning the imputations on both the missingness and
 the values that are to be synthesized. In practice, replacing observed
 and missing cells in a data set by synthetic values into the object
-\texttt{syn}, given the same imputation parameters as before, can be
+\texttt{syn.mis}, given the same imputation parameters as before, can be
 realized by the following code execution.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{syn }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(data.with.missings.to.synthesize, }
-            \AttributeTok{m =} \DecValTok{10}\NormalTok{,}
-            \AttributeTok{maxit =} \DecValTok{7}\NormalTok{, }
-            \AttributeTok{where =} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, }
-                           \AttributeTok{nrow =} \FunctionTok{nrow}\NormalTok{(data.with.missings.to.synthesize),}
-                           \AttributeTok{ncol =} \FunctionTok{ncol}\NormalTok{(data.with.missings.to.synthesize)))}
+\NormalTok{syn.mis }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(data.with.missings.to.synthesize, }
+                \AttributeTok{m =} \DecValTok{10}\NormalTok{,}
+                \AttributeTok{maxit =} \DecValTok{7}\NormalTok{, }
+                \AttributeTok{where =} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, }
+                               \AttributeTok{nrow =} \FunctionTok{nrow}\NormalTok{(data.with.missings.to.synthesize),}
+                               \AttributeTok{ncol =} \FunctionTok{ncol}\NormalTok{(data.with.missings.to.synthesize)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -557,26 +557,6 @@ relation with \texttt{wgt} and \texttt{hgt}. Specifically, the imputed
 values are used to calculate the exact \texttt{bmi} values that
 correspond with \texttt{hgt} and \texttt{wgt}.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# create a single imputed, completely observed \textasciigrave{}boys\textasciigrave{} data set}
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
-
-\NormalTok{meth }\OtherTok{\textless{}{-}} \FunctionTok{make.method}\NormalTok{(boys)}
-\NormalTok{meth[}\StringTok{"bmi"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"\textasciitilde{} I(wgt / (hgt / 100)\^{}2)"}
-\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{make.predictorMatrix}\NormalTok{(boys)}
-\NormalTok{pred[}\FunctionTok{c}\NormalTok{(}\StringTok{"hgt"}\NormalTok{, }\StringTok{"wgt"}\NormalTok{), }\StringTok{"bmi"}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
-
-\NormalTok{imp }\OtherTok{\textless{}{-}} \FunctionTok{mice}\NormalTok{(boys, }
-            \AttributeTok{m =} \DecValTok{1}\NormalTok{,}
-            \AttributeTok{maxit =} \DecValTok{10}\NormalTok{,}
-            \AttributeTok{method =}\NormalTok{ meth,}
-            \AttributeTok{predictorMatrix =}\NormalTok{ pred)}
-
-\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{complete}\NormalTok{(imp)}
-\end{Highlighting}
-\end{Shaded}
-
 \hypertarget{simulation-methods}{%
 \subsection{Simulation methods}\label{simulation-methods}}
 
@@ -666,20 +646,32 @@ b_m = \sum_{l = 1}^m \frac{(q^{(l)} - \bar{q}_m)^2}{(m - 1)}, \\
 \bar{u}_m = \sum_{l = 1}^m \frac{u^{(l)}}{m},
 \] where \(u^{(l)}\) denotes the variance estimate in the \(l\)th
 synthetic data set. These pooling rules are implemented in \texttt{mice}
-as the function \texttt{pool.syn}. \citet{reiter_kinney_2012} proved
-that synthesizing data from the posterior predictive distribution is not
-required for these pooling rules to hold. In fact, the parameters of an
-imputation model can be fixed to their maximum likelihood estimates or
-their posterior modes, and synthetic values can be drawn after plugging
-these values into the imputation models. This observation as been taken
-a step further by \citet{raab_practical_2016}, who developed pooling
-rules that do not require multiple synthetic data sets and performed
-highly similar to the aforementioned pooling rules. However, because
-these pooling rules can only be used when the complete data (rather than
-a subset of the data) is synthesized, we adhere to the originally
-proposed pooling rules by \citet{reiter_partially_inference_2003}, who
-defined the total variance in terms of sampling variance and
-between-imputation variance.
+as the function \texttt{pool.syn()}. Returning to our previous example,
+pooling the parameter estimates of a linear model in which the dependent
+variable \texttt{DV} is regressed on predictors \texttt{IV1} and
+\texttt{IV2} fitted on each of the synthetic data sets is as
+straightforward as the following code block.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fits }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(syn, }\FunctionTok{lm}\NormalTok{(DV }\SpecialCharTok{\textasciitilde{}}\NormalTok{ IV1 }\SpecialCharTok{+}\NormalTok{ IV2))}
+\FunctionTok{pool.syn}\NormalTok{(fits)}
+\end{Highlighting}
+\end{Shaded}
+
+\citet{reiter_kinney_2012} proved that synthesizing data from the
+posterior predictive distribution is not required for these pooling
+rules to hold. In fact, the parameters of an imputation model can be
+fixed to their maximum likelihood estimates or their posterior modes,
+and synthetic values can be drawn after plugging these values into the
+imputation models. This observation as been taken a step further by
+\citet{raab_practical_2016}, who developed pooling rules that do not
+require multiple synthetic data sets and performed highly similar to the
+aforementioned pooling rules. However, because these pooling rules can
+only be used when the complete data (rather than a subset of the data)
+is synthesized, we adhere to the originally proposed pooling rules by
+\citet{reiter_partially_inference_2003}, who defined the total variance
+in terms of sampling variance and between-imputation variance.
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
@@ -701,33 +693,6 @@ can be found in Table 2. From this table, it can be seen that the
 synthetic data estimates closely resemble the true data estimates. All
 sample statistics of interest show negligible bias over the 1000
 synthetic data sets.
-
-The sampling distribution of the means of the continuous variables for
-both the bootstrapped and the synthetic data can be found in Figure 1,
-while the number of observations per category in the bootstrapped data
-and the averaged number of observations per category over the synthetic
-data sets can be found in Figure 2.
-
-Both figures show that the marginal distributions of the bootstrapped
-data and the synthetic data are highly similar. The sampling
-distributions of these parameters hardly seem to differ. Hence, both the
-numeric and graphical results show that univariately the synthetisation
-model proves adequate.
-
-\begin{figure}
-\centering
-\includegraphics{Manuscript_files/figure-latex/univariate-statistics-1.pdf}
-\caption{Empirical sampling distribution of the bootstrapped and
-synthetic means of the continuous variables in the boys data.}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{Manuscript_files/figure-latex/univariate-statistics-II-1.pdf}
-\caption{Empirical sampling distribution of the number of observations
-within each category of the categorical variables in the bootstrapped
-and synthetic boys data.}
-\end{figure}
 
 \begin{table}[ht]
 \caption{Univariate descriptives for the true data and $m=5$ pooled univariate descriptives for the synthetic data over 1000 simulations. Variable names followed by an asterix ($^*$) are categorical.}
@@ -757,6 +722,33 @@ original age & 748 & 9.16 & 6.89 & 10.50 & 0.04 & 21.18 & -0.03 & -1.56 \\
    \hline
 \end{tabular}
 \end{table}
+
+\begin{figure}
+\centering
+\includegraphics{Manuscript_files/figure-latex/univariate-statistics-1.pdf}
+\caption{Empirical sampling distribution of the bootstrapped and
+synthetic means of the continuous variables in the boys data.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{Manuscript_files/figure-latex/univariate-statistics-II-1.pdf}
+\caption{Empirical sampling distribution of the number of observations
+within each category of the categorical variables in the bootstrapped
+and synthetic boys data.}
+\end{figure}
+
+The sampling distribution of the means of the continuous variables for
+both the bootstrapped and the synthetic data can be found in Figure 1,
+while the number of observations per category in the bootstrapped data
+and the averaged number of observations per category over the synthetic
+data sets can be found in Figure 2.
+
+Both figures show that the marginal distributions of the bootstrapped
+data and the synthetic data are highly similar. The sampling
+distributions of these parameters hardly seem to differ. Hence, both the
+numeric and graphical results show that univariately the synthetisation
+model proves adequate.
 
 \hypertarget{bivariate-estimates}{%
 \subsection{Bivariate estimates}\label{bivariate-estimates}}
